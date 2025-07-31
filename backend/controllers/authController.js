@@ -1,9 +1,10 @@
+const jwt = require("jsonwebtoken");
 const Usuario = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
   try {
-    const { nombre, email, password, rol, direccion, telefono } = req.body;
+const { nombre, email, password, direccion, telefono } = req.body;
 
     if (!nombre || !email || !password) {
       return res.status(400).json({ mensaje: "Todos los campos son obligatorios" });
@@ -20,7 +21,7 @@ const register = async (req, res) => {
       nombre,
       email,
       password: hashedPassword,
-      rol,
+      rol: "user",
       direccion,
       telefono,
       activo: true
@@ -31,15 +32,64 @@ const register = async (req, res) => {
     res.status(201).json({ mensaje: "Usuario creado correctamente" });
   } catch (error) {
     console.error("Error en register:", error);
-    res.status(500).json({ mensaje: "Error al registrar usuario" });
+    res.status(400).json({ success: false, error: error.message }); // <--- AQUI
+  }
+
+};
+
+
+//  LOGIN
+const login = async (req, res) => {
+  try {
+    let { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ mensaje: "Todos los campos son obligatorios" });
+    }
+
+    email = email.trim().toLowerCase(); // 🔥 Limpiar y normalizar el email
+    const usuario = await Usuario.findOne({ email });
+
+    console.log("🟡 Email recibido:", email);
+    console.log("🔵 Usuario encontrado:", usuario);
+
+    if (!usuario) {
+      return res.status(401).json({ mensaje: "Credenciales inválidas" });
+    }
+
+    const passwordValido = await bcrypt.compare(password, usuario.password);
+    console.log("✅ Password válido:", passwordValido);
+
+    if (!passwordValido) {
+      return res.status(401).json({ mensaje: "Credenciales inválidas" });
+    }
+
+    const token = jwt.sign(
+      { id: usuario._id, rol: usuario.rol },
+      process.env.JWT_SECRET || "secreto",
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      mensaje: "Inicio de sesión exitoso",
+      token,
+      usuario: {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+      },
+    });
+
+  } catch (error) {
+    console.error("❌ Error en login:", error);
+    res.status(500).json({ mensaje: "Error en el servidor al iniciar sesión" });
   }
 };
 
-const login = async (req, res) => {
-  // puedes implementarlo después
-};
+
 
 module.exports = {
   register,
-  login
+  login,
 };

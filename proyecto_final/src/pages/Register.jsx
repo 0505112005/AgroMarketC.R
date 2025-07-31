@@ -32,6 +32,9 @@ const Register = () => {
         return;
       }
 
+      // Guardar en localStorage que tiene perfil
+      localStorage.setItem("tienePerfil", "true");
+
       // Limpiar formulario después de éxito
       setForm({
         nombre: "",
@@ -41,6 +44,7 @@ const Register = () => {
         direccion: "",
         telefono: "",
       });
+
       alert(result.message || "Registro exitoso");
     } catch (error) {
       console.error("Error en registro:", error);
@@ -99,22 +103,11 @@ const Register = () => {
           value={form.telefono}
           className="p-2 border rounded"
         />
-        <select
-          name="rol"
-          onChange={handleChange}
-          value={form.rol}
-          className="p-2 border rounded"
-        >
-          <option value="cliente">Cliente</option>
-          <option value="tienda">Tienda</option>
-        </select>
         <button
           type="submit"
           disabled={loading}
           className={`p-2 rounded text-white ${
-            loading
-              ? "bg-gray-400"
-              : "bg-green-600 hover:bg-green-700"
+            loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
           }`}
         >
           {loading ? "Registrando..." : "Registrarse"}
