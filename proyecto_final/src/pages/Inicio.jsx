@@ -25,41 +25,112 @@ const Inicio = () => {
     <div className="container">
       {/* HEADER */}
       <header className="header">
-        <h1>🌿 Mercado Orgánico</h1>
+        <h1>🌿 Agro Market</h1>
         <div className="header-buttons">
           <button onClick={() => navigate("/vender")}>🛒 Vender</button>
-          <button onClick={() => navigate("/Perfil")}>👤 Perfil</button>
+          
         </div>
       </header>
 
       {/* LAYOUT */}
       <div className="content">
         <aside className="sidebar">
-          <h3>Filtros</h3>
-          <ul>
-            <li>100% Orgánico</li>
-            <li>75% Orgánico</li>
-            <li>50% Orgánico</li>
-          </ul>
+          <div className="logo">
+            <h2>🌿</h2>
+          </div>
+
+          <nav className="nav-menu">
+            <ul>
+              <li>
+                <button>📊 Dashboard</button>
+              </li>
+              <li>
+                <button>📦 Catálogo</button>
+              </li>
+              <li>
+                <button>🛒 Carrito</button>
+              </li>
+              <li>
+                <button>📃 Pedidos</button>
+              </li>
+            </ul>
+          </nav>
+
+          <div className="usuario">
+            <img
+              src="ruta-del-avatar.jpg"
+              alt="Avatar"
+              className="avatar"
+            />
+            <div className="info-usuario">
+              <p className="nombre">Rodolfo</p>
+              <p className="rol">Comprador</p>
+              <div className="header-buttons">
+                <button onClick={() => navigate("/Perfil")}>👤 Perfil</button>
+                
+              </div>
+          
+            </div>
+          </div>
         </aside>
 
         <main className="main">
-          <h2>Productos disponibles</h2>
-          {productos.length === 0 ? (
-            <p>No hay productos disponibles</p>
-          ) : (
-            <div className="productos-grid">
-              {productos.map((producto) => (
-                <div className="card" key={producto._id}>
-                  <h3>{producto.nombre}</h3>
-                  <p className="descripcion">{producto.descripcion}</p>
-                  <p className="certificacion">
-                    <strong>Certificación:</strong> {producto.certificacion}
-                  </p>
-                </div>
-              ))}
+          <section className="catalogo">
+            <h2 className="titulo">Catálogo de Productos</h2>
+            <p className="subtitulo">
+              Descubre los mejores productos agrícolas directamente de nuestros agricultores
+            </p>
+
+            <div className="filtros">
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                className="buscador"
+              />
+              <select className="dropdown">
+                <option>Todas las categorías</option>
+                <option>Frutas</option>
+                <option>Verduras</option>
+                <option>Café</option>
+                <option>Otros</option>
+              </select>
+              <select className="dropdown">
+                <option>Nombre A-Z</option>
+                <option>Nombre Z-A</option>
+                <option>Precio más bajo</option>
+                <option>Precio más alto</option>
+              </select>
+              <span className="resultados">
+                {productos.length} productos encontrados
+              </span>
             </div>
-          )}
+
+            <div className="productos-grid">
+              {productos.length === 0 ? (
+                <p>No hay productos disponibles</p>
+              ) : (
+                productos.map((producto) => (
+                  <div className="card" key={producto._id}>
+                    <div className="card-etiqueta">Orgánico</div>
+                    <img
+                      src={producto.imagen}
+                      alt={producto.nombre}
+                      className="card-imagen"
+                    />
+                    <h3 className="card-nombre">{producto.nombre}</h3>
+                    <p className="card-ubicacion">{producto.ubicacion}</p>
+                    <p className="card-precio">€{producto.precio} /kg</p>
+                    <p className="card-stock">Stock: {producto.stock} kg</p>
+                    <p className="card-productor">Por: {producto.productor}</p>
+                    <div className="card-botones">
+                      <button className="ver">Ver</button>
+                      <button className="agregar">Agregar</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
         </main>
       </div>
 

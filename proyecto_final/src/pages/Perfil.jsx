@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../estilos/Perfil.css";
 
 const Perfil = () => {
   const [usuario, setUsuario] = useState(null);
@@ -27,13 +28,21 @@ const Perfil = () => {
   if (!usuario) return <p>Cargando perfil...</p>;
 
   return (
-    <div>
-      <h2>Mi Perfil</h2>
-      <p><strong>Nombre:</strong> {usuario.nombre}</p>
-      <p><strong>Email:</strong> {usuario.email}</p>
-      <p><strong>Rol:</strong> {usuario.rol}</p>
-
-      <button onClick={handleLogout}>Cerrar sesión</button>
+    <div className="perfil-container">
+      <div className="perfil-card">
+        <div className="perfil-avatar">
+          <img
+            src={usuario.avatar || "/avatar-default.png"}
+            alt="Avatar"
+          />
+        </div>
+        <h2>{usuario.nombre}</h2>
+        <p className="perfil-rol">{usuario.rol}</p>
+        <p><strong>Email:</strong> {usuario.email}</p>
+        <button className="perfil-logout" onClick={handleLogout}>
+           Cerrar sesión
+        </button>
+      </div>
     </div>
   );
 };
