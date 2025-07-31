@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "../estilos/Vender.css";
 
 function Vender() {
     const [producto, setProducto] = useState({
@@ -6,7 +7,7 @@ function Vender() {
         descripcion: '',
         precio: '',
         imagen: '',
-        certificacion: '100% orgánico y 0% químico' // valor por defecto
+        certificacion: '100% orgánico y 0% químico'
     });
 
     const handleChange = (e) => {
@@ -43,48 +44,79 @@ function Vender() {
     };
 
     return (
-        <div style={{ padding: '1rem' }}>
-            <h1>Publicar nuevo producto</h1>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
-                <input
-                    type="text"
-                    name="nombre"
-                    placeholder="Nombre del producto"
-                    value={producto.nombre}
-                    onChange={handleChange}
-                    required
-                />
-                <textarea
-                    name="descripcion"
-                    placeholder="Descripción"
-                    value={producto.descripcion}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="number"
-                    name="precio"
-                    placeholder="Precio (₡)"
-                    value={producto.precio}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="text"
-                    name="imagen"
-                    placeholder="URL de imagen"
-                    value={producto.imagen}
-                    onChange={handleChange}
-                />
-                <select name="certificacion" value={producto.certificacion} onChange={handleChange} required>
-                    <option value="">Selecciona certificación</option>
-                    <option value="100%">100% orgánico - 0% químico</option>
-                    <option value="75%">75% orgánico - 25% químico</option>
-                    <option value="50%">50% orgánico - 50% químico</option>
-                </select>
-
-                <button type="submit">Publicar producto</button>
-            </form>
+        <div className="vender-container">
+            <section className="formulario-agregar">
+                <h2>📦 Agregar Nuevo Producto</h2>
+                <form className="formulario" onSubmit={handleSubmit}>
+                    <div className="campo">
+                        <label>Nombre del producto</label>
+                        <input
+                            type="text"
+                            name="nombre"
+                            placeholder="Ej. Tomates Orgánicos"
+                            value={producto.nombre}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="campo">
+                        <label>Descripción</label>
+                        <textarea
+                            name="descripcion"
+                            placeholder="Describe el producto..."
+                            rows="3"
+                            value={producto.descripcion}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="campo">
+                        <label>Precio por unidad</label>
+                        <input
+                            type="number"
+                            name="precio"
+                            placeholder="₡0.00"
+                            value={producto.precio}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="campo">
+                        <label>Imagen (URL opcional)</label>
+                        <input
+                            type="text"
+                            name="imagen"
+                            placeholder="https://..."
+                            value={producto.imagen}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className="campo">
+                        <label>Certificación</label>
+                        <select
+                            name="certificacion"
+                            value={producto.certificacion}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Selecciona certificación</option>
+                            <option value="100%">100% orgánico - 0% químico</option>
+                            <option value="75%">75% orgánico - 25% químico</option>
+                            <option value="50%">50% orgánico - 50% químico</option>
+                        </select>
+                    </div>
+                    <div className="botones-formulario">
+                        <button type="submit" className="publicar"> Publicar producto</button>
+                        <button
+                            type="button"
+                            className="volver-inicio"
+                            onClick={() => window.location.href = "/"}
+                        >
+                            Volver a inicio
+                        </button>
+                    </div>
+                </form>
+            </section>
         </div>
     );
 }

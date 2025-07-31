@@ -39,9 +39,17 @@ const Perfil = () => {
         <h2>{usuario.nombre}</h2>
         <p className="perfil-rol">{usuario.rol}</p>
         <p><strong>Email:</strong> {usuario.email}</p>
-        <button className="perfil-logout" onClick={handleLogout}>
-           Cerrar sesión
-        </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginTop: "1.5rem" }}>
+          <button className="perfil-logout" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+          <button
+            className="perfil-logout"
+            onClick={() => navigate("/")}
+          >
+            Volver a inicio
+          </button>
+        </div>
       </div>
     </div>
   );
