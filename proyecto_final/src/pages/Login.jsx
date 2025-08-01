@@ -28,6 +28,9 @@ const Login = () => {
         throw new Error(data.mensaje || "Error al iniciar sesión");
       }
 
+      // ✅ Muestra en consola lo que envía el backend
+      console.log("Usuario recibido del backend:", data.usuario);
+
       // ✅ Guarda el token y los datos del usuario en localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("isAuthenticated", "true");

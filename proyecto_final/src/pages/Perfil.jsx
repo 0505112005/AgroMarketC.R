@@ -13,7 +13,9 @@ const Perfil = () => {
     if (!isAuthenticated || !storedUser) {
       navigate("/login"); // Redirige si no está logueado
     } else {
-      setUsuario(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUsuario(userData);
+      localStorage.setItem("nombre", userData.nombre); // ✅ Guardar nombre para mostrar en Inicio
     }
   }, [navigate]);
 
@@ -21,6 +23,7 @@ const Perfil = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("nombre"); // ✅ Limpia el nombre también
     alert("Sesión cerrada");
     navigate("/login");
   };

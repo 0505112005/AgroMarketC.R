@@ -2,10 +2,17 @@
 import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
+import { useCarrito } from "../components/CarritoContext";
 
 const Inicio = () => {
   const [productos, setProductos] = useState([]);
+  const [mensajeExito, setMensajeExito] = useState("");
   const navigate = useNavigate();
+  const { agregarProducto } = useCarrito();
+
+  // ✅ Obtener el nombre del usuario desde localStorage
+  const storedUser = localStorage.getItem("usuario");
+  const nombreUsuario = storedUser ? JSON.parse(storedUser).nombre : "Invitado";
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -21,18 +28,33 @@ const Inicio = () => {
     fetchProductos();
   }, []);
 
+  const mostrarMensajeExito = (texto) => {
+    setMensajeExito(texto);
+    setTimeout(() => setMensajeExito(""), 3000);
+  };
+
   return (
     <div className="container">
+      {mensajeExito && <div className="toast-exito">{mensajeExito}</div>}
+
       {/* HEADER */}
       <header className="header">
         <h1>🌿 Agro Market</h1>
         <div className="header-buttons">
-          <button onClick={() => navigate("/vender")}>🛒 Vender</button>
-          
-        </div>
+          <button
+            onClick={() => {
+              const isAuthenticated = localStorage.getItem("isAuthenticated");
+              if (isAuthenticated) {
+                navigate("/Vender");
+              } else {
+                navigate("/Login");
+              }
+            }}
+          >
+            🛒 Vender
+          </button>        </div>
       </header>
 
-      {/* LAYOUT */}
       <div className="content">
         <aside className="sidebar">
           <div className="logo">
@@ -41,35 +63,22 @@ const Inicio = () => {
 
           <nav className="nav-menu">
             <ul>
-              <li>
-                <button>📊 Dashboard</button>
-              </li>
-              <li>
-                <button>📦 Catálogo</button>
-              </li>
-              <li>
-                <button>🛒 Carrito</button>
-              </li>
-              <li>
-                <button>📃 Pedidos</button>
-              </li>
+              <li><button>📊 Dashboard</button></li>
+              <li><button>📦 Catálogo</button></li>
+              <li><button onClick={() => navigate("/carrito")}>🛒 Carrito</button></li>
+              <li><button onClick={() => navigate("/mis-productos")}>
+                🧺 Mis Productos
+              </button></li>
             </ul>
           </nav>
 
           <div className="usuario">
-            <img
-              src="ruta-del-avatar.jpg"
-              alt="Avatar"
-              className="avatar"
-            />
+            <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" className="avatar" />
             <div className="info-usuario">
-              <p className="nombre">Rodolfo</p>
-              <p className="rol">Comprador</p>
+              <p className="nombre">{nombreUsuario}</p>
               <div className="header-buttons">
                 <button onClick={() => navigate("/Perfil")}>👤 Perfil</button>
-                
               </div>
-          
             </div>
           </div>
         </aside>
@@ -82,11 +91,7 @@ const Inicio = () => {
             </p>
 
             <div className="filtros">
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                className="buscador"
-              />
+              <input type="text" placeholder="Buscar productos..." className="buscador" />
               <select className="dropdown">
                 <option>Todas las categorías</option>
                 <option>Frutas</option>
@@ -100,9 +105,7 @@ const Inicio = () => {
                 <option>Precio más bajo</option>
                 <option>Precio más alto</option>
               </select>
-              <span className="resultados">
-                {productos.length} productos encontrados
-              </span>
+              <span className="resultados">{productos.length} productos encontrados</span>
             </div>
 
             <div className="productos-grid">
@@ -112,11 +115,7 @@ const Inicio = () => {
                 productos.map((producto) => (
                   <div className="card" key={producto._id}>
                     <div className="card-etiqueta">Orgánico</div>
-                    <img
-                      src={producto.imagen}
-                      alt={producto.nombre}
-                      className="card-imagen"
-                    />
+                    <img src={producto.imagen} alt={producto.nombre} className="card-imagen" />
                     <h3 className="card-nombre">{producto.nombre}</h3>
                     <p className="card-ubicacion">{producto.ubicacion}</p>
                     <p className="card-precio">€{producto.precio} /kg</p>
@@ -124,7 +123,15 @@ const Inicio = () => {
                     <p className="card-productor">Por: {producto.productor}</p>
                     <div className="card-botones">
                       <button className="ver">Ver</button>
-                      <button className="agregar">Agregar</button>
+                      <button
+                        className="agregar"
+                        onClick={() => {
+                          agregarProducto(producto);
+                          mostrarMensajeExito("✅ Producto agregado al carrito");
+                        }}
+                      >
+                        Agregar
+                      </button>
                     </div>
                   </div>
                 ))
@@ -134,7 +141,6 @@ const Inicio = () => {
         </main>
       </div>
 
-      {/* FOOTER */}
       <footer className="footer">
         <p>&copy; 2025 Mercado Orgánico</p>
       </footer>
