@@ -1,4 +1,3 @@
-// src/pages/Inicio.jsx
 import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +9,10 @@ const Inicio = () => {
   const navigate = useNavigate();
   const { agregarProducto } = useCarrito();
 
-  // ✅ Obtener el nombre del usuario desde localStorage
   const storedUser = localStorage.getItem("usuario");
-  const nombreUsuario = storedUser ? JSON.parse(storedUser).nombre : "Invitado";
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const nombreUsuario = user ? user.nombre : "Invitado";
+  const rolUsuario = user ? user.rol : "invitado";
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -41,19 +41,24 @@ const Inicio = () => {
       <header className="header">
         <h1>🌿 Agro Market</h1>
         <div className="header-buttons">
-          <button
-            onClick={() => {
-              const isAuthenticated = localStorage.getItem("isAuthenticated");
-              if (isAuthenticated) {
-                navigate("/Vender");
-              } else {
-                navigate("/Login");
-              }
-            }}
-          >
-            🛒 Vender
-          </button>        </div>
+          {/* Mostrar botón "Vender" solo si NO es comprador */}
+          {rolUsuario !== "comprador" && (
+            <button
+              onClick={() => {
+                const isAuthenticated = localStorage.getItem("isAuthenticated");
+                if (isAuthenticated) {
+                  navigate("/Vender");
+                } else {
+                  navigate("/Login");
+                }
+              }}
+            >
+              🛒 Vender
+            </button>
+          )}
+        </div>
       </header>
+
 
       <div className="content">
         <aside className="sidebar">
@@ -69,6 +74,15 @@ const Inicio = () => {
               <li><button onClick={() => navigate("/mis-productos")}>
                 🧺 Mis Productos
               </button></li>
+
+              {/* Solo compradores ven este botón */}
+              {rolUsuario === "comprador" && (
+                <li>
+                  <button onClick={() => navigate("/solicitud-vendedor")}>
+                    📩 Quiero Vender
+                  </button>
+                </li>
+              )}
             </ul>
           </nav>
 
@@ -124,13 +138,17 @@ const Inicio = () => {
                     <div className="card-botones">
                       <button className="ver">Ver</button>
                       <button
-                        className="agregar"
                         onClick={() => {
+                          const isAuthenticated = localStorage.getItem("isAuthenticated");
+                          if (!isAuthenticated) {
+                            navigate("/Login");
+                            return;
+                          }
                           agregarProducto(producto);
                           mostrarMensajeExito("✅ Producto agregado al carrito");
                         }}
                       >
-                        Agregar
+                        Añadir al carrito
                       </button>
                     </div>
                   </div>

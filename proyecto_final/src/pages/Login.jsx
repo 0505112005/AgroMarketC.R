@@ -11,10 +11,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("URL de login:", `${process.env.REACT_APP_API_URL}/login`);
+
+    const loginUrl = `${process.env.REACT_APP_API_URL}/auth/login`;
+    console.log("URL de login:", loginUrl);
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/login`, {
+      const res = await fetch(loginUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -28,18 +30,15 @@ const Login = () => {
         throw new Error(data.mensaje || "Error al iniciar sesión");
       }
 
-      // ✅ Muestra en consola lo que envía el backend
-      console.log("Usuario recibido del backend:", data.usuario);
-
-      // ✅ Guarda el token y los datos del usuario en localStorage
+      // Guarda el token y datos del usuario
       localStorage.setItem("token", data.token);
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
       alert("Inicio de sesión exitoso");
-      navigate("/"); // Redirige a inicio u otra página
+      navigate("/"); // Redirige al inicio
     } catch (error) {
-      console.error("Error:", error);
+      console.error("❌ Error al iniciar sesión:", error);
       alert(error.message || "Error de conexión");
     }
   };

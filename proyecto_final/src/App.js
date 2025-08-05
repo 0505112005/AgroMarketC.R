@@ -7,6 +7,7 @@ import RutaProtegida from "./components/RutaProtegida";
 import Login from "./pages/Login"; // Asegúrate de que el path sea correcto
 import Carrito from "./pages/Carrito";
 import MisProductos from "./pages/MisProductos";
+import SolicitudVendedor from "./pages/SolicitudVendedor";
 function App() {
   return (
     <Router>
@@ -18,6 +19,8 @@ function App() {
         <Route path="/vender" element={<Vender />} />
         <Route path="/carrito" element={<Carrito/>} />
         <Route path="/mis-productos" element={<MisProductos />} />
+        <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
+
 
 
         <Route

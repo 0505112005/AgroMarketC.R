@@ -4,10 +4,26 @@ const userSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+
+  // Información adicional
   direccion: { type: String },
   telefono: { type: String },
-  rol: { type: String, default: "user" },
-  activo: { type: Boolean, default: true }
+
+  // 🔐 ROL claro y controlado
+  rol: {
+    type: String,
+    enum: ["comprador", "vendedor", "admin"],
+    default: "comprador",
+  },
+
+  // 🔒 Estado activo/inactivo
+  activo: { type: Boolean, default: true },
+
+  // 🆕 Campo opcional para solicitudes
+  solicitudVendedor: {
+    type: Boolean,
+    default: false, // true si el usuario pidió ser vendedor
+  },
 });
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model("User", userSchema);

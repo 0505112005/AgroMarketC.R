@@ -31,7 +31,7 @@ const Carrito = () => {
       },
       body: JSON.stringify({
         compradorId,
-        compradorNombre, // ✅ AHORA sí lo enviamos
+        compradorNombre, 
         productos: carrito.map((item) => ({
           productoId: item._id,
           cantidad: item.cantidad,
