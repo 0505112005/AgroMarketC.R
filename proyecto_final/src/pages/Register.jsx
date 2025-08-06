@@ -6,7 +6,6 @@ const Register = () => {
     nombre: "",
     email: "",
     password: "",
-    rol: "cliente",
     direccion: "",
     telefono: "",
   });
@@ -15,7 +14,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // Clear error when user types
+    setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -24,6 +23,7 @@ const Register = () => {
     setError("");
 
     try {
+      console.log("Datos antes de enviar a registrarUsuario:", form);
       const result = await Login.registrarUsuario(form);
       console.log("Respuesta del servidor:", result);
 
@@ -32,15 +32,12 @@ const Register = () => {
         return;
       }
 
-      // Guardar en localStorage que tiene perfil
       localStorage.setItem("tienePerfil", "true");
 
-      // Limpiar formulario después de éxito
       setForm({
         nombre: "",
         email: "",
         password: "",
-        rol: "cliente",
         direccion: "",
         telefono: "",
       });

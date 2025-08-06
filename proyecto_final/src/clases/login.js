@@ -5,10 +5,13 @@ class Login {
 
   async registrarUsuario(userData) {
     try {
+      console.log('userData recibido:', userData);
+
+      // Validaciones básicas
       const validations = {
         email: userData?.email?.trim(),
         password: userData?.password?.trim(),
-        nombre: userData?.nombre?.trim()
+        nombre: userData?.nombre?.trim(),
       };
 
       const missingField = Object.entries(validations).find(
@@ -23,10 +26,10 @@ class Login {
         nombre: validations.nombre,
         email: validations.email,
         password: validations.password,
-        rol: userData.rol || "cliente",
         direccion: userData.direccion?.trim() || '',
         telefono: userData.telefono?.trim() || '',
-        activo: true
+        activo: true,
+        rol: "comprador", // Fijamos el rol aquí, para que no venga de frontend
       };
 
       console.log('Payload de registro:', payload);
@@ -35,15 +38,15 @@ class Login {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
       console.log('Respuesta del servidor:', {
         status: response.status,
-        data
+        data,
       });
 
       if (!response.ok) {
@@ -53,19 +56,18 @@ class Login {
       return {
         success: true,
         message: data.message || 'Usuario registrado exitosamente',
-        data: data.usuario
+        data: data.usuario,
       };
 
     } catch (error) {
       console.error('Error en registro:', error);
       return {
         success: false,
-        error: error.message || 'Error al procesar el registro'
+        error: error.message || 'Error al procesar el registro',
       };
     }
   }
 }
-
 
 const loginInstance = new Login();
 export default loginInstance;

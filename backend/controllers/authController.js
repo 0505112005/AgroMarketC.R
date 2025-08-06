@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 
 const register = async (req, res) => {
   try {
-const { nombre, email, password, direccion, telefono } = req.body;
+    const { nombre, email, password, direccion, telefono } = req.body;
 
     if (!nombre || !email || !password) {
       return res.status(400).json({ mensaje: "Todos los campos son obligatorios" });
@@ -21,7 +21,7 @@ const { nombre, email, password, direccion, telefono } = req.body;
       nombre,
       email,
       password: hashedPassword,
-      rol: "user",
+      rol: "comprador",  // Asignamos rol válido para evitar errores
       direccion,
       telefono,
       activo: true
@@ -32,13 +32,12 @@ const { nombre, email, password, direccion, telefono } = req.body;
     res.status(201).json({ mensaje: "Usuario creado correctamente" });
   } catch (error) {
     console.error("Error en register:", error);
-    res.status(400).json({ success: false, error: error.message }); // <--- AQUI
+    res.status(400).json({ success: false, error: error.message });
   }
-
 };
 
 
-//  LOGIN
+// LOGIN
 const login = async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -47,18 +46,14 @@ const login = async (req, res) => {
       return res.status(400).json({ mensaje: "Todos los campos son obligatorios" });
     }
 
-    email = email.trim().toLowerCase(); // 🔥 Limpiar y normalizar el email
+    email = email.trim().toLowerCase();
     const usuario = await Usuario.findOne({ email });
-
-    console.log("🟡 Email recibido:", email);
-    console.log("🔵 Usuario encontrado:", usuario);
 
     if (!usuario) {
       return res.status(401).json({ mensaje: "Credenciales inválidas" });
     }
 
     const passwordValido = await bcrypt.compare(password, usuario.password);
-    console.log("✅ Password válido:", passwordValido);
 
     if (!passwordValido) {
       return res.status(401).json({ mensaje: "Credenciales inválidas" });
@@ -82,12 +77,10 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Error en login:", error);
+    console.error("Error en login:", error);
     res.status(500).json({ mensaje: "Error en el servidor al iniciar sesión" });
   }
 };
-
-
 
 module.exports = {
   register,

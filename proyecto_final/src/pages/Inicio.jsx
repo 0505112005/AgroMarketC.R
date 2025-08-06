@@ -3,6 +3,8 @@ import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
 
+const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
+
 const Inicio = () => {
   const [productos, setProductos] = useState([]);
   const [mensajeExito, setMensajeExito] = useState("");
@@ -41,16 +43,11 @@ const Inicio = () => {
       <header className="header">
         <h1>🌿 Agro Market</h1>
         <div className="header-buttons">
-          {/* Mostrar botón "Vender" solo si NO es comprador */}
           {rolUsuario !== "comprador" && (
             <button
               onClick={() => {
                 const isAuthenticated = localStorage.getItem("isAuthenticated");
-                if (isAuthenticated) {
-                  navigate("/Vender");
-                } else {
-                  navigate("/Login");
-                }
+                navigate(isAuthenticated ? "/Vender" : "/Login");
               }}
             >
               🛒 Vender
@@ -59,8 +56,8 @@ const Inicio = () => {
         </div>
       </header>
 
-
       <div className="content">
+        {/* SIDEBAR */}
         <aside className="sidebar">
           <div className="logo">
             <h2>🌿</h2>
@@ -71,11 +68,7 @@ const Inicio = () => {
               <li><button>📊 Dashboard</button></li>
               <li><button>📦 Catálogo</button></li>
               <li><button onClick={() => navigate("/carrito")}>🛒 Carrito</button></li>
-              <li><button onClick={() => navigate("/mis-productos")}>
-                🧺 Mis Productos
-              </button></li>
-
-              {/* Solo compradores ven este botón */}
+              <li><button onClick={() => navigate("/mis-productos")}>🧺 Mis Productos</button></li>
               {rolUsuario === "comprador" && (
                 <li>
                   <button onClick={() => navigate("/solicitud-vendedor")}>
@@ -97,6 +90,7 @@ const Inicio = () => {
           </div>
         </aside>
 
+        {/* MAIN */}
         <main className="main">
           <section className="catalogo">
             <h2 className="titulo">Catálogo de Productos</h2>
@@ -128,13 +122,25 @@ const Inicio = () => {
               ) : (
                 productos.map((producto) => (
                   <div className="card" key={producto._id}>
-                    <div className="card-etiqueta">Orgánico</div>
-                    <img src={producto.imagen} alt={producto.nombre} className="card-imagen" />
+                    <div className="card-etiqueta">{producto.certificacion || "No especificado"}</div>
+
+                    <img
+                      src={producto.imagen && producto.imagen.trim() !== "" ? producto.imagen : imagenPorDefecto}
+                      alt={producto.nombre}
+                      className="card-imagen"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = imagenPorDefecto;
+                      }}
+                    />
+
+
                     <h3 className="card-nombre">{producto.nombre}</h3>
-                    <p className="card-ubicacion">{producto.ubicacion}</p>
+                    <p className="card-ubicacion">{producto.ubicacion || "Ubicación no especificada"}</p>
                     <p className="card-precio">€{producto.precio} /kg</p>
-                    <p className="card-stock">Stock: {producto.stock} kg</p>
-                    <p className="card-productor">Por: {producto.productor}</p>
+                    <p className="card-stock">Stock: {producto.stock || "N/A"} kg</p>
+                    <p className="card-productor">Por: {producto.productor || "Anónimo"}</p>
+
                     <div className="card-botones">
                       <button className="ver">Ver</button>
                       <button

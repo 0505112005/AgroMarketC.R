@@ -8,7 +8,7 @@ function Vender() {
         descripcion: '',
         precio: '',
         imagen: '',
-        certificacion: '100%' // ahora usamos el valor que acepta el backend
+        certificacion: '100%',
     });
 
     const navigate = useNavigate();
@@ -16,8 +16,10 @@ function Vender() {
 
     useEffect(() => {
         const isAuthenticated = localStorage.getItem("isAuthenticated");
-        if (!isAuthenticated || !usuario) {
-            alert("Debes iniciar sesión para vender productos.");
+
+        // Solo dejar pasar si está autenticado y es VENDEDOR
+        if (!isAuthenticated || !usuario || usuario.rol !== "vendedor") {
+            alert("Acceso denegado. Solo los vendedores pueden publicar productos.");
             navigate("/login");
         }
     }, [navigate, usuario]);
@@ -29,42 +31,45 @@ function Vender() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("usuario desde localStorage:", usuario);
 
+        // Construir producto completo para enviar
         const nuevoProducto = {
             ...producto,
-            imagen: producto.imagen || "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+            imagen: producto.imagen.trim() || "https://cdn-icons-png.flaticon.com/512/847/847969.png",
             usuarioId: usuario.id,
-            productor: usuario.nombre
+            productor: usuario.nombre,
         };
 
-        console.log("Producto que se va a enviar:", nuevoProducto); // 👈 Añade esto
-
-
+        console.log("📦 Enviando producto:", nuevoProducto);
 
         try {
             const res = await fetch("http://localhost:5000/api/productos", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(nuevoProducto)
+                body: JSON.stringify(nuevoProducto),
             });
 
-            if (!res.ok) throw new Error("Error al guardar el producto");
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.mensaje || "Error al guardar el producto");
+            }
 
-            alert("✅ Producto guardado exitosamente");
+            alert("✅ Producto publicado correctamente");
 
+            // Limpiar el formulario
             setProducto({
                 nombre: '',
                 descripcion: '',
                 precio: '',
                 imagen: '',
-                certificacion: '100%'
+                certificacion: '100%',
             });
+
         } catch (err) {
-            console.error(err);
-            alert("❌ Error al enviar el producto");
+            console.error("❌ Error al enviar producto:", err);
+            alert("❌ Error al guardar el producto. Intenta nuevamente.");
         }
     };
 
@@ -84,6 +89,7 @@ function Vender() {
                             required
                         />
                     </div>
+
                     <div className="campo">
                         <label>Descripción</label>
                         <textarea
@@ -95,6 +101,7 @@ function Vender() {
                             required
                         />
                     </div>
+
                     <div className="campo">
                         <label>Precio por unidad</label>
                         <input
@@ -106,6 +113,7 @@ function Vender() {
                             required
                         />
                     </div>
+
                     <div className="campo">
                         <label>Imagen (URL opcional)</label>
                         <input
@@ -116,27 +124,26 @@ function Vender() {
                             onChange={handleChange}
                         />
                     </div>
+
                     <div className="campo">
-                        <label>Certificación</label>
+                        <label>Certificación:</label>
                         <select
                             name="certificacion"
                             value={producto.certificacion}
                             onChange={handleChange}
                             required
                         >
-                            <option value="">Selecciona certificación</option>
-                            <option value="100%">100% orgánico - 0% químico</option>
-                            <option value="75%">75% orgánico - 25% químico</option>
-                            <option value="50%">50% orgánico - 50% químico</option>
+                            <option value="">Seleccione una opción</option>
+                            <option value="Orgánico">Orgánico</option>
+                            <option value="No orgánico">No orgánico</option>
+                            <option value="En transición">En transición</option>
                         </select>
+
                     </div>
+
                     <div className="botones-formulario">
                         <button type="submit" className="publicar">Publicar producto</button>
-                        <button
-                            type="button"
-                            className="volver-inicio"
-                            onClick={() => navigate("/")}
-                        >
+                        <button type="button" className="volver-inicio" onClick={() => navigate("/")}>
                             Volver a inicio
                         </button>
                     </div>
