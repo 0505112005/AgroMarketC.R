@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Landing from "./pages/Landing";
 import Register from "./pages/Register";
 import Inicio from "./pages/Inicio";
 import Vender from "./pages/Vender";
@@ -12,7 +13,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/inicio" />} />
+        <Route path="/" element={<Navigate to="/Landing" />} />
+        <Route path="/Landing" element={<Landing />} />
         <Route path="/inicio" element={<Inicio />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
