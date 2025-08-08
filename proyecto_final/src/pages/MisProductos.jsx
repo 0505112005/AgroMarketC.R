@@ -13,7 +13,7 @@ const MisProductos = () => {
     // 🔐 Protege la ruta para que solo el vendedor logeado pueda entrar
     if (!usuario || usuario.rol !== "vendedor") {
       alert("Acceso denegado. Solo los vendedores pueden ver esta página.");
-      navigate("/");
+      navigate("/inicio");
       return;
     }
 

@@ -14,11 +14,13 @@ app.use(express.json()); // permite leer JSON en el body
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const pedidoRoutes = require("./routes/pedidoRoutes");
+const favoritosRoutes = require("./routes/favoritos");
 
 // Usa las rutas
 app.use("/api/auth", authRoutes);
-app.use("/api/productos", productRoutes); 
+app.use("/api/productos", productRoutes);
 app.use("/api/pedidos", pedidoRoutes);
+app.use("/api/favoritos", favoritosRoutes);
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);

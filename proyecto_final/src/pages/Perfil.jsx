@@ -48,7 +48,7 @@ const Perfil = () => {
           </button>
           <button
             className="perfil-logout"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/inicio")}
           >
             Volver a inicio
           </button>

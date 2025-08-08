@@ -3,163 +3,261 @@ import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
 
-const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
-
 const Inicio = () => {
-  const [productos, setProductos] = useState([]);
-  const [mensajeExito, setMensajeExito] = useState("");
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [pedidos, setPedidos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
+  const [productosDestacados, setProductosDestacados] = useState([]);
+  const [actividadReciente, setActividadReciente] = useState([]);
   const navigate = useNavigate();
-  const { agregarProducto } = useCarrito();
+  const { carrito = [] } = useCarrito();
 
-  const storedUser = localStorage.getItem("usuario");
-  const user = storedUser ? JSON.parse(storedUser) : null;
-  const nombreUsuario = user ? user.nombre : "Invitado";
-  const rolUsuario = user ? user.rol : "invitado";
-
+  // Cargar usuario del localStorage sólo una vez
   useEffect(() => {
-    const fetchProductos = async () => {
+    const storedUser = localStorage.getItem("usuario");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoadingUser(false);
+  }, []);
+
+  // Redirigir a login solo si ya terminó de cargar y no hay usuario
+  useEffect(() => {
+    if (!loadingUser && !user) {
+      navigate("/login");
+    }
+  }, [loadingUser, user, navigate]);
+
+  // Fetch datos cuando hay usuario
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchPedidos = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/productos");
-        const data = await response.json();
-        setProductos(data);
-      } catch (error) {
-        console.error("Error al obtener productos:", error);
+        const res = await fetch(`http://localhost:5000/api/pedidos/comprador/${user.id}`);
+        if (!res.ok) {
+          setPedidos([]);
+          return;
+        }
+        const data = await res.json();
+        setPedidos(Array.isArray(data) ? data : []);
+      } catch {
+        setPedidos([]);
       }
     };
 
-    fetchProductos();
-  }, []);
+    const fetchFavoritos = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/favoritos?userId=${user.id}`);
+        if (!res.ok) {
+          setFavoritos([]);
+          return;
+        }
+        const data = await res.json();
+        setFavoritos(Array.isArray(data) ? data : []);
+      } catch {
+        setFavoritos([]);
+      }
+    };
 
-  const mostrarMensajeExito = (texto) => {
-    setMensajeExito(texto);
-    setTimeout(() => setMensajeExito(""), 3000);
-  };
+    const fetchProductosDestacados = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/productos/destacados`);
+        if (!res.ok) {
+          setProductosDestacados([]);
+          return;
+        }
+        const data = await res.json();
+        setProductosDestacados(Array.isArray(data) ? data : []);
+      } catch {
+        setProductosDestacados([]);
+      }
+    };
+
+    const fetchActividadReciente = () => {
+      setActividadReciente([
+        { id: 1, texto: "Nuevo pedido recibido", tiempo: "Hace 2 horas" },
+        { id: 2, texto: "Producto agregado al catálogo", tiempo: "Hace 5 horas" },
+        { id: 3, texto: "Cliente nuevo registrado", tiempo: "Hace 1 día" },
+        { id: 4, texto: "Pedido entregado exitosamente", tiempo: "Hace 2 días" },
+      ]);
+    };
+
+    fetchPedidos();
+    fetchFavoritos();
+    fetchProductosDestacados();
+    fetchActividadReciente();
+  }, [user?.id]);
+
+  if (loadingUser) {
+    // Mientras carga el usuario, muestra un simple mensaje o spinner
+    return <div>Cargando usuario...</div>;
+  }
+
+  const nombreUsuario = user?.nombre || "Invitado";
+  const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
   return (
     <div className="container">
-      {mensajeExito && <div className="toast-exito">{mensajeExito}</div>}
-
-      {/* HEADER */}
+      {/* resto de tu JSX igual */}
       <header className="header">
         <h1>🌿 Agro Market</h1>
-        <div className="header-buttons">
-          {rolUsuario !== "comprador" && (
-            <button
-              onClick={() => {
-                const isAuthenticated = localStorage.getItem("isAuthenticated");
-                navigate(isAuthenticated ? "/Vender" : "/Login");
-              }}
-            >
-              🛒 Vender
-            </button>
-          )}
-        </div>
+        <button
+          className="btn-catalogo"
+          onClick={() => navigate("/catalogo")}
+          type="button"
+        >
+          Ver Catálogo
+        </button>
       </header>
 
       <div className="content">
-        {/* SIDEBAR */}
         <aside className="sidebar">
           <div className="logo">
-            <h2>🌿</h2>
+            <h2>🌿 AgroMarket</h2>
+          </div>
+
+          <div className="usuario">
+            <img
+              src="https://www.w3schools.com/howto/img_avatar.png"
+              alt="Avatar"
+              className="avatar"
+            />
+            <div>
+              <p className="nombre">{nombreUsuario}</p>
+              <p className="rol">{user?.rol || ""}</p>
+              <button
+                className="btn-perfil"
+                onClick={() => navigate("/perfil")}
+                type="button"
+              >
+                👤 Perfil
+              </button>
+            </div>
           </div>
 
           <nav className="nav-menu">
             <ul>
-              <li><button>📊 Dashboard</button></li>
-              <li><button>📦 Catálogo</button></li>
-              <li><button onClick={() => navigate("/carrito")}>🛒 Carrito</button></li>
-              <li><button onClick={() => navigate("/mis-productos")}>🧺 Mis Productos</button></li>
-              {rolUsuario === "comprador" && (
+              <li>
+                <button onClick={() => navigate("/inicio")} type="button">
+                  📊 Dashboard
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/catalogo")} type="button">
+                  📦 Catálogo
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/carrito")} type="button">
+                  🛒 Carrito ({carrito.length})
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/mis-productos")} type="button">
+                  🧺 Mis Productos
+                </button>
+              </li>
+              {user?.rol === "comprador" && (
                 <li>
-                  <button onClick={() => navigate("/solicitud-vendedor")}>
+                  <button
+                    onClick={() => navigate("/solicitud-vendedor")}
+                    type="button"
+                  >
                     📩 Quiero Vender
                   </button>
                 </li>
               )}
             </ul>
           </nav>
-
-          <div className="usuario">
-            <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" className="avatar" />
-            <div className="info-usuario">
-              <p className="nombre">{nombreUsuario}</p>
-              <div className="header-buttons">
-                <button onClick={() => navigate("/Perfil")}>👤 Perfil</button>
-              </div>
-            </div>
-          </div>
         </aside>
 
-        {/* MAIN */}
         <main className="main">
-          <section className="catalogo">
-            <h2 className="titulo">Catálogo de Productos</h2>
-            <p className="subtitulo">
-              Descubre los mejores productos agrícolas directamente de nuestros agricultores
-            </p>
+          <section className="saludo">
+            <h2>Bienvenido, {nombreUsuario}!</h2>
+            <p>Descubre los mejores productos agrícolas</p>
+          </section>
 
-            <div className="filtros">
-              <input type="text" placeholder="Buscar productos..." className="buscador" />
-              <select className="dropdown">
-                <option>Todas las categorías</option>
-                <option>Frutas</option>
-                <option>Verduras</option>
-                <option>Café</option>
-                <option>Otros</option>
-              </select>
-              <select className="dropdown">
-                <option>Nombre A-Z</option>
-                <option>Nombre Z-A</option>
-                <option>Precio más bajo</option>
-                <option>Precio más alto</option>
-              </select>
-              <span className="resultados">{productos.length} productos encontrados</span>
+          <section className="estadisticas">
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{pedidos.length}</div>
+              <div className="estadistica-label">Pedidos Realizados</div>
+              <div className="estadistica-icon" aria-label="Pedidos">
+                📦
+              </div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">
+                ₡{totalGastado.toLocaleString()}
+              </div>
+              <div className="estadistica-label">Total Gastado</div>
+              <div className="estadistica-icon" aria-label="Total Gastado">
+                💰
+              </div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{carrito.length}</div>
+              <div className="estadistica-label">En Carrito</div>
+              <div className="estadistica-icon" aria-label="Carrito">
+                🛒
+              </div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{favoritos.length}</div>
+              <div className="estadistica-label">Favoritos</div>
+              <div className="estadistica-icon" aria-label="Favoritos">
+                ❤️
+              </div>
+            </div>
+          </section>
+
+          <section className="bottom-secciones">
+            <div className="productos-destacados cuadro">
+              <h3>Productos Destacados</h3>
+              <div className="productos-grid">
+                {productosDestacados.length === 0 && (
+                  <p>No hay productos destacados.</p>
+                )}
+                {productosDestacados.map((prod) => (
+                  <div key={prod._id} className="card">
+                    <img
+                      src={prod.imagen || "https://via.placeholder.com/150"}
+                      alt={prod.nombre}
+                      className="card-imagen"
+                    />
+                    <h4>{prod.nombre}</h4>
+                    <p className="descripcion">{prod.descripcion || ""}</p>
+                    <p className="precio">₡{prod.precio?.toLocaleString() || "-"}</p>
+                    <p className="vendedor">
+                      Por {prod.vendedor || "Desconocido"}
+                    </p>
+                    <button
+                      className="ver"
+                      onClick={() => navigate(`/producto/${prod._id}`)}
+                      type="button"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="productos-grid">
-              {productos.length === 0 ? (
-                <p>No hay productos disponibles</p>
-              ) : (
-                productos.map((producto) => (
-                  <div className="card" key={producto._id}>
-                    <div className="card-etiqueta">{producto.certificacion || "No especificado"}</div>
-
-                    <img
-                      src={producto.imagen && producto.imagen.trim() !== "" ? producto.imagen : imagenPorDefecto}
-                      alt={producto.nombre}
-                      className="card-imagen"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = imagenPorDefecto;
-                      }}
-                    />
-
-
-                    <h3 className="card-nombre">{producto.nombre}</h3>
-                    <p className="card-ubicacion">{producto.ubicacion || "Ubicación no especificada"}</p>
-                    <p className="card-precio">€{producto.precio} /kg</p>
-                    <p className="card-stock">Stock: {producto.stock || "N/A"} kg</p>
-                    <p className="card-productor">Por: {producto.productor || "Anónimo"}</p>
-
-                    <div className="card-botones">
-                      <button className="ver">Ver</button>
-                      <button
-                        onClick={() => {
-                          const isAuthenticated = localStorage.getItem("isAuthenticated");
-                          if (!isAuthenticated) {
-                            navigate("/Login");
-                            return;
-                          }
-                          agregarProducto(producto);
-                          mostrarMensajeExito("✅ Producto agregado al carrito");
-                        }}
-                      >
-                        Añadir al carrito
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
+            <div className="actividad-reciente cuadro">
+              <h3>Actividad Reciente</h3>
+              <ul>
+                {actividadReciente.length === 0 && (
+                  <li>No hay actividad reciente.</li>
+                )}
+                {actividadReciente.map((act) => (
+                  <li key={act.id}>
+                    <strong>{act.texto}</strong>
+                    <br />
+                    <small>{act.tiempo}</small>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
         </main>

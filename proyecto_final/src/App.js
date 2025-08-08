@@ -9,6 +9,7 @@ import Login from "./pages/Login"; // Asegúrate de que el path sea correcto
 import Carrito from "./pages/Carrito";
 import MisProductos from "./pages/MisProductos";
 import SolicitudVendedor from "./pages/SolicitudVendedor";
+import Catalogo from "./pages/Catalogo";
 function App() {
   return (
     <Router>
@@ -22,6 +23,7 @@ function App() {
         <Route path="/carrito" element={<Carrito/>} />
         <Route path="/mis-productos" element={<MisProductos />} />
         <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
+        <Route path="/catalogo" element={<Catalogo />} />
 
 
 
