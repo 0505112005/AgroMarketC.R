@@ -16,9 +16,18 @@ const Inicio = () => {
   // Cargar usuario del localStorage sólo una vez
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+
+    try {
+      if (storedUser && storedUser !== "undefined") {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null); // No hay usuario válido
+      }
+    } catch (error) {
+      console.error("Error al parsear usuario desde localStorage:", error);
+      setUser(null);
     }
+
     setLoadingUser(false);
   }, []);
 

@@ -1,65 +1,76 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    const loginUrl = `${process.env.REACT_APP_API_URL}/auth/login`;
+    console.log("URL de login:", loginUrl);
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch(loginUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Error al iniciar sesión");
-        return;
+        throw new Error(data.mensaje || "Error al iniciar sesión");
       }
 
-      // Guardar token e info en localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("nombre", data.usuario.nombre);
-      localStorage.setItem("rol", data.usuario.rol);
+      // Normalizamos el usuario para que siempre tenga id
+      const usuarioFormateado = {
+        id: data.usuario.id || data.usuario._id, // asegura el id
+        nombre: data.usuario.nombre || "Usuario",
+        rol: data.usuario.rol || "",
+        email: data.usuario.email || "",
+      };
+
+      // Guardamos datos en localStorage
+      localStorage.setItem("token", data.token || "");
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("usuario", JSON.stringify(usuarioFormateado));
 
       alert("Inicio de sesión exitoso");
-      navigate("/inicio"); // Ir directo a inicio, no a Landing
-    } catch (err) {
-      console.error(err);
-      setError("Error en el servidor");
+      navigate("/inicio");
+
+    } catch (error) {
+      console.error("❌ Error al iniciar sesión:", error);
+      alert(error.message || "Error de conexión");
     }
   };
 
   return (
-    <div className="login-container">
+    <form onSubmit={handleSubmit}>
       <h2>Iniciar Sesión</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Entrar</button>
-      </form>
-    </div>
+      <input
+        type="email"
+        name="email"
+        placeholder="Correo electrónico"
+        value={form.email}
+        onChange={handleChange}
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        value={form.password}
+        onChange={handleChange}
+        required
+      />
+      <button type="submit">Entrar</button>
+    </form>
   );
 };
 
