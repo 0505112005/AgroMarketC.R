@@ -184,6 +184,8 @@ const Catalogo = () => {
           })
         )}
       </div>
+
+      <button className="volver-inicio" onClick={() => navigate('/inicio')}>Volver a Inicio</button>
     </section>
   );
 };

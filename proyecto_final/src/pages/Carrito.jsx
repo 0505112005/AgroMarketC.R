@@ -1,5 +1,6 @@
 import { useCarrito } from "../components/CarritoContext";
 import { useNavigate } from "react-router-dom";
+import "../estilos/Carrito.css";
 
 const Carrito = () => {
   const { carrito, quitarProducto, vaciarCarrito } = useCarrito();
@@ -57,56 +58,65 @@ const Carrito = () => {
 
   if (carrito.length === 0) {
     return (
-      <div className="p-4">
-        <h2 className="text-2xl mb-4">Tu carrito está vacío</h2>
+      <div className="carrito-container">
+        <h2 className="carrito-titulo">Carrito de Compras</h2>
+        <button className="volver-inicio" onClick={() => navigate('/inicio')}>
+          Volver a Inicio
+        </button>
+        <div className="carrito-vacio">
+          Tu carrito está vacío
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl mb-4 font-bold">Carrito de Compras</h2>
+    <div className="carrito-container">
+      <h2 className="carrito-titulo">Carrito de Compras</h2>
+      <button className="volver-inicio" onClick={() => navigate('/inicio')}>
+        Volver a Inicio
+      </button>
 
-      <ul className="mb-4">
+      <div className="carrito-lista">
         {carrito.map((item) => (
-          <li
-            key={item._id}
-            className="flex justify-between items-center border-b py-2"
-          >
-            <div>
-              <p className="font-semibold">{item.nombre}</p>
-              <p>
-                {item.cantidad} x €{item.precio} = €
-                {(item.precio * item.cantidad).toFixed(2)}
-              </p>
+          <div key={item._id} className="carrito-item">
+            <img 
+              src={item.imagen || 'placeholder-image.jpg'} 
+              alt={item.nombre} 
+              className="carrito-item-imagen"
+            />
+            <div className="carrito-item-info">
+              <h3 className="carrito-item-nombre">{item.nombre}</h3>
+              <p className="carrito-item-precio">€{item.precio}</p>
+            </div>
+            <div className="carrito-item-cantidad">
+              <span className="cantidad-numero">
+                {item.cantidad}
+              </span>
+              <span>unidades</span>
             </div>
             <button
               onClick={() => quitarProducto(item._id)}
-              className="text-red-600 hover:underline"
+              className="carrito-item-quitar"
             >
-              Quitar
+              ✕
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
 
-      <p className="text-lg font-semibold mb-4">
-        Total: €{total.toFixed(2)}
-      </p>
-
-      <div className="flex gap-4">
-        <button
-          onClick={vaciarCarrito}
-          className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
-        >
-          Vaciar carrito
-        </button>
-        <button
-          onClick={handleCheckout}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-        >
-          Realizar Pedido
-        </button>
+      <div className="carrito-resumen">
+        <p className="carrito-total">
+          Total: €{total.toFixed(2)}
+        </p>
+        <div className="carrito-acciones">
+          <button onClick={vaciarCarrito} className="btn-vaciar">
+            Vaciar carrito
+          </button>
+          <button onClick={handleCheckout} className="btn-pedido">
+            Realizar Pedido
+          </button>
+        </div>
       </div>
     </div>
   );

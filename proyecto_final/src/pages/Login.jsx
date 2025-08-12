@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../estilos/Login.css"; 
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -51,26 +52,55 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Iniciar Sesión</h2>
-      <input
-        type="email"
-        name="email"
-        placeholder="Correo electrónico"
-        value={form.email}
-        onChange={handleChange}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Contraseña"
-        value={form.password}
-        onChange={handleChange}
-        required
-      />
-      <button type="submit">Entrar</button>
-    </form>
+    <div className="login-container">
+      
+      
+      <form className="login-form" onSubmit={handleSubmit}>
+        <div className="form-header">
+          <h2 className="login-title">🌱 Iniciar Sesión</h2>
+          <p className="login-subtitle">Bienvenido a AgromarketC.R</p>
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="email">Correo electrónico</label>
+          <input
+            id="email"
+            className="login-input"
+            type="email"
+            name="email"
+            placeholder="tucorreo@ejemplo.com"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="password">Contraseña</label>
+          <input
+            id="password"
+            className="login-input"
+            type="password"
+            name="password"
+            placeholder="Tu contraseña"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="submit" className="login-button">
+          Iniciar Sesión
+        </button>
+
+        <div className="register-link">
+          ¿No tienes una cuenta?
+          <a href="/register" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>
+            Regístrate aquí
+          </a>
+        </div>
+      </form>
+    </div>
   );
 };
 

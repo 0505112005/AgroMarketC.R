@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../estilos/MisProductos.css";
 
 const MisProductos = () => {
   const [misProductos, setMisProductos] = useState([]);
@@ -79,65 +80,106 @@ const MisProductos = () => {
 
   return (
     <div className="mis-productos-container">
-      <h2>🧺 Mis Productos Publicados</h2>
+      <div className="mis-productos-header">
+        <h2 className="mis-productos-titulo">🧺 Mis Productos Publicados</h2>
+        <button className="btn-publicar" onClick={() => navigate('/vender')}>
+            Nuevo Producto
+        </button>
+      </div>
+      <button className="volver-inicio" onClick={() => navigate('/inicio')}>
+        Volver a Inicio
+      </button>
+      
       {misProductos.length === 0 ? (
-        <p>No has publicado productos aún.</p>
+        <div className="mis-productos-vacio">
+          No has publicado productos aún.
+        </div>
       ) : (
-        <ul>
+        <div className="productos-lista">
           {misProductos.map((producto) => (
-            <li key={producto._id} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem" }}>
+            <div key={producto._id} className="producto-item">
               {editandoId === producto._id ? (
-                <>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    placeholder="Nombre"
-                  />
-                  <input
-                    type="text"
-                    name="descripcion"
-                    value={formData.descripcion}
-                    onChange={handleChange}
-                    placeholder="Descripción"
-                  />
-                  <input
-                    type="number"
-                    name="precio"
-                    value={formData.precio}
-                    onChange={handleChange}
-                    placeholder="Precio"
-                  />
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleChange}
-                    placeholder="Stock"
-                  />
-                  <button onClick={handleGuardar}>💾 Guardar</button>
-                  <button onClick={() => setEditandoId(null)}>❌ Cancelar</button>
-                </>
+                <form className="formulario-edicion" onSubmit={(e) => e.preventDefault()}>
+                  <div className="campo-edicion">
+                    <label>Nombre</label>
+                    <input
+                      type="text"
+                      name="nombre"
+                      value={formData.nombre}
+                      onChange={handleChange}
+                      placeholder="Nombre del producto"
+                    />
+                  </div>
+                  
+                  <div className="campo-edicion">
+                    <label>Descripción</label>
+                    <textarea
+                      name="descripcion"
+                      value={formData.descripcion}
+                      onChange={handleChange}
+                      placeholder="Descripción del producto"
+                      rows="3"
+                    />
+                  </div>
+                  
+                  <div className="campo-edicion">
+                    <label>Precio</label>
+                    <input
+                      type="number"
+                      name="precio"
+                      value={formData.precio}
+                      onChange={handleChange}
+                      placeholder="Precio"
+                      min="0"
+                    />
+                  </div>
+                  
+                  <div className="campo-edicion">
+                    <label>Stock</label>
+                    <input
+                      type="number"
+                      name="stock"
+                      value={formData.stock}
+                      onChange={handleChange}
+                      placeholder="Stock disponible"
+                      min="0"
+                    />
+                  </div>
+                  
+                  <div className="botones-edicion">
+                    <button className="btn-guardar" onClick={handleGuardar}>
+                      💾 Guardar
+                    </button>
+                    <button className="btn-cancelar" onClick={() => setEditandoId(null)}>
+                      Cancelar
+                    </button>
+                  </div>
+                </form>
               ) : (
                 <>
-                  <h3>{producto.nombre}</h3>
-                  <p>{producto.descripcion}</p>
-                  <p>₡{producto.precio}</p>
-                  <p>Stock: {producto.stock}</p>
                   <img
-                    src={producto.imagen}
+                    src={producto.imagen || 'placeholder-image.jpg'}
                     alt={producto.nombre}
-                    style={{ width: "150px" }}
+                    className="producto-imagen"
                   />
-                  <br />
-                  <button onClick={() => handleEditar(producto)}>✏️ Editar</button>
-                  <button onClick={() => handleEliminar(producto._id)}>🗑️ Eliminar</button>
+                  <h3 className="producto-nombre">{producto.nombre}</h3>
+                  <p className="producto-descripcion">{producto.descripcion}</p>
+                  <p className="producto-precio">₡{producto.precio}</p>
+                  <p className="producto-stock">Stock: {producto.stock} unidades</p>
+                  
+                  <div className="producto-acciones">
+                    <button className="btn-editar" onClick={() => handleEditar(producto)}>
+                      ✏️ Editar
+                    </button>
+                    <button className="btn-eliminar" onClick={() => handleEliminar(producto._id)}>
+                      🗑️ Eliminar
+                    </button>
+                  </div>
                 </>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

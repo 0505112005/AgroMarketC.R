@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Login from "../clases/login";
+import "../estilos/Register.css";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -51,64 +53,105 @@ const Register = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h2 className="text-2xl mb-4">Registro</h2>
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+    <div className="register-container">
+      
+
+      <form className="register-form" onSubmit={handleSubmit}>
+        <div className="form-header">
+          <h2 className="register-title">🌱 Crear Cuenta</h2>
+          <p className="register-subtitle">Únete a la comunidad de AgromarketC.R</p>
         </div>
-      )}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <input
-          name="nombre"
-          placeholder="Nombre"
-          onChange={handleChange}
-          value={form.nombre}
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          type="email"
-          onChange={handleChange}
-          value={form.email}
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          name="password"
-          placeholder="Contraseña"
-          type="password"
-          onChange={handleChange}
-          value={form.password}
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          name="direccion"
-          placeholder="Dirección"
-          onChange={handleChange}
-          value={form.direccion}
-          className="p-2 border rounded"
-        />
-        <input
-          name="telefono"
-          placeholder="Teléfono"
-          onChange={handleChange}
-          value={form.telefono}
-          className="p-2 border rounded"
-        />
+
+        {error && (
+          <div className="error-message">
+            ⚠️ {error}
+          </div>
+        )}
+
+        <div className="form-grid">
+          <div className="input-group">
+            <label htmlFor="nombre">Nombre completo</label>
+            <input
+              id="nombre"
+              className="register-input"
+              name="nombre"
+              placeholder="Tu nombre"
+              onChange={handleChange}
+              value={form.nombre}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="telefono">Teléfono</label>
+            <input
+              id="telefono"
+              className="register-input"
+              name="telefono"
+              placeholder="Número teléfono"
+              onChange={handleChange}
+              value={form.telefono}
+            />
+          </div>
+
+          <div className="input-group full-width">
+            <label htmlFor="email">Correo electrónico</label>
+            <input
+              id="email"
+              className="register-input"
+              name="email"
+              type="email"
+              placeholder="tucorreo@ejemplo.com"
+              onChange={handleChange}
+              value={form.email}
+              required
+            />
+          </div>
+
+          <div className="input-group full-width">
+            <label htmlFor="direccion">Dirección</label>
+            <input
+              id="direccion"
+              className="register-input"
+              name="direccion"
+              placeholder="Tu dirección completa"
+              onChange={handleChange}
+              value={form.direccion}
+            />
+          </div>
+
+          <div className="input-group full-width">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              className="register-input"
+              name="password"
+              type="password"
+              placeholder="Crea una contraseña segura"
+              onChange={handleChange}
+              value={form.password}
+              required
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={loading}
-          className={`p-2 rounded text-white ${
-            loading ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
-          }`}
+          className="register-button"
         >
-          {loading ? "Registrando..." : "Registrarse"}
+          {loading ? "Creando cuenta..." : "Crear cuenta"}
         </button>
+
+        <div className="login-link">
+          ¿Ya tienes una cuenta?
+          <a href="/login" onClick={(e) => { e.preventDefault(); navigate('/login'); }}>
+            Inicia sesión
+          </a>
+        </div>
       </form>
     </div>
   );

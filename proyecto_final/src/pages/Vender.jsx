@@ -143,8 +143,8 @@ function Vender() {
 
                     <div className="botones-formulario">
                         <button type="submit" className="publicar">Publicar producto</button>
-                        <button type="button" className="volver-inicio" onClick={() => navigate("/")}>
-                            Volver a inicio
+                        <button type="button" className="volver-inicio" onClick={() => navigate("/mis-productos")}>
+                            Volver
                         </button>
                     </div>
                 </form>
