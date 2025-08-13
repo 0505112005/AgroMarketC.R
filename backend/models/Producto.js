@@ -9,7 +9,10 @@ const productoSchema = new mongoose.Schema({
     enum: ["Orgánico", "No orgánico", "En transición"],
     default: "No orgánico",
   },
-  imagen: { type: String },
+  imagen: {
+    type: String,
+    default: "https://via.placeholder.com/300x200?text=Sin+imagen",
+  },
   usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: "Usuario", required: true },
   productor: { type: String },
   activo: { type: Boolean, default: true },

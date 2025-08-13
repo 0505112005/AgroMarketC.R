@@ -2,40 +2,35 @@ import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
+import { useFavoritos } from "../context/FavoritosContext";
 
 const Inicio = () => {
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [pedidos, setPedidos] = useState([]);
-  const [favoritos, setFavoritos] = useState([]);
   const [productosDestacados, setProductosDestacados] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0); // Mensajes no leídos
+
   const navigate = useNavigate();
   const { carrito = [] } = useCarrito();
+  const { favoritos } = useFavoritos(); // favoritos desde contexto
 
-  // Cargar usuario del localStorage sólo una vez
+  // Cargar usuario del localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-
     try {
-      if (storedUser && storedUser !== "undefined") {
-        setUser(JSON.parse(storedUser));
-      } else {
-        setUser(null); // No hay usuario válido
-      }
-    } catch (error) {
-      console.error("Error al parsear usuario desde localStorage:", error);
+      if (storedUser && storedUser !== "undefined") setUser(JSON.parse(storedUser));
+      else setUser(null);
+    } catch {
       setUser(null);
     }
-
     setLoadingUser(false);
   }, []);
 
-  // Redirigir a login solo si ya terminó de cargar y no hay usuario
+  // Redirigir a login si no hay usuario
   useEffect(() => {
-    if (!loadingUser && !user) {
-      navigate("/login");
-    }
+    if (!loadingUser && !user) navigate("/login");
   }, [loadingUser, user, navigate]);
 
   // Fetch datos cuando hay usuario
@@ -45,10 +40,7 @@ const Inicio = () => {
     const fetchPedidos = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/pedidos/comprador/${user.id}`);
-        if (!res.ok) {
-          setPedidos([]);
-          return;
-        }
+        if (!res.ok) return setPedidos([]);
         const data = await res.json();
         setPedidos(Array.isArray(data) ? data : []);
       } catch {
@@ -56,27 +48,10 @@ const Inicio = () => {
       }
     };
 
-    const fetchFavoritos = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/favoritos?userId=${user.id}`);
-        if (!res.ok) {
-          setFavoritos([]);
-          return;
-        }
-        const data = await res.json();
-        setFavoritos(Array.isArray(data) ? data : []);
-      } catch {
-        setFavoritos([]);
-      }
-    };
-
     const fetchProductosDestacados = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/productos/destacados`);
-        if (!res.ok) {
-          setProductosDestacados([]);
-          return;
-        }
+        if (!res.ok) return setProductosDestacados([]);
         const data = await res.json();
         setProductosDestacados(Array.isArray(data) ? data : []);
       } catch {
@@ -94,22 +69,21 @@ const Inicio = () => {
     };
 
     fetchPedidos();
-    fetchFavoritos();
     fetchProductosDestacados();
     fetchActividadReciente();
+
+    // Simulación de mensajes no leídos
+    setUnreadCount(3);
+
   }, [user?.id]);
 
-  if (loadingUser) {
-    // Mientras carga el usuario, muestra un simple mensaje o spinner
-    return <div>Cargando usuario...</div>;
-  }
+  if (loadingUser) return <div>Cargando usuario...</div>;
 
   const nombreUsuario = user?.nombre || "Invitado";
   const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
   return (
     <div className="container">
-      {/* resto de tu JSX igual */}
       <header className="header">
         <h1>🌿 Agro Market</h1>
         <button
@@ -168,6 +142,18 @@ const Inicio = () => {
                   🧺 Mis Productos
                 </button>
               </li>
+              <li>
+                <button
+                  onClick={() => navigate("/mensajeria")}
+                  type="button"
+                  style={{ position: "relative" }}
+                >
+                  💬 Mensajería
+                  {unreadCount > 0 && (
+                    <span className="badge-unread">{unreadCount}</span>
+                  )}
+                </button>
+              </li>
               {user?.rol === "comprador" && (
                 <li>
                   <button
@@ -192,32 +178,22 @@ const Inicio = () => {
             <div className="estadistica-card">
               <div className="estadistica-valor">{pedidos.length}</div>
               <div className="estadistica-label">Pedidos Realizados</div>
-              <div className="estadistica-icon" aria-label="Pedidos">
-                📦
-              </div>
+              <div className="estadistica-icon" aria-label="Pedidos">📦</div>
             </div>
             <div className="estadistica-card">
-              <div className="estadistica-valor">
-                ₡{totalGastado.toLocaleString()}
-              </div>
+              <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
               <div className="estadistica-label">Total Gastado</div>
-              <div className="estadistica-icon" aria-label="Total Gastado">
-                💰
-              </div>
+              <div className="estadistica-icon" aria-label="Total Gastado">💰</div>
             </div>
             <div className="estadistica-card">
               <div className="estadistica-valor">{carrito.length}</div>
               <div className="estadistica-label">En Carrito</div>
-              <div className="estadistica-icon" aria-label="Carrito">
-                🛒
-              </div>
+              <div className="estadistica-icon" aria-label="Carrito">🛒</div>
             </div>
             <div className="estadistica-card">
               <div className="estadistica-valor">{favoritos.length}</div>
               <div className="estadistica-label">Favoritos</div>
-              <div className="estadistica-icon" aria-label="Favoritos">
-                ❤️
-              </div>
+              <div className="estadistica-icon" aria-label="Favoritos">❤️</div>
             </div>
           </section>
 
@@ -225,9 +201,7 @@ const Inicio = () => {
             <div className="productos-destacados cuadro">
               <h3>Productos Destacados</h3>
               <div className="productos-grid">
-                {productosDestacados.length === 0 && (
-                  <p>No hay productos destacados.</p>
-                )}
+                {productosDestacados.length === 0 && <p>No hay productos destacados.</p>}
                 {productosDestacados.map((prod) => (
                   <div key={prod._id} className="card">
                     <img
@@ -238,9 +212,7 @@ const Inicio = () => {
                     <h4>{prod.nombre}</h4>
                     <p className="descripcion">{prod.descripcion || ""}</p>
                     <p className="precio">₡{prod.precio?.toLocaleString() || "-"}</p>
-                    <p className="vendedor">
-                      Por {prod.vendedor || "Desconocido"}
-                    </p>
+                    <p className="vendedor">Por {prod.vendedor || "Desconocido"}</p>
                     <button
                       className="ver"
                       onClick={() => navigate(`/producto/${prod._id}`)}
@@ -256,9 +228,7 @@ const Inicio = () => {
             <div className="actividad-reciente cuadro">
               <h3>Actividad Reciente</h3>
               <ul>
-                {actividadReciente.length === 0 && (
-                  <li>No hay actividad reciente.</li>
-                )}
+                {actividadReciente.length === 0 && <li>No hay actividad reciente.</li>}
                 {actividadReciente.map((act) => (
                   <li key={act.id}>
                     <strong>{act.texto}</strong>

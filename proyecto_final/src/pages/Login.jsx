@@ -1,107 +1,255 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
-import "../estilos/Login.css"; 
+import { useCarrito } from "../components/CarritoContext";
+import { useFavoritos } from "../context/FavoritosContext";
 
-const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
+const Inicio = () => {
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [pedidos, setPedidos] = useState([]);
+  const [productosDestacados, setProductosDestacados] = useState([]);
+  const [actividadReciente, setActividadReciente] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const navigate = useNavigate();
+  const { carrito = [] } = useCarrito();
+  const { favoritos } = useFavoritos(); // FAVORITOS desde el contexto
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const loginUrl = `${process.env.REACT_APP_API_URL}/auth/login`;
-    console.log("URL de login:", loginUrl);
-
+  // Cargar usuario del localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
     try {
-      const res = await fetch(loginUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.mensaje || "Error al iniciar sesión");
-      }
-
-      // Normalizamos el usuario para que siempre tenga id
-      const usuarioFormateado = {
-        id: data.usuario.id || data.usuario._id, // asegura el id
-        nombre: data.usuario.nombre || "Usuario",
-        rol: data.usuario.rol || "",
-        email: data.usuario.email || "",
-      };
-
-      // Guardamos datos en localStorage
-      localStorage.setItem("token", data.token || "");
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("usuario", JSON.stringify(usuarioFormateado));
-
-      alert("Inicio de sesión exitoso");
-      navigate("/inicio");
-
+      if (storedUser && storedUser !== "undefined") {
+        setUser(JSON.parse(storedUser));
+      } else setUser(null);
     } catch (error) {
-      console.error("❌ Error al iniciar sesión:", error);
-      alert(error.message || "Error de conexión");
+      console.error("Error al parsear usuario:", error);
+      setUser(null);
     }
-  };
+    setLoadingUser(false);
+  }, []);
+
+  // Redirigir a login si no hay usuario
+  useEffect(() => {
+    if (!loadingUser && !user) navigate("/login");
+  }, [loadingUser, user, navigate]);
+
+  // Fetch pedidos, productos destacados y actividad reciente
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchPedidos = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/pedidos/comprador/${user.id}`);
+        if (!res.ok) return setPedidos([]);
+        const data = await res.json();
+        setPedidos(Array.isArray(data) ? data : []);
+      } catch {
+        setPedidos([]);
+      }
+    };
+
+    const fetchProductosDestacados = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/productos/destacados`);
+        if (!res.ok) return setProductosDestacados([]);
+        const data = await res.json();
+        setProductosDestacados(Array.isArray(data) ? data : []);
+      } catch {
+        setProductosDestacados([]);
+      }
+    };
+
+    const fetchActividadReciente = () => {
+      setActividadReciente([
+        { id: 1, texto: "Nuevo pedido recibido", tiempo: "Hace 2 horas" },
+        { id: 2, texto: "Producto agregado al catálogo", tiempo: "Hace 5 horas" },
+        { id: 3, texto: "Cliente nuevo registrado", tiempo: "Hace 1 día" },
+        { id: 4, texto: "Pedido entregado exitosamente", tiempo: "Hace 2 días" },
+      ]);
+    };
+
+    fetchPedidos();
+    fetchProductosDestacados();
+    fetchActividadReciente();
+
+    // Mensajes no leídos simulados
+    setUnreadCount(3);
+  }, [user?.id]);
+
+  if (loadingUser) return <div>Cargando usuario...</div>;
+
+  const nombreUsuario = user?.nombre || "Invitado";
+  const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
   return (
-    <div className="login-container">
-      
-      
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="form-header">
-          <h2 className="login-title">🌱 Iniciar Sesión</h2>
-          <p className="login-subtitle">Bienvenido a AgromarketC.R</p>
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="email">Correo electrónico</label>
-          <input
-            id="email"
-            className="login-input"
-            type="email"
-            name="email"
-            placeholder="tucorreo@ejemplo.com"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="input-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            id="password"
-            className="login-input"
-            type="password"
-            name="password"
-            placeholder="Tu contraseña"
-            value={form.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" className="login-button">
-          Iniciar Sesión
+    <div className="container">
+      <header className="header">
+        <h1>🌿 Agro Market</h1>
+        <button
+          className="btn-catalogo"
+          onClick={() => navigate("/catalogo")}
+          type="button"
+        >
+          Ver Catálogo
         </button>
+      </header>
 
-        <div className="register-link">
-          ¿No tienes una cuenta?
-          <a href="/register" onClick={(e) => { e.preventDefault(); navigate('/register'); }}>
-            Regístrate aquí
-          </a>
-        </div>
-      </form>
+      <div className="content">
+        <aside className="sidebar">
+          <div className="logo">
+            <h2>🌿 AgroMarket</h2>
+          </div>
+
+          <div className="usuario">
+            <img
+              src="https://www.w3schools.com/howto/img_avatar.png"
+              alt="Avatar"
+              className="avatar"
+            />
+            <div>
+              <p className="nombre">{nombreUsuario}</p>
+              <p className="rol">{user?.rol || ""}</p>
+              <button
+                className="btn-perfil"
+                onClick={() => navigate("/perfil")}
+                type="button"
+              >
+                👤 Perfil
+              </button>
+            </div>
+          </div>
+
+          <nav className="nav-menu">
+            <ul>
+              <li>
+                <button onClick={() => navigate("/inicio")} type="button">
+                  📊 Dashboard
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/catalogo")} type="button">
+                  📦 Catálogo
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/carrito")} type="button">
+                  🛒 Carrito ({carrito.length})
+                </button>
+              </li>
+              <li>
+                <button onClick={() => navigate("/mis-productos")} type="button">
+                  🧺 Mis Productos
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigate("/mensajeria")}
+                  type="button"
+                  style={{ position: "relative" }}
+                >
+                  💬 Mensajería
+                  {unreadCount > 0 && (
+                    <span className="badge-unread">{unreadCount}</span>
+                  )}
+                </button>
+              </li>
+              {user?.rol === "comprador" && (
+                <li>
+                  <button
+                    onClick={() => navigate("/solicitud-vendedor")}
+                    type="button"
+                  >
+                    📩 Quiero Vender
+                  </button>
+                </li>
+              )}
+            </ul>
+          </nav>
+        </aside>
+
+        <main className="main">
+          <section className="saludo">
+            <h2>Bienvenido, {nombreUsuario}!</h2>
+            <p>Descubre los mejores productos agrícolas</p>
+          </section>
+
+          <section className="estadisticas">
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{pedidos.length}</div>
+              <div className="estadistica-label">Pedidos Realizados</div>
+              <div className="estadistica-icon" aria-label="Pedidos">📦</div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">
+                ₡{totalGastado.toLocaleString()}
+              </div>
+              <div className="estadistica-label">Total Gastado</div>
+              <div className="estadistica-icon" aria-label="Total Gastado">💰</div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{carrito.length}</div>
+              <div className="estadistica-label">En Carrito</div>
+              <div className="estadistica-icon" aria-label="Carrito">🛒</div>
+            </div>
+            <div className="estadistica-card">
+              <div className="estadistica-valor">{favoritos.length}</div>
+              <div className="estadistica-label">Favoritos</div>
+              <div className="estadistica-icon" aria-label="Favoritos">❤️</div>
+            </div>
+          </section>
+
+          <section className="bottom-secciones">
+            <div className="productos-destacados cuadro">
+              <h3>Productos Destacados</h3>
+              <div className="productos-grid">
+                {productosDestacados.length === 0 && <p>No hay productos destacados.</p>}
+                {productosDestacados.map(prod => (
+                  <div key={prod._id} className="card">
+                    <img
+                      src={prod.imagen || "https://via.placeholder.com/150"}
+                      alt={prod.nombre}
+                      className="card-imagen"
+                    />
+                    <h4>{prod.nombre}</h4>
+                    <p className="descripcion">{prod.descripcion || ""}</p>
+                    <p className="precio">₡{prod.precio?.toLocaleString() || "-"}</p>
+                    <p className="vendedor">Por {prod.vendedor || "Desconocido"}</p>
+                    <button
+                      className="ver"
+                      onClick={() => navigate(`/producto/${prod._id}`)}
+                      type="button"
+                    >
+                      Ver
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="actividad-reciente cuadro">
+              <h3>Actividad Reciente</h3>
+              <ul>
+                {actividadReciente.length === 0 && <li>No hay actividad reciente.</li>}
+                {actividadReciente.map(act => (
+                  <li key={act.id}>
+                    <strong>{act.texto}</strong>
+                    <br />
+                    <small>{act.tiempo}</small>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <footer className="footer">
+        <p>&copy; 2025 Mercado Orgánico</p>
+      </footer>
     </div>
   );
 };
 
-export default Login;
+export default Inicio;
