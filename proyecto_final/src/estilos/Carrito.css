@@ -208,3 +208,33 @@
     width: 100%;
   }
 }
+
+
+
+/* Contenedor general del formulario de pago */
+.formulario-pago {
+  display: grid;
+  grid-template-columns: 180px 1fr; /* ancho fijo para labels, resto para inputs */
+  gap: 20px 20px; /* primer valor = separación vertical, segundo = horizontal */
+  align-items: center; /* alinea verticalmente */
+}
+
+/* Cada campo del formulario */
+.campo {
+  display: contents; /* permite que label e input usen el grid del padre */
+}
+
+/* Estilo de las etiquetas */
+.campo label {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Estilo de los inputs */
+.campo input,
+.campo select {
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}

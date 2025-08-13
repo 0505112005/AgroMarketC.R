@@ -48,6 +48,9 @@ const Catalogo = () => {
       {mensajeExito && <div className="toast-exito">{mensajeExito}</div>}
 
       <h2 className="titulo">Catálogo de Productos</h2>
+      <button className="volver-inicio" onClick={() => navigate("/inicio")}>
+        Volver a Inicio
+      </button>
       <p className="subtitulo">
         Descubre los mejores productos agrícolas directamente de nuestros agricultores
       </p>
