@@ -83,7 +83,7 @@ const Inicio = () => {
   return (
     <div className="container">
       <header className="header">
-        <h1>🌿 Agro Market</h1>
+        <h1>🌿AgroMarket</h1>
         <button
           className="btn-catalogo"
           onClick={() => navigate("/catalogo")}
@@ -95,9 +95,7 @@ const Inicio = () => {
 
       <div className="content">
         <aside className="sidebar">
-          <div className="logo">
-            <h2>🌿 AgroMarket</h2>
-          </div>
+          
 
           <div className="usuario">
             <img

@@ -1,141 +1,191 @@
-@import './variables.css';
+/* Register CSS - Estilo coherente con AgroMarket */
 
-/* Container y Formulario */
+/* Contenedor principal */
 .register-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-gradient);
-  padding: var(--spacing-md);
-  position: relative;
+  background: linear-gradient(135deg, #27ae60, #4caf50);
+  padding: 2rem;
 }
 
+/* Formulario */
 .register-form {
-  background: var(--color-bg);
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
+  background: white;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: var(--form-max-width);
+  max-width: 520px;
   position: relative;
-  animation: slideUp var(--transition-normal) forwards;
 }
 
+/* Borde superior verde */
 .register-form::before {
   content: '';
   position: absolute;
-  inset: 0 0 auto 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2e7d32, #4caf50);
+  border-radius: 12px 12px 0 0;
 }
 
-/* Header y Grid */
-.form-header { text-align: center; margin-bottom: var(--spacing-xl); }
-.register-title { color: var(--color-text); font-size: var(--font-size-xxl); font-weight: 600; margin-bottom: var(--spacing-sm); }
-.register-subtitle { color: var(--color-text-light); font-size: var(--font-size-sm); }
+/* Header */
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
 
+.register-title {
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.register-subtitle {
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Mensaje de error */
+.error-message {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Grid de formulario */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
+  gap: 1rem;
 }
 
-/* Input Groups */
+/* Grupos de input */
 .input-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 1rem;
 }
 
-.input-group.full-width { grid-column: span 2; }
+.input-group.full-width {
+  grid-column: span 2;
+}
 
 .input-group label {
   display: block;
-  color: var(--color-text);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  margin-bottom: var(--spacing-sm);
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
 }
 
-/* Inputs y Botones */
+/* Inputs */
 .register-input {
   width: 100%;
-  padding: var(--spacing-md) var(--spacing-md);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-md);
-  background: var(--color-bg-light);
-  transition: all var(--transition-fast);
+  padding: 0.9rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #f8f9fa;
+  transition: all 0.2s;
+  font-family: inherit;
 }
 
 .register-input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  background: var(--color-bg);
-  box-shadow: 0 0 0 4px rgba(46,125,50,0.1);
+  border-color: #2e7d32;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
+.register-input::placeholder {
+  color: #adb5bd;
+}
+
+/* Botón */
 .register-button {
-  background: var(--color-primary);
+  width: 100%;
+  background: #2e7d32;
   color: white;
   border: none;
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
-  font-size: var(--font-size-md);
-  font-weight: 500;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
-  width: 100%;
-}
-
-.register-button {
-  margin-top: var(--spacing-md);
+  transition: all 0.2s;
+  margin-top: 1.5rem;
 }
 
 .register-button:hover {
-  background: var(--color-primary-light);
+  background: #4caf50;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
 }
 
-/* Enlaces */
+.register-button:disabled {
+  background: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-button:disabled:hover {
+  background: #95a5a6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Link de login */
 .login-link {
   text-align: center;
-  margin-top: var(--spacing-lg);
-  color: var(--color-text-light);
-  font-size: var(--font-size-sm);
+  margin-top: 1.5rem;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .login-link a {
-  color: var(--color-primary);
+  color: #2e7d32;
   text-decoration: none;
-  font-weight: 500;
-  margin-left: var(--spacing-sm);
-  transition: color var(--transition-fast);
+  font-weight: 600;
+  margin-left: 0.5rem;
+  transition: color 0.2s;
 }
 
 .login-link a:hover {
-  color: var(--color-primary-light);
+  color: #4caf50;
   text-decoration: underline;
 }
 
-/* Media Queries */
+/* Responsivo */
 @media (max-width: 640px) {
-  .form-grid, .input-group.full-width {
+  .form-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .input-group.full-width {
     grid-column: span 1;
   }
 }
 
 @media (max-width: 480px) {
-  .register-container { 
-    padding: var(--spacing-sm); 
+  .register-container {
+    padding: 1rem;
   }
+  
   .register-form {
-    padding: var(--spacing-lg);
-    box-shadow: none;
+    padding: 2rem 1.5rem;
   }
-  .register-title { 
-    font-size: var(--font-size-xl); 
+  
+  .register-title {
+    font-size: 1.5rem;
   }
 }

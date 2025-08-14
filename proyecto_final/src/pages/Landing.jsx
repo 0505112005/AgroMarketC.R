@@ -54,7 +54,7 @@ export default function Landing() {
         </nav>
 
         <div className="actions">
-          <Link to="/explorar" className="btn btn-light">Explorar</Link>
+         
           <Link to="/login" className="btn btn-primary">Iniciar Sesión</Link>
         </div>
       </header>
@@ -74,7 +74,7 @@ export default function Landing() {
           </p>
           <div className="cta">
             <Link to="/explorar" className="btn btn-primary btn-lg">Explorar Productos →</Link>
-            <button type="button" className="btn btn-light btn-lg">▶ Ver Demo</button>
+            
           </div>
 
           <ul className="trust reveal" ref={setRef}>

@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../estilos/Login.css";
@@ -43,31 +42,41 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
       <form onSubmit={handleSubmit} className="login-form">
+        <h2>Iniciar Sesión</h2>
+        
         <label>
-          Correo Electrónico:
+          Correo Electrónico
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@email.com"
             required
           />
         </label>
 
         <label>
-          Contraseña:
+          Contraseña
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Ingresa tu contraseña"
             required
           />
         </label>
 
-        {error && <p className="error">{error}</p>}
+        {error && <div className="error">{error}</div>}
 
-        <button type="submit" className="btn-login">Ingresar</button>
+        <button type="submit" className="btn-login">
+          Ingresar
+        </button>
+
+        <div className="register-link">
+          ¿No tienes cuenta?
+          <a href="/register">Regístrate aquí</a>
+        </div>
       </form>
     </div>
   );

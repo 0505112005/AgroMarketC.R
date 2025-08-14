@@ -38,15 +38,8 @@ function App() {
               <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
               <Route path="/catalogo" element={<Catalogo />} />
               <Route path="/mensajeria" element={<Mensajeria />} />
+              <Route path="/perfil" element={  <Perfil />  } />
 
-              <Route
-                path="/perfil"
-                element={
-                  <RutaProtegida>
-                    <Perfil />
-                  </RutaProtegida>
-                }
-              />
             </Routes>
           </Router>
         </NotificacionesProvider>
