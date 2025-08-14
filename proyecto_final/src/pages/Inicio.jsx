@@ -3,11 +3,9 @@ import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
-import { useFavoritos } from "../context/FavoritosContext";
 
 const Inicio = () => {
   const [user, setUser] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [pedidos, setPedidos] = useState([]);
   const [productosDestacados, setProductosDestacados] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
@@ -15,24 +13,17 @@ const Inicio = () => {
 
   const navigate = useNavigate();
   const { carrito } = useCarrito();
-  const { favoritos, cargando } = useFavoritos(); // favoritos desde contexto
 
   // Cargar usuario del localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-    try {
-      if (storedUser && storedUser !== "undefined") setUser(JSON.parse(storedUser));
-      else setUser(null);
-    } catch {
+    if (storedUser && storedUser !== "undefined") {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser.id ? parsedUser : null); // solo si tiene id
+    } else {
       setUser(null);
     }
-    setLoadingUser(false);
   }, []);
-
-  // Redirigir a login si no hay usuario
-  useEffect(() => {
-    if (!loadingUser && !user) navigate("/login");
-  }, [loadingUser, user, navigate]);
 
   // Fetch de datos cuando hay usuario
   useEffect(() => {
@@ -75,7 +66,14 @@ const Inicio = () => {
     setUnreadCount(3);
   }, [user?.id]);
 
-  if (loadingUser) return <div>Cargando usuario...</div>;
+  // Manejo de botón Perfil
+  const handlePerfilClick = () => {
+    if (user?.id) {
+      navigate("/perfil");
+    } else {
+      alert("Debes iniciar sesión para ver tu perfil"); // opcional
+    }
+  };
 
   const nombreUsuario = user?.nombre || "Invitado";
   const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
@@ -95,8 +93,6 @@ const Inicio = () => {
 
       <div className="content">
         <aside className="sidebar">
-          
-
           <div className="usuario">
             <img
               src="https://www.w3schools.com/howto/img_avatar.png"
@@ -108,7 +104,7 @@ const Inicio = () => {
               <p className="rol">{user?.rol || ""}</p>
               <button
                 className="btn-perfil"
-                onClick={() => navigate("/perfil")}
+                onClick={handlePerfilClick}
                 type="button"
               >
                 👤 Perfil
@@ -185,11 +181,6 @@ const Inicio = () => {
               <div className="estadistica-valor">{carrito.length}</div>
               <div className="estadistica-label">En Carrito</div>
               <div className="estadistica-icon" aria-label="Carrito">🛒</div>
-            </div>
-            <div className="estadistica-card">
-              <div className="estadistica-valor">{favoritos.length}</div>
-              <div className="estadistica-label">Favoritos</div>
-              <div className="estadistica-icon" aria-label="Favoritos">❤️</div>
             </div>
           </section>
 

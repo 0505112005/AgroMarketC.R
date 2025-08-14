@@ -7,7 +7,6 @@ import Register from "./pages/Register";
 import Inicio from "./pages/Inicio";
 import Vender from "./pages/Vender";
 import Perfil from "./pages/Perfil";
-import RutaProtegida from "./components/RutaProtegida";
 import Login from "./pages/Login"; 
 import Carrito from "./pages/Carrito";
 import MisProductos from "./pages/MisProductos";
@@ -17,34 +16,28 @@ import Mensajeria from "./pages/Mensajeria";
 
 // Contextos
 import { CarritoProvider } from "./components/CarritoContext";
-import { FavoritosProvider } from "./context/FavoritosContext";
 import { NotificacionesProvider } from "./context/NotificacionesContext";
 
 function App() {
   return (
-    <FavoritosProvider>
-      <CarritoProvider>
-        <NotificacionesProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Navigate to="/Landing" />} />
-              <Route path="/Landing" element={<Landing />} />
-              <Route path="/inicio" element={<Inicio />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/vender" element={<Vender />} />
-              <Route path="/carrito" element={<Carrito />} />
-              <Route path="/mis-productos" element={<MisProductos />} />
-              <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
-              <Route path="/catalogo" element={<Catalogo />} />
-              <Route path="/mensajeria" element={<Mensajeria />} />
-              <Route path="/perfil" element={  <Perfil />  } />
-
-            </Routes>
-          </Router>
-        </NotificacionesProvider>
-      </CarritoProvider>
-    </FavoritosProvider>
+    <CarritoProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/Landing" />} />
+            <Route path="/Landing" element={<Landing />} />
+            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/perfil" element={<Perfil />} />
+            <Route path="/vender" element={<Vender />} />
+            <Route path="/carrito" element={<Carrito />} />
+            <Route path="/mis-productos" element={<MisProductos />} />
+            <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
+            <Route path="/catalogo" element={<Catalogo />} />
+            <Route path="/mensajeria" element={<Mensajeria />} />
+          </Routes>
+        </Router>
+    </CarritoProvider>
   );
 }
 
