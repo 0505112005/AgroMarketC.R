@@ -15,20 +15,17 @@ const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const pedidoRoutes = require("./routes/pedidoRoutes");
 const favoritosRoutes = require("./routes/favoritos");
-
-// Nuevas rutas para likes y notificaciones
-const likesRoutes = require("./routes/likes");
 const notificacionesRoutes = require("./routes/notificaciones");
+
 
 // Usa las rutas
 app.use("/api/auth", authRoutes);
 app.use("/api/productos", productRoutes);
 app.use("/api/pedidos", pedidoRoutes);
 app.use("/api/favoritos", favoritosRoutes);
-
-// Agrega las rutas nuevas para likes y notificaciones
-app.use("/api/likes", likesRoutes);
 app.use("/api/notificaciones", notificacionesRoutes);
+
+
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);

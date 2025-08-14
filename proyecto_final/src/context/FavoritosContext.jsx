@@ -1,3 +1,4 @@
+// src/context/FavoritosContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
 const FavoritosContext = createContext();
@@ -5,10 +6,11 @@ const FavoritosContext = createContext();
 export const FavoritosProvider = ({ children }) => {
   const [favoritos, setFavoritos] = useState([]);
   const [cargando, setCargando] = useState(false);
-  const token = localStorage.getItem("token"); // o usuario.id según tu auth
 
-  // Usamos useCallback para que useEffect no dé warning
+  const obtenerToken = () => localStorage.getItem("token");
+
   const cargarFavoritos = useCallback(async () => {
+    const token = obtenerToken();
     if (!token) {
       setFavoritos([]);
       return;
@@ -19,59 +21,53 @@ export const FavoritosProvider = ({ children }) => {
       const res = await fetch("http://localhost:5000/api/favoritos", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("No autorizado o error en la API");
+      if (!res.ok) throw new Error("No se pudieron cargar los favoritos");
+
       const data = await res.json();
-      setFavoritos(Array.isArray(data) ? data : []);
+      setFavoritos(data);
     } catch (error) {
       console.error("Error cargando favoritos:", error);
       setFavoritos([]);
     }
     setCargando(false);
-  }, [token]);
-
-  const toggleFavorito = async (producto) => {
-    if (!token) {
-      alert("Debe iniciar sesión para gestionar favoritos.");
-      return false;
-    }
-
-    const favoritoExistente = favoritos.find(
-      (fav) => fav.productoId?._id === producto._id
-    );
-
-    try {
-      if (favoritoExistente) {
-        await fetch(`http://localhost:5000/api/favoritos/${favoritoExistente.productoId._id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      } else {
-        await fetch("http://localhost:5000/api/favoritos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ productoId: producto._id }),
-        });
-      }
-      await cargarFavoritos();
-      return true;
-    } catch (error) {
-      console.error("Error actualizando favoritos:", error);
-      return false;
-    }
-  };
+  }, []);
 
   useEffect(() => {
     cargarFavoritos();
-  }, [cargarFavoritos]); // ahora no da warning
+  }, [cargarFavoritos]);
+
+  const toggleFavorito = async (producto) => {
+    const token = obtenerToken();
+    if (!token) return null;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/favoritos/${producto._id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Error modificando favorito");
+      }
+
+      const data = await res.json();
+
+      if (data.agregado) {
+        setFavoritos((prev) => [...prev, data.producto]);
+      } else {
+        setFavoritos((prev) => prev.filter((f) => f._id !== data.producto._id));
+      }
+
+      return data.agregado;
+    } catch (error) {
+      console.error("Error modificando favorito:", error);
+      return null;
+    }
+  };
 
   return (
-    <FavoritosContext.Provider value={{ favoritos, cargando, toggleFavorito }}>
+    <FavoritosContext.Provider value={{ favoritos, cargando, toggleFavorito, cargarFavoritos }}>
       {children}
     </FavoritosContext.Provider>
   );

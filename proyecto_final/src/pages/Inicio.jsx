@@ -1,3 +1,4 @@
+// src/pages/Inicio.jsx
 import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
@@ -10,11 +11,11 @@ const Inicio = () => {
   const [pedidos, setPedidos] = useState([]);
   const [productosDestacados, setProductosDestacados] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0); // Mensajes no leídos
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const navigate = useNavigate();
-  const { carrito = [] } = useCarrito();
-  const { favoritos } = useFavoritos(); // favoritos desde contexto
+  const { carrito } = useCarrito();
+  const { favoritos, cargando } = useFavoritos(); // favoritos desde contexto
 
   // Cargar usuario del localStorage
   useEffect(() => {
@@ -33,7 +34,7 @@ const Inicio = () => {
     if (!loadingUser && !user) navigate("/login");
   }, [loadingUser, user, navigate]);
 
-  // Fetch datos cuando hay usuario
+  // Fetch de datos cuando hay usuario
   useEffect(() => {
     if (!user?.id) return;
 
@@ -71,10 +72,7 @@ const Inicio = () => {
     fetchPedidos();
     fetchProductosDestacados();
     fetchActividadReciente();
-
-    // Simulación de mensajes no leídos
     setUnreadCount(3);
-
   }, [user?.id]);
 
   if (loadingUser) return <div>Cargando usuario...</div>;
