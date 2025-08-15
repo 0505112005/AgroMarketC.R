@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
 import "../estilos/catalogo.css";
 
@@ -6,14 +7,15 @@ const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
 
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
+  const [topFavoritos, setTopFavoritos] = useState([]);
   const [filtros, setFiltros] = useState({ nombre: "", categoria: "", precioMin: "", precioMax: "" });
   const [mensajeExito, setMensajeExito] = useState("");
-  const [favoritos, setFavoritos] = useState([]);
   const [usuario, setUsuario] = useState(null);
 
-  const { agregarProducto } = useCarrito();
+  const navigate = useNavigate();
+  const { carrito, agregarProducto } = useCarrito();
 
-  // Cargar usuario desde localStorage
+  // Cargar usuario
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("usuario"));
     if (storedUser?.id) setUsuario(storedUser);
@@ -33,20 +35,19 @@ const Catalogo = () => {
     fetchProductos();
   }, []);
 
-  // Cargar favoritos del usuario
-  const cargarFavoritos = async () => {
-    if (!usuario?.id) return;
-    try {
-      const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${usuario.id}`);
-      const data = await res.json();
-      setFavoritos(data);
-    } catch (err) {
-      console.error("Error cargando favoritos:", err);
-    }
-  };
-
+  // Obtener top favoritos del usuario
   useEffect(() => {
-    cargarFavoritos();
+    if (!usuario?.id) return;
+    const fetchTopFavoritos = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${usuario.id}`);
+        const data = await res.json();
+        setTopFavoritos(data);
+      } catch (err) {
+        console.error("Error al cargar top favoritos:", err);
+      }
+    };
+    fetchTopFavoritos();
   }, [usuario]);
 
   const mostrarMensajeExito = (texto) => {
@@ -54,30 +55,15 @@ const Catalogo = () => {
     setTimeout(() => setMensajeExito(""), 3000);
   };
 
-  const handleAgregarCarrito = async (producto) => {
+  const handleAgregarCarrito = (producto) => {
     if (!usuario?.id) {
-      alert("Debe iniciar sesión para agregar productos");
+      navigate("/login");
       return;
     }
-
     agregarProducto(producto);
     mostrarMensajeExito("✅ Producto agregado al carrito");
-
-    try {
-      const res = await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId: usuario.id, productoId: producto._id }),
-      });
-
-      if (res.ok) cargarFavoritos();
-      else console.error(await res.json());
-    } catch (err) {
-      console.error(err);
-    }
   };
 
-  // Productos filtrados
   const productosFiltrados = productos.filter((p) => {
     const nombreMatch = p.nombre.toLowerCase().includes(filtros.nombre.toLowerCase());
     const categoriaMatch = filtros.categoria ? p.certificacion === filtros.categoria : true;
@@ -87,39 +73,35 @@ const Catalogo = () => {
     return nombreMatch && categoriaMatch && precioMatch;
   });
 
-  // Top 5 más vendidos según cantidadAgregados
-  const topVendidos = [...favoritos]
-    .sort((a, b) => b.cantidadAgregados - a.cantidadAgregados)
-    .slice(0, 5);
-
-  if (!usuario) return <p>Cargando catálogo...</p>;
-
   return (
     <section className="catalogo">
       {mensajeExito && <div className="toast-exito">{mensajeExito}</div>}
 
-      {/* Top 5 productos más vendidos */}
-      <h2 className="titulo">Productos más vendidos</h2>
-      {topVendidos.length === 0 ? (
-        <p>No hay productos vendidos aún</p>
-      ) : (
-        <div className="productos-grid favoritos-carrusel">
-          {topVendidos.map((fav) => (
-            <div className="card" key={fav._id}>
-              <img
-                src={fav.productoId.imagen?.trim() ? fav.productoId.imagen : imagenPorDefecto}
-                alt={fav.productoId.nombre}
-                className="card-imagen"
-              />
-              <h3 className="card-nombre">{fav.productoId.nombre}</h3>
-              <p className="card-precio">€{fav.productoId.precio} /kg</p>
-              <button onClick={() => handleAgregarCarrito(fav.productoId)}>Añadir al carrito</button>
-            </div>
-          ))}
-        </div>
+      {/* Top favoritos */}
+      {topFavoritos.length > 0 && (
+        <>
+          <h2 className="titulo">Tus productos más agregados</h2>
+          <div className="productos-grid">
+            {topFavoritos.map((fav) => (
+              <div className="card" key={fav.productoId._id}>
+                <img
+                  src={fav.productoId.imagen?.trim() ? fav.productoId.imagen : imagenPorDefecto}
+                  alt={fav.productoId.nombre}
+                  className="card-imagen"
+                />
+                <h3 className="card-nombre">{fav.productoId.nombre}</h3>
+                <p className="card-precio">€{fav.productoId.precio} /kg</p>
+                <p className="card-detalle">Agregado {fav.cantidadAgregados} veces</p>
+                <button className="btn-agregar" onClick={() => handleAgregarCarrito(fav.productoId)}>
+                  Añadir al carrito
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
-      {/* Filtros */}
+      {/* Catálogo completo */}
       <h2 className="titulo">Catálogo completo</h2>
       <div className="filtros">
         <input
@@ -140,17 +122,13 @@ const Catalogo = () => {
           value={filtros.precioMax}
           onChange={(e) => setFiltros({ ...filtros, precioMax: e.target.value })}
         />
-        <select
-          value={filtros.categoria}
-          onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
-        >
+        <select value={filtros.categoria} onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}>
           <option value="">Todas las categorías</option>
           <option value="Orgánico">Orgánico</option>
           <option value="Híbrido">Híbrido</option>
         </select>
       </div>
 
-      {/* Catálogo completo */}
       <div className="productos-grid">
         {productosFiltrados.length === 0 ? (
           <p>No hay productos disponibles</p>
@@ -164,7 +142,10 @@ const Catalogo = () => {
               />
               <h3 className="card-nombre">{producto.nombre}</h3>
               <p className="card-precio">€{producto.precio} /kg</p>
-              <button onClick={() => handleAgregarCarrito(producto)}>Añadir al carrito</button>
+              <p className="card-detalle">{producto.descripcion || "Sin descripción"}</p>
+              <button className="btn-agregar" onClick={() => handleAgregarCarrito(producto)}>
+                Añadir al carrito
+              </button>
             </div>
           ))
         )}

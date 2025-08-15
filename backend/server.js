@@ -15,12 +15,14 @@ const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const pedidoRoutes = require("./routes/pedidoRoutes");
 const favoritosCarritoRoutes = require("./routes/favoritosCarrito");
+const carritoRoutes = require("./routes/carrito"); // <--- faltaba
 
 // Usa las rutas
 app.use("/api/auth", authRoutes);
 app.use("/api/productos", productRoutes);
 app.use("/api/pedidos", pedidoRoutes);
 app.use("/api/favoritos-carrito", favoritosCarritoRoutes);
+app.use("/api/carrito", carritoRoutes); // <--- faltaba
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);

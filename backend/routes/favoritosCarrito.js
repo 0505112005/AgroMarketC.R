@@ -16,6 +16,20 @@ router.get("/:usuarioId", async (req, res) => {
   }
 });
 
+// Obtener los 5 productos más vendidos globalmente
+router.get("/top", async (req, res) => {
+  try {
+    const top = await FavoritoCarrito.find()
+      .sort({ cantidadAgregados: -1 })
+      .limit(5)
+      .populate("productoId");
+    res.json(top);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al obtener los más vendidos" });
+  }
+});
+
 // Incrementar contador al agregar al carrito
 router.post("/agregar", async (req, res) => {
   const { usuarioId, productoId } = req.body;

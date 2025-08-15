@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Vender.jsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import "../estilos/Vender.css";
 
 function Vender() {
@@ -14,16 +16,6 @@ function Vender() {
     const navigate = useNavigate();
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    useEffect(() => {
-        const isAuthenticated = localStorage.getItem("isAuthenticated");
-
-        // Solo dejar pasar si está autenticado y es VENDEDOR
-        if (!isAuthenticated || !usuario || usuario.rol !== "vendedor") {
-            alert("Acceso denegado. Solo los vendedores pueden publicar productos.");
-            navigate("/login");
-        }
-    }, [navigate, usuario]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setProducto({ ...producto, [name]: value });
@@ -32,7 +24,17 @@ function Vender() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Construir producto completo para enviar
+        const token = localStorage.getItem("token");
+        if (!token) {
+            Swal.fire({
+                icon: "error",
+                title: "Error de autenticación",
+                text: "No se encontró el token. Inicia sesión nuevamente.",
+                confirmButtonColor: "#4CAF50"
+            });
+            return;
+        }
+
         const nuevoProducto = {
             ...producto,
             imagen: producto.imagen.trim() || "https://cdn-icons-png.flaticon.com/512/847/847969.png",
@@ -40,13 +42,12 @@ function Vender() {
             productor: usuario.nombre,
         };
 
-        console.log("📦 Enviando producto:", nuevoProducto);
-
         try {
             const res = await fetch("http://localhost:5000/api/productos", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(nuevoProducto),
             });
@@ -56,9 +57,15 @@ function Vender() {
                 throw new Error(errorData.mensaje || "Error al guardar el producto");
             }
 
-            alert("✅ Producto publicado correctamente");
+            Swal.fire({
+                icon: "success",
+                title: "¡Producto publicado!",
+                text: "Tu producto ha sido agregado correctamente.",
+                confirmButtonColor: "#4CAF50",
+                timer: 2000,
+                timerProgressBar: true
+            });
 
-            // Limpiar el formulario
             setProducto({
                 nombre: '',
                 descripcion: '',
@@ -67,9 +74,16 @@ function Vender() {
                 certificacion: '100%',
             });
 
+            navigate("/mis-productos");
+
         } catch (err) {
             console.error("❌ Error al enviar producto:", err);
-            alert("❌ Error al guardar el producto. Intenta nuevamente.");
+            Swal.fire({
+                icon: "error",
+                title: "Error al guardar",
+                text: err.message || "Intenta nuevamente.",
+                confirmButtonColor: "#4CAF50"
+            });
         }
     };
 
@@ -138,12 +152,15 @@ function Vender() {
                             <option value="No orgánico">No orgánico</option>
                             <option value="En transición">En transición</option>
                         </select>
-
                     </div>
 
                     <div className="botones-formulario">
                         <button type="submit" className="publicar">Publicar producto</button>
-                        <button type="button" className="volver-inicio" onClick={() => navigate("/mis-productos")}>
+                        <button
+                            type="button"
+                            className="volver-inicio"
+                            onClick={() => navigate("/mis-productos")}
+                        >
                             Volver
                         </button>
                     </div>

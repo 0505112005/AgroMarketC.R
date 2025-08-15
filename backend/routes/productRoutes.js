@@ -5,7 +5,9 @@ const authMiddleware = require("../middleware/authMiddleware"); // middleware de
 
 const IMAGEN_POR_DEFECTO = "https://via.placeholder.com/300x200?text=Sin+Imagen";
 
+// ==========================
 // Crear un nuevo producto
+// ==========================
 router.post("/", authMiddleware, async (req, res) => {
   try {
     console.log("Nuevo producto recibido:", req.body);
@@ -26,7 +28,9 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
+// ==========================
 // Obtener todos los productos
+// ==========================
 router.get("/", async (req, res) => {
   try {
     const productos = await Producto.find();
@@ -37,7 +41,9 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ==========================
 // Obtener solo los productos del usuario logeado
+// ==========================
 router.get("/mis-productos", authMiddleware, async (req, res) => {
   try {
     const productos = await Producto.find({ usuarioId: req.user._id });
@@ -45,6 +51,59 @@ router.get("/mis-productos", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error al obtener productos del usuario:", error);
     res.status(500).json({ error: "Error al obtener los productos del usuario" });
+  }
+});
+
+// ==========================
+// Actualizar un producto
+// ==========================
+router.put("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const datos = req.body;
+
+  try {
+    const producto = await Producto.findById(id);
+    if (!producto) return res.status(404).json({ mensaje: "Producto no encontrado" });
+
+    if (producto.usuarioId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ mensaje: "No tienes permiso para editar este producto" });
+    }
+
+    // Actualizar campos
+    producto.nombre = datos.nombre || producto.nombre;
+    producto.descripcion = datos.descripcion || producto.descripcion;
+    producto.precio = datos.precio !== undefined ? datos.precio : producto.precio;
+    producto.stock = datos.stock !== undefined ? datos.stock : producto.stock;
+    producto.imagen = datos.imagen || producto.imagen;
+    producto.certificacion = datos.certificacion || producto.certificacion;
+
+    const actualizado = await producto.save();
+    res.json(actualizado);
+  } catch (error) {
+    console.error("Error al actualizar producto:", error);
+    res.status(500).json({ mensaje: "Error al actualizar producto" });
+  }
+});
+
+// ==========================
+// Eliminar un producto
+// ==========================
+router.delete("/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const producto = await Producto.findById(id);
+    if (!producto) return res.status(404).json({ mensaje: "Producto no encontrado" });
+
+    if (producto.usuarioId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ mensaje: "No tienes permiso para eliminar este producto" });
+    }
+
+    await Producto.findByIdAndDelete(id);
+    res.json({ mensaje: "Producto eliminado correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    res.status(500).json({ mensaje: "Error al eliminar producto" });
   }
 });
 
