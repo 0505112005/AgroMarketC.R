@@ -1,0 +1,49 @@
+/* Paleta de Colores AgroMarket - Variables CSS */
+:root {
+  /* Colores principales */
+  --verde-principal: #2e7d32;     /* Verde Principal (Sidebar, botones principales, precios) */
+  --verde-claro: #4caf50;         /* Verde Claro (Headers, hover effects, bordes activos) */
+  --azul-oscuro: #2c3e50;         /* Azul Oscuro (Títulos, texto principal) */
+  --verde-muy-claro: #a5d6a7;     /* Verde Muy Claro (Texto secundario, subtítulos) */
+  
+  /* Colores complementarios */
+  --blanco: #ffffff;
+  --gris-claro: #f8f9fa;
+  --gris-medio: #e9ecef;
+  --gris-texto: #666;
+  --negro: #2c3e50;
+  
+  /* Colores de estado */
+  --error: #e74c3c;
+  --exito: #2e7d32;
+  --advertencia: #f39c12;
+  --informacion: #3498db;
+  
+  /* Sombras */
+  --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --sombra-fuerte: 0 6px 15px rgba(0, 0, 0, 0.15);
+  
+  /* Bordes redondeados */
+  --radio-pequeno: 6px;
+  --radio-medio: 8px;
+  --radio-grande: 12px;
+  
+  /* Transiciones */
+  --transicion-rapida: all 0.2s ease;
+  --transicion-media: all 0.3s ease;
+}
+
+/* Clases de utilidad para colores */
+.color-verde-principal { color: var(--verde-principal) !important; }
+.color-verde-claro { color: var(--verde-claro) !important; }
+.color-azul-oscuro { color: var(--azul-oscuro) !important; }
+.color-verde-muy-claro { color: var(--verde-muy-claro) !important; }
+
+.bg-verde-principal { background-color: var(--verde-principal) !important; }
+.bg-verde-claro { background-color: var(--verde-claro) !important; }
+.bg-azul-oscuro { background-color: var(--azul-oscuro) !important; }
+.bg-gris-claro { background-color: var(--gris-claro) !important; }
+
+.border-verde-principal { border-color: var(--verde-principal) !important; }
+.border-verde-claro { border-color: var(--verde-claro) !important; }

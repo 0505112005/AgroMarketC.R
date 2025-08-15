@@ -47,7 +47,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="nav__menu">
-        <NavLink end to="/" className={linkClass}>
+        <NavLink end to="/inicio" className={linkClass}>
           📊 Dashboard
         </NavLink>
         <NavLink to="/catalogo" className={linkClass}>

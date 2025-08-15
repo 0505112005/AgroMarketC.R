@@ -23,7 +23,7 @@
 
 .formulario label {
   font-weight: bold;
-  color: #4a7c59;
+  color: #2e7d32;
   margin-bottom: 0.5rem;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .publicar {
-  background: #7bc47f;
+  background: #4caf50;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -57,13 +57,13 @@
 }
 
 .publicar:hover {
-  background: #4a7c59;
+  background: #2e7d32;
 }
 
 .volver-inicio {
   background: #eafbe7;
-  color: #4a7c59;
-  border: 2px solid #7bc47f;
+  color: #2e7d32;
+  border: 2px solid #4caf50;
   border-radius: 8px;
   padding: 0.7rem 1.5rem;
   font-weight: bold;
@@ -72,7 +72,7 @@
 }
 
 .volver-inicio:hover {
-  background: #7bc47f;
+  background: #4caf50;
   color: #fff;
-  border-color: #4a7c59;
+  border-color: #2e7d32;
 }

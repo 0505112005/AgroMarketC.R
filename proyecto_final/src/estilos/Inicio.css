@@ -1,4 +1,5 @@
 /* Inicio CSS - Para usar con AppLayout - Versión simplificada */
+@import './variables.css';
 
 /* Contenido principal del inicio */
 .inicio-content {
@@ -12,12 +13,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #4caf50;
+  background: var(--verde-claro);
   color: white;
   padding: 1.5rem 2rem;
-  border-radius: 12px;
+  border-radius: var(--radio-grande);
   margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+  box-shadow: var(--sombra-media);
 }
 
 .inicio-header h1 {
@@ -28,20 +29,20 @@
 
 .btn-catalogo {
   background-color: white;
-  color: #4caf50;
+  color: var(--verde-claro);
   border: none;
   padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--radio-medio);
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transicion-rapida);
   font-size: 0.95rem;
 }
 
 .btn-catalogo:hover {
-  background-color: #f8f9fa;
+  background-color: var(--gris-claro);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--sombra-suave);
 }
 
 /* Saludo */
@@ -50,19 +51,19 @@
   margin-bottom: 2rem;
   padding: 2rem;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-suave);
 }
 
 .saludo h2 {
-  color: #2c3e50;
+  color: var(--azul-oscuro);
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
 .saludo p {
-  color: #666;
+  color: var(--gris-texto);
   font-size: 1.1rem;
   margin: 0;
 }

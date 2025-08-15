@@ -21,10 +21,11 @@ export default function App() {
   return (
     <Routes>
       {/* Rutas CON sidebar persistente */}
-      <Route path="Landing" element={<Landing />} />
+      <Route index element={<Landing />} />
+     
       <Route element={<AppLayout />}>
         {/* "/" redirige a Landing */}
-        <Route index element={<Inicio />} />
+        
         <Route path="inicio" element={<Inicio />} />
         <Route path="catalogo" element={<Catalogo />} />
         <Route path="vender" element={<Vender />} />
