@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../estilos/Landing.css";
 
 const productosDemo = [
-  { id: 1, titulo: "Tomates Orgánicos", precio: "₡3,500", tag: "Orgánico", img: "/images/tomates.jpg" },
-  { id: 2, titulo: "Bananos Premium",  precio: "₡2,800", tag: "Premium",  img: "/images/bananos.jpg" },
-  { id: 3, titulo: "Café Especial",    precio: "₡15,000", tag: "Orgánico", img: "/images/cafe.jpg" },
-  { id: 4, titulo: "Aguacates Hass",   precio: "₡4,200",  tag: "Orgánico", img: "/images/aguacate.jpg" },
+  { id: 1, titulo: "Tomates Orgánicos", precio: "₡3,500", tag: "Orgánico", img: "https://walmartcr.vtexassets.com/arquivos/ids/530600-1200-900?v=638419994295830000&width=1200&height=900&aspect=true" },
+  { id: 2, titulo: "Bananos Premium",  precio: "₡2,800", tag: "Premium",  img: "https://walmartcr.vtexassets.com/arquivos/ids/380406-1200-900?v=638103010359230000&width=1200&height=900&aspect=true" },
+  { id: 3, titulo: "Café Especial",    precio: "₡15,000", tag: "Orgánico", img: "https://walmartcr.vtexassets.com/arquivos/ids/508873-1200-900?v=638416210236570000&width=1200&height=900&aspect=true" },
+  { id: 4, titulo: "Aguacates Hass",   precio: "₡4,200",  tag: "Orgánico", img: "https://walmartcr.vtexassets.com/arquivos/ids/530468-1200-900?v=638419993606200000&width=1200&height=900&aspect=true" },
 ];
 
 export default function Landing() {
-  const navigate = useNavigate();
+  
   const revealRef = useRef([]);
 
   // --- usuario desde localStorage (con try/catch)
@@ -21,8 +21,8 @@ export default function Landing() {
   } catch {
     user = null;
   }
-  const nombreUsuario = user?.nombre ?? "Invitado";
-  const rolUsuario    = user?.rol ?? "invitado";
+  //const nombreUsuario = user?.nombre ?? "Invitado";
+  //const rolUsuario    = user?.rol ?? "invitado";
 
   // --- scroll reveal
   useEffect(() => {

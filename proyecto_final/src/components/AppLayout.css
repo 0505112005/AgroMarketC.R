@@ -1,0 +1,254 @@
+/* AppLayout CSS - Estilo coherente con AgroMarket */
+
+/* Layout principal */
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.layout__sidebar {
+  width: 320px;
+  background: #2e7d32;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.layout__content {
+  margin-left: 320px;
+  flex: 1;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Sidebar Navigation */
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  color: white;
+  padding: 0.5rem;
+}
+
+/* Brand */
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav__brand strong {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+}
+
+.nav__sub {
+  font-size: 0.85rem;
+  color: #a5d6a7;
+  font-weight: 400;
+}
+
+/* Usuario */
+.nav__user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.nav__avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav__user-info {
+  flex: 1;
+}
+
+.nav__user-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 0.2rem 0;
+  color: white;
+}
+
+.nav__user-role {
+  font-size: 0.85rem;
+  color: #a5d6a7;
+  margin: 0;
+  text-transform: capitalize;
+}
+
+/* Menu */
+.nav__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  margin-bottom: 2rem;
+}
+
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav__link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(2px);
+}
+
+.nav__link--active {
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nav__link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: #4caf50;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Badge para mensajes no leídos */
+.nav__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Footer */
+.nav__footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+}
+
+.logout-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .layout__sidebar {
+    width: 250px;
+  }
+  
+  .layout__content {
+    margin-left: 250px;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout__sidebar {
+    width: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .layout__sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .layout__content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .nav {
+    padding: 1rem;
+  }
+  
+  .nav__brand {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .nav__user {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Scrollbar personalizado para el sidebar */
+.layout__sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.layout__sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layout__sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.layout__sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

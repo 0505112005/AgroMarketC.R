@@ -9,7 +9,6 @@ const Inicio = () => {
   const [pedidos, setPedidos] = useState([]);
   const [productosDestacados, setProductosDestacados] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   const navigate = useNavigate();
   const { carrito } = useCarrito();
@@ -19,7 +18,7 @@ const Inicio = () => {
     const storedUser = localStorage.getItem("usuario");
     if (storedUser && storedUser !== "undefined") {
       const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser.id ? parsedUser : null); // solo si tiene id
+      setUser(parsedUser.id ? parsedUser : null);
     } else {
       setUser(null);
     }
@@ -63,175 +62,93 @@ const Inicio = () => {
     fetchPedidos();
     fetchProductosDestacados();
     fetchActividadReciente();
-    setUnreadCount(3);
   }, [user?.id]);
-
-  // Manejo de botón Perfil
-  const handlePerfilClick = () => {
-    if (user?.id) {
-      navigate("/perfil");
-    } else {
-      alert("Debes iniciar sesión para ver tu perfil"); // opcional
-    }
-  };
 
   const nombreUsuario = user?.nombre || "Invitado";
   const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
   return (
-    <div className="container">
-      <header className="header">
-        <h1>🌿AgroMarket</h1>
+    <div className="inicio-content">
+      <header className="inicio-header">
+        <h1>🌿 Dashboard - AgroMarket</h1>
         <button
           className="btn-catalogo"
           onClick={() => navigate("/catalogo")}
           type="button"
         >
-          Ver Catálogo
+          Ver Catálogo Completo
         </button>
       </header>
 
-      <div className="content">
-        <aside className="sidebar">
-          <div className="usuario">
-            <img
-              src="https://www.w3schools.com/howto/img_avatar.png"
-              alt="Avatar"
-              className="avatar"
-            />
-            <div>
-              <p className="nombre">{nombreUsuario}</p>
-              <p className="rol">{user?.rol || ""}</p>
-              <button
-                className="btn-perfil"
-                onClick={handlePerfilClick}
-                type="button"
-              >
-                👤 Perfil
-              </button>
-            </div>
-          </div>
+      <section className="saludo">
+        <h2>¡Bienvenido, {nombreUsuario}!</h2>
+        <p>Descubre los mejores productos agrícolas frescos y de calidad</p>
+      </section>
 
-          <nav className="nav-menu">
-            <ul>
-              <li>
-                <button onClick={() => navigate("/inicio")} type="button">
-                  📊 Dashboard
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate("/catalogo")} type="button">
-                  📦 Catálogo
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate("/carrito")} type="button">
-                  🛒 Carrito ({carrito.length})
-                </button>
-              </li>
-              <li>
-                <button onClick={() => navigate("/mis-productos")} type="button">
-                  🧺 Mis Productos
-                </button>
-              </li>
-              <li>
+      <section className="estadisticas">
+        <div className="estadistica-card">
+          <div className="estadistica-valor">{pedidos.length}</div>
+          <div className="estadistica-label">Pedidos Realizados</div>
+          <div className="estadistica-icon" aria-label="Pedidos">📦</div>
+        </div>
+        <div className="estadistica-card">
+          <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
+          <div className="estadistica-label">Total Gastado</div>
+          <div className="estadistica-icon" aria-label="Total Gastado">💰</div>
+        </div>
+        <div className="estadistica-card">
+          <div className="estadistica-valor">{carrito.length}</div>
+          <div className="estadistica-label">En Carrito</div>
+          <div className="estadistica-icon" aria-label="Carrito">🛒</div>
+        </div>
+      </section>
+
+      <section className="bottom-secciones">
+        <div className="productos-destacados cuadro">
+          <h3>Productos Destacados</h3>
+          <div className="productos-grid">
+            {productosDestacados.length === 0 && (
+              <p className="no-productos">No hay productos destacados disponibles.</p>
+            )}
+            {productosDestacados.map((prod) => (
+              <div key={prod._id} className="card">
+                <img
+                  src={prod.imagen || "https://via.placeholder.com/150?text=Sin+Imagen"}
+                  alt={prod.nombre}
+                  className="card-imagen"
+                />
+                <h4>{prod.nombre}</h4>
+                <p className="descripcion">{prod.descripcion || "Sin descripción"}</p>
+                <p className="precio">₡{prod.precio?.toLocaleString() || "0"}</p>
+                <p className="vendedor">Por {prod.vendedor || "Vendedor Desconocido"}</p>
                 <button
-                  onClick={() => navigate("/mensajeria")}
+                  className="ver"
+                  onClick={() => navigate(`/producto/${prod._id}`)}
                   type="button"
-                  style={{ position: "relative" }}
                 >
-                  💬 Mensajería
-                  {unreadCount > 0 && (
-                    <span className="badge-unread">{unreadCount}</span>
-                  )}
+                  Ver Producto
                 </button>
-              </li>
-              {user?.rol === "comprador" && (
-                <li>
-                  <button
-                    onClick={() => navigate("/solicitud-vendedor")}
-                    type="button"
-                  >
-                    📩 Quiero Vender
-                  </button>
-                </li>
-              )}
-            </ul>
-          </nav>
-        </aside>
-
-        <main className="main">
-          <section className="saludo">
-            <h2>Bienvenido, {nombreUsuario}!</h2>
-            <p>Descubre los mejores productos agrícolas</p>
-          </section>
-
-          <section className="estadisticas">
-            <div className="estadistica-card">
-              <div className="estadistica-valor">{pedidos.length}</div>
-              <div className="estadistica-label">Pedidos Realizados</div>
-              <div className="estadistica-icon" aria-label="Pedidos">📦</div>
-            </div>
-            <div className="estadistica-card">
-              <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
-              <div className="estadistica-label">Total Gastado</div>
-              <div className="estadistica-icon" aria-label="Total Gastado">💰</div>
-            </div>
-            <div className="estadistica-card">
-              <div className="estadistica-valor">{carrito.length}</div>
-              <div className="estadistica-label">En Carrito</div>
-              <div className="estadistica-icon" aria-label="Carrito">🛒</div>
-            </div>
-          </section>
-
-          <section className="bottom-secciones">
-            <div className="productos-destacados cuadro">
-              <h3>Productos Destacados</h3>
-              <div className="productos-grid">
-                {productosDestacados.length === 0 && <p>No hay productos destacados.</p>}
-                {productosDestacados.map((prod) => (
-                  <div key={prod._id} className="card">
-                    <img
-                      src={prod.imagen || "https://via.placeholder.com/150"}
-                      alt={prod.nombre}
-                      className="card-imagen"
-                    />
-                    <h4>{prod.nombre}</h4>
-                    <p className="descripcion">{prod.descripcion || ""}</p>
-                    <p className="precio">₡{prod.precio?.toLocaleString() || "-"}</p>
-                    <p className="vendedor">Por {prod.vendedor || "Desconocido"}</p>
-                    <button
-                      className="ver"
-                      onClick={() => navigate(`/producto/${prod._id}`)}
-                      type="button"
-                    >
-                      Ver
-                    </button>
-                  </div>
-                ))}
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            <div className="actividad-reciente cuadro">
-              <h3>Actividad Reciente</h3>
-              <ul>
-                {actividadReciente.length === 0 && <li>No hay actividad reciente.</li>}
-                {actividadReciente.map((act) => (
-                  <li key={act.id}>
-                    <strong>{act.texto}</strong>
-                    <br />
-                    <small>{act.tiempo}</small>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-        </main>
-      </div>
-
-      <footer className="footer">
-        <p>&copy; 2025 Mercado Orgánico</p>
-      </footer>
+        <div className="actividad-reciente cuadro">
+          <h3>Actividad Reciente</h3>
+          <ul>
+            {actividadReciente.length === 0 && (
+              <li>No hay actividad reciente para mostrar.</li>
+            )}
+            {actividadReciente.map((act) => (
+              <li key={act.id}>
+                <strong>{act.texto}</strong>
+                <br />
+                <small className="tiempo">{act.tiempo}</small>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </div>
   );
 };

@@ -1,44 +1,47 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Layout con sidebar fijo
+import AppLayout from "./components/AppLayout";
 
 // Páginas
 import Landing from "./pages/Landing";
-import Register from "./pages/Register";
 import Inicio from "./pages/Inicio";
+import Catalogo from "./pages/Catalogo";
 import Vender from "./pages/Vender";
 import Perfil from "./pages/Perfil";
-import Login from "./pages/Login"; 
 import Carrito from "./pages/Carrito";
 import MisProductos from "./pages/MisProductos";
+import Mensajeria from "./pages/Mensajeria";
 import SolicitudVendedor from "./pages/SolicitudVendedor";
-import Catalogo from "./pages/Catalogo";
-import Mensajeria from "./pages/Mensajeria"; 
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
-// Contextos
-import { CarritoProvider } from "./components/CarritoContext";
-import { NotificacionesProvider } from "./context/NotificacionesContext";
-
-function App() {
+export default function App() {
   return (
-    <CarritoProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Navigate to="/Landing" />} />
-            <Route path="/Landing" element={<Landing />} />
-            <Route path="/inicio" element={<Inicio />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/vender" element={<Vender />} />
-            <Route path="/carrito" element={<Carrito />} />
-            <Route path="/mis-productos" element={<MisProductos />} />
-            <Route path="/solicitud-vendedor" element={<SolicitudVendedor />} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/mensajeria" element={<Mensajeria />} />
-          </Routes>
-        </Router>
-    </CarritoProvider>
+    <Routes>
+      {/* Rutas CON sidebar persistente */}
+      <Route path="Landing" element={<Landing />} />
+      <Route element={<AppLayout />}>
+        {/* "/" redirige a Landing */}
+        <Route index element={<Inicio />} />
+        <Route path="inicio" element={<Inicio />} />
+        <Route path="catalogo" element={<Catalogo />} />
+        <Route path="vender" element={<Vender />} />
+        <Route path="perfil" element={<Perfil />} />
+        <Route path="carrito" element={<Carrito />} />
+        <Route path="mis-productos" element={<MisProductos />} />
+        <Route path="mensajeria" element={<Mensajeria />} />
+        <Route path="solicitud-vendedor" element={<SolicitudVendedor />} />
+      </Route>
+
+      {/* Rutas SIN sidebar (públicas) */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Helpers / redirecciones */}
+      <Route path="/Landing" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<div style={{ padding: 24 }}>404 — No encontrado</div>} />
+    </Routes>
   );
 }
-
-export default App;

@@ -104,9 +104,7 @@ const Carrito = () => {
     return (
       <div className="carrito-container">
         <h2 className="carrito-titulo">Carrito de Compras</h2>
-        <button className="volver-inicio" onClick={() => navigate("/inicio")}>
-          Volver a Inicio
-        </button>
+      
         <div className="carrito-vacio">Tu carrito está vacío</div>
       </div>
     );

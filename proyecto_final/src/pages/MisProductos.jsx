@@ -86,9 +86,7 @@ const MisProductos = () => {
             Nuevo Producto
         </button>
       </div>
-      <button className="volver-inicio" onClick={() => navigate('/inicio')}>
-        Volver a Inicio
-      </button>
+      
       
       {misProductos.length === 0 ? (
         <div className="mis-productos-vacio">

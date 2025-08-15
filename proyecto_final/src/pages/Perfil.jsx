@@ -22,7 +22,7 @@ const Perfil = () => {
     localStorage.removeItem("usuario");
     localStorage.removeItem("nombre");
     alert("Sesión cerrada");
-    navigate("/inicio");
+    navigate("/Landing");
   };
 
   return (
@@ -50,12 +50,7 @@ const Perfil = () => {
               Cerrar sesión
             </button>
           )}
-          <button
-            className="perfil-logout"
-            onClick={() => navigate("/inicio")}
-          >
-            Volver a inicio
-          </button>
+         
         </div>
       </div>
     </div>
