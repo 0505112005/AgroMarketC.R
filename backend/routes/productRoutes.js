@@ -19,7 +19,19 @@ router.post("/", authMiddleware, async (req, res) => {
     // Agregar el usuario logeado
     req.body.usuarioId = req.user._id;
 
-    const nuevoProducto = new Producto(req.body);
+    const nuevoProducto = new Producto({
+      nombre: req.body.nombre,
+      descripcion: req.body.descripcion,
+      precio: req.body.precio,
+      certificacion: req.body.certificacion,
+      origen: req.body.origen,
+      temporada: req.body.temporada,
+      stock: req.body.stock,
+      imagen: req.body.imagen,
+      usuarioId: req.user._id,
+      productor: req.body.productor,
+    });
+
     const guardado = await nuevoProducto.save();
     res.status(201).json(guardado);
   } catch (error) {
@@ -76,6 +88,9 @@ router.put("/:id", authMiddleware, async (req, res) => {
     producto.stock = datos.stock !== undefined ? datos.stock : producto.stock;
     producto.imagen = datos.imagen || producto.imagen;
     producto.certificacion = datos.certificacion || producto.certificacion;
+    producto.origen = datos.origen || producto.origen;
+    producto.temporada = datos.temporada || producto.temporada;
+    producto.productor = datos.productor || producto.productor;
 
     const actualizado = await producto.save();
     res.json(actualizado);

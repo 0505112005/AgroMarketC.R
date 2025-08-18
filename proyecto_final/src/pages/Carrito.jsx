@@ -1,280 +1,157 @@
+import React, { useState } from "react";
 import { useCarrito } from "../components/CarritoContext";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import "../estilos/Carrito.css";
+import Swal from "sweetalert2";
+
+// Función de validación
+const validarTarjeta = ({ numero, nombre, expiracion, cvv }) => {
+  const num = numero.replace(/\s+/g, '');
+  if (!/^\d{16}$/.test(num)) return "Número de tarjeta inválido";
+
+  if (!nombre.trim()) return "Nombre no puede estar vacío";
+
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiracion)) 
+    return "Fecha de expiración inválida";
+
+  const [mes, anio] = expiracion.split("/").map(Number);
+  const fechaActual = new Date();
+  const añoActual = Number(fechaActual.getFullYear().toString().slice(-2));
+  const mesActual = fechaActual.getMonth() + 1;
+  if (anio < añoActual || (anio === añoActual && mes < mesActual))
+    return "Tarjeta expirada";
+
+  if (!/^\d{3}$/.test(cvv)) return "CVV inválido";
+
+  return true;
+};
 
 const Carrito = () => {
-  const { carrito, quitarProducto, vaciarCarrito } = useCarrito();
-  const navigate = useNavigate();
-
-  const [mostrarPago, setMostrarPago] = useState(false);
-  const [metodoPago, setMetodoPago] = useState("");
-  const [nombrePago, setNombrePago] = useState("");
-  const [sinpeNumero, setSinpeNumero] = useState("");
-  const [tarjetaNumero, setTarjetaNumero] = useState("");
-  const [tarjetaNombre, setTarjetaNombre] = useState("");
-  const [vencimiento, setVencimiento] = useState("");
+  const { carrito, quitarProducto, restarProducto, vaciarCarrito } = useCarrito();
+  const [showModal, setShowModal] = useState(false);
+  const [nombre, setNombre] = useState("");
+  const [numeroTarjeta, setNumeroTarjeta] = useState("");
+  const [expiracion, setExpiracion] = useState("");
   const [cvv, setCvv] = useState("");
 
-  const total = carrito.reduce(
-    (acc, item) => acc + item.precio * item.cantidad,
-    0
-  );
-
-  const user = JSON.parse(localStorage.getItem("usuario")) || {};
-  
-  // Abrir el formulario de pago
-  const handleRealizarPedidoClick = () => {
-    if (!user?.id && !user?._id) {
-      alert("Debes iniciar sesión para hacer un pedido.");
-      return;
-    }
-    setNombrePago(user.nombre || "");
-    setMostrarPago(true);
+  const formatNumeroTarjeta = (num) => num.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
+  const formatExpiracion = (exp) => {
+    let val = exp.replace(/\D/g, "");
+    if (val.length >= 3) val = val.slice(0,4);
+    if (val.length > 2) val = val.slice(0,2) + "/" + val.slice(2);
+    return val;
   };
 
-  // Cerrar el formulario de pago
-  const handleCancelarPago = () => {
-    setMostrarPago(false);
-    setMetodoPago("");
-    // Limpiar campos si quieres...
-  };
+  const handleNumeroChange = (e) => setNumeroTarjeta(formatNumeroTarjeta(e.target.value));
+  const handleExpiracionChange = (e) => setExpiracion(formatExpiracion(e.target.value));
 
-  // Manejar el envío del formulario de pago
-  const handleConfirmarPago = async (e) => {
-    e.preventDefault();
+  const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
 
-    // Validaciones básicas
-    if (!nombrePago.trim()) {
-      alert("Por favor ingresa tu nombre");
-      return;
-    }
-    if (!metodoPago) {
-      alert("Por favor selecciona un método de pago");
-      return;
-    }
-    if (metodoPago === "sinpe" && !sinpeNumero.trim()) {
-      alert("Por favor ingresa el número SINPE");
-      return;
-    }
-    if (metodoPago === "tarjeta") {
-      if (!tarjetaNombre.trim() || !tarjetaNumero.trim() || !vencimiento || !cvv.trim()) {
-        alert("Por favor completa todos los datos de la tarjeta");
-        return;
-      }
-    }
-
-    // Aquí puedes armar el cuerpo para enviar al backend (ejemplo simplificado)
-    const compradorId = user?.id || user?._id;
-    const compradorNombre = nombrePago;
-
-    try {
-      const respuesta = await fetch("http://localhost:5000/api/pedidos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          compradorId,
-          compradorNombre,
-          metodoPago,
-          detallesPago: metodoPago === "sinpe" 
-            ? { numeroSINPE: sinpeNumero }
-            : { tarjetaNombre, tarjetaNumero, vencimiento, cvv },
-          productos: carrito.map(item => ({
-            productoId: item._id,
-            cantidad: item.cantidad,
-            vendedorId: item.usuarioId,
-          })),
-        }),
+  const handlePago = () => {
+    const resultado = validarTarjeta({ numero: numeroTarjeta, nombre, expiracion, cvv });
+    if (resultado !== true) {
+      Swal.fire({
+        icon: "error",
+        title: "Error en el pago",
+        text: resultado
       });
-
-      if (!respuesta.ok) throw new Error("Error al realizar el pedido");
-
-      const data = await respuesta.json();
-      alert("✅ Pedido realizado con éxito");
-      vaciarCarrito();
-      setMostrarPago(false);
-      navigate("/Pedidos");
-    } catch (error) {
-      console.error(error);
-      alert("Hubo un error al realizar el pedido.");
+      return;
     }
-  };
 
-  if (carrito.length === 0) {
-    return (
-      <div className="carrito-container">
-        <h2 className="carrito-titulo">Carrito de Compras</h2>
-      
-        <div className="carrito-vacio">Tu carrito está vacío</div>
-      </div>
-    );
-  }
+    // Pago simulado
+    Swal.fire({
+      icon: "success",
+      title: "¡Pago realizado!",
+      text: `Se ha procesado tu pago de CRC ${total}`
+    });
+
+    vaciarCarrito();
+    setShowModal(false);
+    setNombre(""); setNumeroTarjeta(""); setExpiracion(""); setCvv("");
+  };
 
   return (
     <div className="carrito-container">
-      <h2 className="carrito-titulo">Carrito de Compras</h2>
-      <button className="volver-inicio" onClick={() => navigate("/inicio")}>
-        Volver a Inicio
-      </button>
-
-      <div className="carrito-lista">
-        {carrito.map((item) => (
-          <div key={item._id} className="carrito-item">
-            <img
-              src={item.imagen || "placeholder-image.jpg"}
-              alt={item.nombre}
-              className="carrito-item-imagen"
-            />
-            <div className="carrito-item-info">
-              <h3 className="carrito-item-nombre">{item.nombre}</h3>
-              <p className="carrito-item-precio">₡{item.precio}</p>
-            </div>
-            <div className="carrito-item-cantidad">
-              <span className="cantidad-numero">{item.cantidad}</span> unidades
-            </div>
-            <button
-              onClick={() => quitarProducto(item._id)}
-              className="carrito-item-quitar"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <div className="carrito-resumen">
-        <p className="carrito-total">Total: ₡{total.toFixed(2)}</p>
-        <div className="carrito-acciones">
-          <button onClick={vaciarCarrito} className="btn-vaciar">
-            Vaciar carrito
-          </button>
-          <button
-            onClick={() => navigate("/catalogo")}
-            className="btn-continuar"
-          >
-            Continuar Comprando
-          </button>
-          <button onClick={handleRealizarPedidoClick} className="btn-pedido">
-            Realizar Pedido
-          </button>
-        </div>
-      </div>
-
-      {/* Contenedor tipo modal para pago */}
-      {mostrarPago && (
-        <div className="vender-container">
-          <section className="formulario-agregar">
-            <h2>📦 Información de Pago</h2>
-            <form onSubmit={handleConfirmarPago}>
-              <div className="campo">
-                <label>Nombre completo: </label>
-                <input
-                  type="text"
-                  name="nombrePago"
-                  value={nombrePago}
-                  onChange={(e) => setNombrePago(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="campo">
-                <label>Método de pago: </label>
-                <select
-                  value={metodoPago}
-                  onChange={(e) => setMetodoPago(e.target.value)}
-                  required
-                >
-                  <option value="">Seleccione una opción</option>
-                  <option value="sinpe">SINPE</option>
-                  <option value="tarjeta">Tarjeta de crédito/débito</option>
-                </select>
-              </div>
-              
-              
-
-
-              {/* Campos condicionales */}
-              {metodoPago === "sinpe" && (
-                <div className="campo">
-                  <label style={{ display: "block", textAlign: "center", marginBottom: "5px" }}>
-                    -Realizar el SINPE al 8499-1555-  
-                  </label>
-                  
-                  <br /> {/* salto de línea */}             
-                  <label>Ingresar número de comprobante:  </label>
-                  <input
-                    type="text"
-                    value={sinpeNumero}
-                    onChange={(e) => setSinpeNumero(e.target.value)}
-                    required
-                  />
+      <h2>Tu Carrito</h2>
+      {carrito.length === 0 ? (
+        <p>No tienes productos en el carrito.</p>
+      ) : (
+        <>
+          <ul className="lista-carrito">
+            {carrito.map((prod) => (
+              <li key={prod._id} className="producto-carrito">
+                <img src={prod.imagen || "https://via.placeholder.com/100"} alt={prod.nombre} />
+                <div>
+                  <h4>{prod.nombre}</h4>
+                  <p>CRC {prod.precio} x {prod.cantidad}</p>
+                  <div className="botones-cantidad">
+                    <button onClick={() => restarProducto(prod._id)}>-</button>
+                    <button onClick={() => quitarProducto(prod._id)}>X</button>
+                  </div>
                 </div>
-                
-              )}
+              </li>
+            ))}
+          </ul>
+          <h3>Total: CRC {total}</h3>
+          <button className="btn-pagar" onClick={() => setShowModal(true)}>Realizar Pedido</button>
+        </>
+      )}
 
-              {metodoPago === "tarjeta" && (
-                <>
-                  <div className="campo">
-                    <label>Nombre del titular: </label>
-                    <input
-                      type="text"
-                      value={tarjetaNombre}
-                      onChange={(e) => setTarjetaNombre(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="campo">
-                    <label>Número de tarjeta: </label>
-                    <input
-                      type="text"
-                      maxLength="16"
-                      value={tarjetaNumero}
-                      onChange={(e) => setTarjetaNumero(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="campo">
-                    <label>Fecha de vencimiento: </label>
-                    <input
-                      type="month"
-                      value={vencimiento}
-                      onChange={(e) => setVencimiento(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="campo">
-                    <label>CVV:</label>
-                    <input
-                      type="password"
-                      maxLength="3"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
-                      required
-                    />
-                  </div>
-                </>
-              )}
+      {showModal && (
+        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="modal-contenido grande" onClick={(e) => e.stopPropagation()}>
+            <h2>Pago</h2>
 
-              <p className="carrito-total">Total: ₡{total.toFixed(2)}</p>
-              
-              <div className="botones-formulario">            
-                <button type="submit" className="publicar">
-                  Confirmar Pedido
-                </button>            
-                <button 
-                  type="submit"                  
-                  onClick={handleCancelarPago}>                
-                  Cancelar
-                </button>    
-                
+            <div className={`tarjeta-realista ${cvv ? "girar" : ""}`}>
+              <div className="tarjeta-frente">
+                <div className="chip"></div>
+                <div className="tarjeta-numero">{numeroTarjeta || "#### #### #### ####"}</div>
+                <div className="tarjeta-info">
+                  <span className="tarjeta-nombre">{nombre.toUpperCase() || "NOMBRE EN TARJETA"}</span>
+                  <span className="tarjeta-expiracion">{expiracion || "MM/AA"}</span>
+                </div>
               </div>
-              
-              <div>
-                
+              <div className="tarjeta-atras">
+                <div className="banda-magnetica"></div>
+                <div className="cvv-back">{cvv || "CVV"}</div>
               </div>
+            </div>
 
+            <form className="form-pago" onSubmit={(e) => { e.preventDefault(); handlePago(); }}>
+              <input
+                type="text"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Nombre en tarjeta"
+                required
+              />
+              <input
+                type="text"
+                value={numeroTarjeta}
+                onChange={handleNumeroChange}
+                placeholder="Número de tarjeta"
+                maxLength={19}
+                required
+              />
+              <input
+                type="text"
+                value={expiracion}
+                onChange={handleExpiracionChange}
+                placeholder="MM/AA"
+                maxLength={5}
+                required
+              />
+              <input
+                type="text"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                placeholder="CVV"
+                maxLength={3}
+                required
+              />
+              <button type="submit" className="btn-confirmar">Pagar</button>
             </form>
-          </section>
+            <button className="btn-cerrar" onClick={() => setShowModal(false)}>X</button>
+          </div>
         </div>
       )}
     </div>

@@ -1,101 +1,63 @@
-import { createContext, useState, useContext, useEffect } from "react";
+// src/components/CarritoContext.jsx
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CarritoContext = createContext();
 
 export const useCarrito = () => useContext(CarritoContext);
 
 export const CarritoProvider = ({ children }) => {
-  const [carrito, setCarrito] = useState([]);
-  const [usuario, setUsuario] = useState(null);
+  const [carrito, setCarrito] = useState(() => {
+    const stored = localStorage.getItem("carrito");
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  // Cargar usuario y carrito al iniciar
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("usuario"));
-    if (storedUser?.id) {
-      setUsuario(storedUser);
-      fetchCarrito(storedUser.id);
-    }
-  }, []);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }, [carrito]);
 
-  const fetchCarrito = async (userId) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/carrito", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      // Mapear productos con la información completa
-      const carritoMapeado = data.productos.map((p) => ({
-        ...p.productoId,
-        cantidad: p.cantidad,
-      }));
-      setCarrito(carritoMapeado);
-    } catch (err) {
-      console.error("Error cargando carrito:", err);
-    }
+  // Agregar producto (si ya existe, suma cantidad)
+  const agregarProducto = (producto) => {
+    setCarrito((prev) => {
+      const existe = prev.find((p) => p._id === producto._id);
+      if (existe) {
+        return prev.map((p) =>
+          p._id === producto._id
+            ? { ...p, cantidad: p.cantidad + producto.cantidad }
+            : p
+        );
+      }
+      return [...prev, { ...producto, cantidad: producto.cantidad || 1 }];
+    });
   };
 
-  const agregarProducto = async (producto) => {
-    if (!usuario) return;
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/carrito/agregar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productoId: producto._id }),
-      });
-      const data = await res.json();
-      // Mapear de nuevo con info completa
-      const carritoMapeado = data.productos.map((p) => ({
-        ...p.productoId,
-        cantidad: p.cantidad,
-      }));
-      setCarrito(carritoMapeado);
-    } catch (err) {
-      console.error("Error agregando producto al carrito:", err);
-    }
+  // Restar cantidad de un producto (o eliminar si queda 0)
+  const restarProducto = (id) => {
+    setCarrito((prev) =>
+      prev
+        .map((p) =>
+          p._id === id ? { ...p, cantidad: p.cantidad - 1 } : p
+        )
+        .filter((p) => p.cantidad > 0)
+    );
   };
 
-  const quitarProducto = async (id) => {
-    if (!usuario) return;
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/carrito/eliminar/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      const carritoMapeado = data.productos.map((p) => ({
-        ...p.productoId,
-        cantidad: p.cantidad,
-      }));
-      setCarrito(carritoMapeado);
-    } catch (err) {
-      console.error("Error eliminando producto del carrito:", err);
-    }
+  // Quitar producto completamente
+  const quitarProducto = (id) => {
+    setCarrito((prev) => prev.filter((p) => p._id !== id));
   };
 
-  const vaciarCarrito = async () => {
-    if (!usuario) return;
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/carrito/vaciar", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setCarrito([]);
-    } catch (err) {
-      console.error("Error vaciando carrito:", err);
-    }
-  };
+  // Vaciar carrito
+  const vaciarCarrito = () => setCarrito([]);
 
   return (
     <CarritoContext.Provider
-      value={{ carrito, agregarProducto, quitarProducto, vaciarCarrito }}
+      value={{
+        carrito,
+        agregarProducto,
+        restarProducto,
+        quitarProducto,
+        vaciarCarrito,
+      }}
     >
       {children}
     </CarritoContext.Provider>

@@ -10,7 +10,10 @@ function Vender() {
         descripcion: '',
         precio: '',
         imagen: '',
-        certificacion: '100%',
+        certificacion: 'No orgánico', // valor por defecto válido
+        origen: '',
+        temporada: '',
+        stock: 1,
     });
 
     const navigate = useNavigate();
@@ -40,6 +43,8 @@ function Vender() {
             imagen: producto.imagen.trim() || "https://cdn-icons-png.flaticon.com/512/847/847969.png",
             usuarioId: usuario.id,
             productor: usuario.nombre,
+            precio: Number(producto.precio),
+            stock: Number(producto.stock),
         };
 
         try {
@@ -71,7 +76,10 @@ function Vender() {
                 descripcion: '',
                 precio: '',
                 imagen: '',
-                certificacion: '100%',
+                certificacion: 'No orgánico',
+                origen: '',
+                temporada: '',
+                stock: 1,
             });
 
             navigate("/mis-productos");
@@ -129,6 +137,19 @@ function Vender() {
                     </div>
 
                     <div className="campo">
+                        <label>Stock disponible</label>
+                        <input
+                            type="number"
+                            name="stock"
+                            placeholder="Cantidad disponible"
+                            value={producto.stock}
+                            onChange={handleChange}
+                            min={1}
+                            required
+                        />
+                    </div>
+
+                    <div className="campo">
                         <label>Imagen (URL opcional)</label>
                         <input
                             type="text"
@@ -140,18 +161,39 @@ function Vender() {
                     </div>
 
                     <div className="campo">
-                        <label>Certificación:</label>
+                        <label>Certificación</label>
                         <select
                             name="certificacion"
                             value={producto.certificacion}
                             onChange={handleChange}
                             required
                         >
-                            <option value="">Seleccione una opción</option>
                             <option value="Orgánico">Orgánico</option>
                             <option value="No orgánico">No orgánico</option>
                             <option value="En transición">En transición</option>
                         </select>
+                    </div>
+
+                    <div className="campo">
+                        <label>Origen</label>
+                        <input
+                            type="text"
+                            name="origen"
+                            placeholder="Ej. Costa Rica"
+                            value={producto.origen}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="campo">
+                        <label>Temporada</label>
+                        <input
+                            type="text"
+                            name="temporada"
+                            placeholder="Ej. Primavera"
+                            value={producto.temporada}
+                            onChange={handleChange}
+                        />
                     </div>
 
                     <div className="botones-formulario">
