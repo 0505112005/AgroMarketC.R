@@ -1,50 +1,75 @@
-import React, { useEffect, useState } from "react";
-import "../estilos/Inicio.css"; // Asegúrate de tener estilos
+const express = require("express");
+const router = express.Router();
+const FavoritoCarrito = require("../models/FavoritoCarrito");
 
-const Inicio = () => {
-  const [favoritos, setFavoritos] = useState([]);
-  const usuarioId = "68917ee7e9b743dfd720a229"; // Reemplaza con el ID dinámico si tienes login
+// POST /api/favoritos-carrito/agregar
+router.post("/agregar", async (req, res) => {
+  try {
+    const { usuarioId, productoId } = req.body;
 
-  useEffect(() => {
-    const fetchFavoritos = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${usuarioId}`);
-        if (!res.ok) throw new Error("Error al obtener favoritos");
-        const data = await res.json();
-        setFavoritos(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchFavoritos();
-  }, [usuarioId]);
+    if (!usuarioId || !productoId) {
+      return res.status(400).json({ error: "Faltan datos obligatorios" });
+    }
 
-  if (favoritos.length === 0) return <p>Cargando favoritos...</p>;
+    let favorito = await FavoritoCarrito.findOne({ usuarioId, productoId });
 
-  return (
-    <div className="inicio-container">
-      <h2>Tus Productos Favoritos</h2>
-      <div className="favoritos-grid">
-        {favoritos
-          .filter(fav => fav.productoId) // filtramos los que no tienen productoId
-          .map(fav => (
-            <div className="card" key={fav._id}>
-              <img
-                src={fav.productoId.imagen || "https://via.placeholder.com/300x200?text=Sin+imagen"}
-                alt={fav.productoId.nombre}
-                className="card-img"
-              />
-              <div className="card-body">
-                <h3>{fav.productoId.nombre}</h3>
-                <p>{fav.productoId.descripcion}</p>
-                <p>Precio: ₡{fav.productoId.precio}</p>
-                <p>Agregado {fav.cantidadAgregados} veces</p>
-              </div>
-            </div>
-          ))}
-      </div>
-    </div>
-  );
-};
+    if (favorito) {
+      favorito.cantidadAgregados += 1;
+      await favorito.save();
+    } else {
+      favorito = new FavoritoCarrito({
+        usuarioId,
+        productoId,
+        cantidadAgregados: 1,
+      });
+      await favorito.save();
+    }
 
-export default Inicio;
+    res.json(favorito);
+  } catch (error) {
+    console.error("Error agregando favorito:", error);
+    res.status(500).json({ error: "No se pudo agregar a favoritos" });
+  }
+});
+
+// GET /api/favoritos-carrito/top/:usuarioId
+router.get("/top/:usuarioId", async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const top5 = await FavoritoCarrito.find({ usuarioId })
+      .sort({ cantidadAgregados: -1 })
+      .limit(5)
+      .populate("productoId");
+    res.json(top5);
+  } catch (error) {
+    console.error("Error al obtener top 5 favoritos:", error);
+    res.status(500).json({ error: "No se pudo obtener el top 5" });
+  }
+});
+
+// GET /api/favoritos-carrito/all/:usuarioId
+router.get("/all/:usuarioId", async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const favoritos = await FavoritoCarrito.find({ usuarioId }).populate("productoId");
+    res.json(favoritos || []);
+  } catch (error) {
+    console.error("Error al obtener favoritos:", error);
+    res.status(500).json({ error: "Error al obtener favoritos" });
+  }
+});
+
+// 🚀 Nueva ruta para compatibilidad con frontend
+// GET /api/favoritos-carrito/:usuarioId
+router.get("/:usuarioId", async (req, res) => {
+  try {
+    const { usuarioId } = req.params;
+    const favoritos = await FavoritoCarrito.find({ usuarioId }).populate("productoId");
+    res.json(favoritos || []);
+  } catch (error) {
+    console.error("Error al obtener favoritos (ruta simple):", error);
+    res.status(500).json({ error: "Error al obtener favoritos" });
+  }
+});
+
+module.exports = router;
