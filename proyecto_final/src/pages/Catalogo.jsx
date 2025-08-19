@@ -178,17 +178,7 @@ const Catalogo = () => {
     <section className="catalogo">
       <div className="catalogo-content">
         {/* Top favoritos */}
-        {topFavoritos.length > 0 && (
-          <>
-            <h2 className="titulo">🌿 Tus productos más agregados</h2>
-            <div className="productos-grid">
-              {topFavoritos.map((fav) => {
-                if (!fav?.productoId) return null;
-                return renderCard(fav.productoId);
-              })}
-            </div>
-          </>
-        )}
+       
 
         {/* Catálogo completo */}
         <h2 className="titulo">🌿 Catálogo completo</h2>
