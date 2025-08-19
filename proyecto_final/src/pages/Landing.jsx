@@ -10,19 +10,7 @@ const productosDemo = [
 ];
 
 export default function Landing() {
-  
   const revealRef = useRef([]);
-
-  // --- usuario desde localStorage (con try/catch)
-  let user = null;
-  try {
-    const raw = localStorage.getItem("usuario");
-    user = raw ? JSON.parse(raw) : null;
-  } catch {
-    user = null;
-  }
-  //const nombreUsuario = user?.nombre ?? "Invitado";
-  //const rolUsuario    = user?.rol ?? "invitado";
 
   // --- scroll reveal
   useEffect(() => {
@@ -33,6 +21,7 @@ export default function Landing() {
     revealRef.current.forEach((el) => el && io.observe(el));
     return () => io.disconnect();
   }, []);
+
   const setRef = (el) => revealRef.current.push(el);
 
   return (
@@ -40,10 +29,8 @@ export default function Landing() {
       {/* NAVBAR */}
       <header className="navbar blur">
         <div className="brand">
-          
-            <strong> 🌿 AgroMarket</strong>
-            <small>Fresh & Sustainable</small>
-          
+          <strong> 🌿 AgroMarket</strong>
+          <small>Fresh & Sustainable</small>
         </div>
 
         <nav className="menu">
@@ -53,12 +40,9 @@ export default function Landing() {
         </nav>
 
         <div className="actions">
-         
           <Link to="/login" className="btn btn-primary">Iniciar Sesión</Link>
         </div>
       </header>
-
-      
 
       {/* HERO */}
       <section className="hero">
@@ -73,12 +57,11 @@ export default function Landing() {
           </p>
           <div className="cta">
             <Link to="/explorar" className="btn btn-primary btn-lg">Explorar Productos →</Link>
-            
           </div>
 
           <ul className="trust reveal" ref={setRef}>
             <li>Pagos Seguros</li>
-            <li>Entregas en 24‑48h</li>
+            <li>Entregas en 24-48h</li>
             <li>Soporte Local</li>
           </ul>
         </div>

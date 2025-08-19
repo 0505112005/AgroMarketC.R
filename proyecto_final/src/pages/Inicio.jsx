@@ -7,10 +7,8 @@ import { useCarrito } from "../components/CarritoContext";
 const Inicio = () => {
   const [user, setUser] = useState(null);
   const [pedidos, setPedidos] = useState([]);
-  const [productosDestacados, setProductosDestacados] = useState([]);
-  const [topFavoritos, setTopFavoritos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
-
   const navigate = useNavigate();
   const { carrito } = useCarrito();
 
@@ -25,7 +23,7 @@ const Inicio = () => {
     }
   }, []);
 
-  // Fetch de datos cuando hay usuario
+  // Traer pedidos y favoritos del usuario
   useEffect(() => {
     if (!user?.id) return;
 
@@ -35,19 +33,34 @@ const Inicio = () => {
         if (!res.ok) return setPedidos([]);
         const data = await res.json();
         setPedidos(Array.isArray(data) ? data : []);
-      } catch {
+      } catch (err) {
+        console.error("Error fetching pedidos:", err);
         setPedidos([]);
       }
     };
 
-    const fetchProductosDestacados = async () => {
+    const fetchFavoritos = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/productos/destacados`);
-        if (!res.ok) return setProductosDestacados([]);
+        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${user.id}`);
+        if (!res.ok) return setFavoritos([]);
         const data = await res.json();
-        setProductosDestacados(Array.isArray(data) ? data : []);
-      } catch {
-        setProductosDestacados([]);
+
+        const productosFavoritos = data
+          .filter(item => item?.productoId)
+          .map(item => ({
+            _id: item.productoId._id,
+            nombre: item.productoId.nombre,
+            precio: item.productoId.precio,
+            imagen: item.productoId.imagen,
+            veces: item.cantidadAgregados
+          }));
+
+        // Ordenar por veces agregadas y tomar los top 5
+        const topFavoritos = productosFavoritos.sort((a, b) => b.veces - a.veces).slice(0, 5);
+        setFavoritos(topFavoritos);
+      } catch (err) {
+        console.error("Error fetching favoritos:", err);
+        setFavoritos([]);
       }
     };
 
@@ -61,7 +74,7 @@ const Inicio = () => {
     };
 
     fetchPedidos();
-    fetchProductosDestacados();
+    fetchFavoritos();
     fetchActividadReciente();
   }, [user?.id]);
 
@@ -104,61 +117,52 @@ const Inicio = () => {
         </div>
       </section>
 
-      <section className="bottom-secciones">
-        <div className="productos-destacados cuadro">
-          
-          <h3>Productos Destacados</h3>
-          <div className="productos-grid">
-            {topFavoritos.length > 0 && (
-          <>
-            <h2 className="titulo">🌿 Tus productos más agregados</h2>
-            <div className="productos-grid">
-              {topFavoritos.map((fav) => {
-                if (!fav?.productoId) return null;
-               
-              })}
-            </div>
-          </>
-        )}
-            {productosDestacados.length === 0 && (
-              <p className="no-productos">No hay productos destacados disponibles.</p>
+      <section className="main-secciones">
+        {/* Productos Favoritos */}
+        <div className="favoritos cuadro">
+          <h3 className="titulo-seccion">⭐ Tus Productos Favoritos</h3>
+          <div className="productos-grid favoritos-grid">
+            {favoritos.length === 0 ? (
+              <p className="no-productos">Todavía no tienes productos favoritos.</p>
+            ) : (
+              favoritos.map((prod) => (
+                <div key={prod._id} className="card pequeña">
+                  <img
+                    src={prod.imagen || "https://via.placeholder.com/100?text=Sin+Imagen"}
+                    alt={prod.nombre}
+                    className="card-imagen"
+                  />
+                  <h4>{prod.nombre}</h4>
+                  <p className="precio">₡{prod.precio?.toLocaleString() || "0"}</p>
+                  <p className="veces">Añadido {prod.veces} veces</p>
+                  <button
+                    className="ver"
+                    onClick={() => navigate(`/producto/${prod._id}`)}
+                    type="button"
+                  >
+                    Ver Producto
+                  </button>
+                </div>
+              ))
             )}
-            {productosDestacados.map((prod) => (
-              <div key={prod._id} className="card">
-                <img
-                  src={prod.imagen || "https://via.placeholder.com/150?text=Sin+Imagen"}
-                  alt={prod.nombre}
-                  className="card-imagen"
-                />
-                <h4>{prod.nombre}</h4>
-                <p className="descripcion">{prod.descripcion || "Sin descripción"}</p>
-                <p className="precio">₡{prod.precio?.toLocaleString() || "0"}</p>
-                <p className="vendedor">Por {prod.vendedor || "Vendedor Desconocido"}</p>
-                <button
-                  className="ver"
-                  onClick={() => navigate(`/producto/${prod._id}`)}
-                  type="button"
-                >
-                  Ver Producto
-                </button>
-              </div>
-            ))}
           </div>
         </div>
 
+        {/* Actividad Reciente */}
         <div className="actividad-reciente cuadro">
-          <h3>Actividad Reciente</h3>
+          <h3 className="titulo-seccion">📋 Actividad Reciente</h3>
           <ul>
-            {actividadReciente.length === 0 && (
-              <li>No hay actividad reciente para mostrar.</li>
+            {actividadReciente.length === 0 ? (
+              <li>No hay actividad reciente.</li>
+            ) : (
+              actividadReciente.map((act) => (
+                <li key={act.id}>
+                  <strong>{act.texto}</strong>
+                  <br />
+                  <small className="tiempo">{act.tiempo}</small>
+                </li>
+              ))
             )}
-            {actividadReciente.map((act) => (
-              <li key={act.id}>
-                <strong>{act.texto}</strong>
-                <br />
-                <small className="tiempo">{act.tiempo}</small>
-              </li>
-            ))}
           </ul>
         </div>
       </section>

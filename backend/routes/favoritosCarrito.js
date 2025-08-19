@@ -1,50 +1,50 @@
-// backend/routes/favoritosCarrito.js
-const express = require("express");
-const router = express.Router();
-const FavoritoCarrito = require("../models/FavoritoCarrito");
+import React, { useEffect, useState } from "react";
+import "../estilos/Inicio.css"; // Asegúrate de tener estilos
 
-// Obtener los 5 favoritos de un usuario
-router.get("/:usuarioId", async (req, res) => {
-  try {
-    const favoritos = await FavoritoCarrito.find({ usuarioId: req.params.usuarioId })
-      .sort({ cantidadAgregados: -1 })
-      .limit(5)
-      .populate("productoId");
-    res.json(favoritos);
-  } catch (err) {
-    res.status(500).json({ error: "Error al obtener favoritos" });
-  }
-});
+const Inicio = () => {
+  const [favoritos, setFavoritos] = useState([]);
+  const usuarioId = "68917ee7e9b743dfd720a229"; // Reemplaza con el ID dinámico si tienes login
 
-// Obtener los 5 productos más vendidos globalmente
-router.get("/top", async (req, res) => {
-  try {
-    const top = await FavoritoCarrito.find()
-      .sort({ cantidadAgregados: -1 })
-      .limit(5)
-      .populate("productoId");
-    res.json(top);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error al obtener los más vendidos" });
-  }
-});
+  useEffect(() => {
+    const fetchFavoritos = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${usuarioId}`);
+        if (!res.ok) throw new Error("Error al obtener favoritos");
+        const data = await res.json();
+        setFavoritos(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchFavoritos();
+  }, [usuarioId]);
 
-// Incrementar contador al agregar al carrito
-router.post("/agregar", async (req, res) => {
-  const { usuarioId, productoId } = req.body;
-  if (!usuarioId || !productoId) return res.status(400).json({ error: "Faltan datos" });
+  if (favoritos.length === 0) return <p>Cargando favoritos...</p>;
 
-  try {
-    const favorito = await FavoritoCarrito.findOneAndUpdate(
-      { usuarioId, productoId },
-      { $inc: { cantidadAgregados: 1 } },
-      { new: true, upsert: true } // crea si no existe
-    );
-    res.json(favorito);
-  } catch (err) {
-    res.status(500).json({ error: "Error al actualizar favorito" });
-  }
-});
+  return (
+    <div className="inicio-container">
+      <h2>Tus Productos Favoritos</h2>
+      <div className="favoritos-grid">
+        {favoritos
+          .filter(fav => fav.productoId) // filtramos los que no tienen productoId
+          .map(fav => (
+            <div className="card" key={fav._id}>
+              <img
+                src={fav.productoId.imagen || "https://via.placeholder.com/300x200?text=Sin+imagen"}
+                alt={fav.productoId.nombre}
+                className="card-img"
+              />
+              <div className="card-body">
+                <h3>{fav.productoId.nombre}</h3>
+                <p>{fav.productoId.descripcion}</p>
+                <p>Precio: ₡{fav.productoId.precio}</p>
+                <p>Agregado {fav.cantidadAgregados} veces</p>
+              </div>
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+};
 
-module.exports = router;
+export default Inicio;
