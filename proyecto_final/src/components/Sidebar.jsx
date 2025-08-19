@@ -56,9 +56,7 @@ export default function Sidebar() {
         <NavLink to="/carrito" className={linkClass}>
           🛒 Carrito ({carrito.length})
         </NavLink>
-        <NavLink to="/vender" className={linkClass}>
-          🌱 Vender
-        </NavLink>
+        
         <NavLink to="/mis-productos" className={linkClass}>
           🧺 Mis Productos
         </NavLink>

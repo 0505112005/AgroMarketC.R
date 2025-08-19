@@ -8,6 +8,7 @@ const Inicio = () => {
   const [user, setUser] = useState(null);
   const [pedidos, setPedidos] = useState([]);
   const [productosDestacados, setProductosDestacados] = useState([]);
+  const [topFavoritos, setTopFavoritos] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
 
   const navigate = useNavigate();
@@ -105,8 +106,20 @@ const Inicio = () => {
 
       <section className="bottom-secciones">
         <div className="productos-destacados cuadro">
+          
           <h3>Productos Destacados</h3>
           <div className="productos-grid">
+            {topFavoritos.length > 0 && (
+          <>
+            <h2 className="titulo">🌿 Tus productos más agregados</h2>
+            <div className="productos-grid">
+              {topFavoritos.map((fav) => {
+                if (!fav?.productoId) return null;
+               
+              })}
+            </div>
+          </>
+        )}
             {productosDestacados.length === 0 && (
               <p className="no-productos">No hay productos destacados disponibles.</p>
             )}

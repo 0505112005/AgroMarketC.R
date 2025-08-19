@@ -9,7 +9,13 @@ const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
   const [topFavoritos, setTopFavoritos] = useState([]);
-  const [filtros, setFiltros] = useState({ nombre: "", categoria: "", precioMin: "", precioMax: "" });
+  const [filtros, setFiltros] = useState({ 
+    nombre: "", 
+    categoria: "", 
+    precioMin: "", 
+    precioMax: 50000,
+    soloOrganicos: false
+  });
   const [usuario, setUsuario] = useState(null);
   const [productoModal, setProductoModal] = useState(null);
 
@@ -62,13 +68,32 @@ const Catalogo = () => {
     });
   };
 
-  const handleAgregarCarrito = (producto) => {
+  const handleAgregarCarrito = async (producto) => {
     if (!usuario?.id) {
       navigate("/login");
       return;
     }
     if (!producto) return;
+    
+    // Agregar al carrito
     agregarProducto(producto);
+    
+    // Actualizar contador de favoritos en la API
+    try {
+      await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuarioId: usuario.id,
+          productoId: producto._id,
+        }),
+      });
+    } catch (err) {
+      console.error("Error al actualizar favoritos:", err);
+    }
+    
     mostrarMensajeExito("Producto agregado al carrito");
   };
 
@@ -77,113 +102,231 @@ const Catalogo = () => {
     if (!p) return false;
     const nombreMatch = p.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase());
     const categoriaMatch = filtros.categoria ? p.certificacion === filtros.categoria : true;
-    const precioMatch =
-      (!filtros.precioMin || p.precio >= Number(filtros.precioMin)) &&
-      (!filtros.precioMax || p.precio <= Number(filtros.precioMax));
-    return nombreMatch && categoriaMatch && precioMatch;
+    const precioMatch = p.precio <= filtros.precioMax && p.precio >= (filtros.precioMin || 0);
+    const organicoMatch = filtros.soloOrganicos ? p.certificacion === "Orgánico" : true;
+    
+    return nombreMatch && categoriaMatch && precioMatch && organicoMatch;
   });
 
+  const handleBuscar = () => {
+    // La búsqueda se actualiza automáticamente por el filtrado reactivo
+    console.log("Filtros aplicados:", filtros);
+  };
+
   // Renderizado
-  const renderCard = (producto) => (
-    <div className="card" key={producto._id}>
-      <img
-        src={producto.imagen?.trim() ? producto.imagen : imagenPorDefecto}
-        alt={producto.nombre || "Producto"}
-        className="card-imagen"
-      />
-      <h3 className="card-nombre">{producto.nombre}</h3>
-      <p className="card-precio">€{producto.precio} /kg</p>
-      <p className="card-certificacion">{producto.certificacion}</p>
-      <div className="card-botones">
-        <button className="btn-vermas" onClick={() => setProductoModal(producto)}>
-          Ver más
-        </button>
-        <button className="btn-agregar" onClick={() => handleAgregarCarrito(producto)}>
-          Añadir al carrito
-        </button>
+  const renderCard = (producto) => {
+    // Función para convertir certificación a clase CSS
+    const getCertificacionClass = (cert) => {
+      if (!cert) return '';
+      return cert.toLowerCase().replace(/\s+/g, '-');
+    };
+
+    // Simular rating (puedes agregar esto a tu modelo de producto más adelante)
+    const rating = (Math.random() * 2 + 3).toFixed(1); // Rating entre 3.0 y 5.0
+
+    return (
+      <div className="card" key={producto._id}>
+        <img
+          src={producto.imagen?.trim() ? producto.imagen : imagenPorDefecto}
+          alt={producto.nombre || "Producto"}
+          className="card-img"
+        />
+        <div className="card-tags">
+          <span className={`tag ${getCertificacionClass(producto.certificacion)}`}>
+            {producto.certificacion}
+          </span>
+          <span className="stock">Stock: {producto.stock}</span>
+        </div>
+        <h3 className="card-title">{producto.nombre}</h3>
+        <p className="card-description">
+          {producto.descripcion?.length > 60 
+            ? `${producto.descripcion.substring(0, 60)}...` 
+            : producto.descripcion || "Sin descripción"}
+        </p>
+        <div className="card-location">
+          📍 {producto.origen || "Origen no especificado"}
+        </div>
+        <div className="card-footer">
+          <div className="price-rating">
+            <span className="price">€{producto.precio} <small>por {producto.unidadVenta || 'kg'}</small></span>
+            <span className="rating">⭐ {rating}</span>
+          </div>
+          <div className="seller">
+            <span>{producto.productor || "Productor"}</span>
+            <span className="delivery">🚚 Entrega 24h</span>
+          </div>
+          <div className="card-buttons">
+            <button 
+              className="btn-ver-mas" 
+              onClick={() => setProductoModal(producto)}
+            >
+               Ver más
+            </button>
+            <button 
+              className="add-btn" 
+              onClick={() => handleAgregarCarrito(producto)}
+            >
+               Agregar
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <section className="catalogo">
+      <div className="catalogo-content">
+        {/* Top favoritos */}
+        {topFavoritos.length > 0 && (
+          <>
+            <h2 className="titulo">🌿 Tus productos más agregados</h2>
+            <div className="productos-grid">
+              {topFavoritos.map((fav) => {
+                if (!fav?.productoId) return null;
+                return renderCard(fav.productoId);
+              })}
+            </div>
+          </>
+        )}
 
-      {/* Top favoritos */}
-      {topFavoritos.length > 0 && (
-        <>
-          <h2 className="titulo">Tus productos más agregados</h2>
-          <div className="productos-grid">
-            {topFavoritos.map((fav) => {
-              if (!fav?.productoId) return null;
-              return renderCard(fav.productoId);
-            })}
-          </div>
-        </>
-      )}
+        {/* Catálogo completo */}
+        <h2 className="titulo">🌿 Catálogo completo</h2>
+        
+        <div className="productos-grid">
+          {productosFiltrados.length === 0 ? (
+            <p>No hay productos disponibles</p>
+          ) : (
+            productosFiltrados.map(renderCard)
+          )}
+        </div>
+      </div>
 
-      {/* Catálogo completo */}
-      <h2 className="titulo">Catálogo completo</h2>
-      <div className="filtros">
+      {/* Buscador flotante */}
+      <div className="catalogo-container">
+        <h2>Busqueda de Productos</h2>
+        <p>Descubre productos frescos y de calidad premium.</p>
+
         <input
           type="text"
-          placeholder="Buscar por nombre"
+          placeholder="🔍 Buscar productos por nombre..."
           value={filtros.nombre}
           onChange={(e) => setFiltros({ ...filtros, nombre: e.target.value })}
+          className="search-input"
         />
-        <input
-          type="number"
-          placeholder="Precio mínimo"
-          value={filtros.precioMin}
-          onChange={(e) => setFiltros({ ...filtros, precioMin: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Precio máximo"
-          value={filtros.precioMax}
-          onChange={(e) => setFiltros({ ...filtros, precioMax: e.target.value })}
-        />
+
         <select
           value={filtros.categoria}
           onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
         >
-          <option value="">Todas las categorías</option>
+          <option value="">Todas las Categorías</option>
           <option value="Orgánico">Orgánico</option>
           <option value="No orgánico">No orgánico</option>
           <option value="En transición">En transición</option>
         </select>
-      </div>
 
-      <div className="productos-grid">
-        {productosFiltrados.length === 0 ? (
-          <p>No hay productos disponibles</p>
-        ) : (
-          productosFiltrados.map(renderCard)
-        )}
+        <div className="range-container">
+          <label htmlFor="precioRange">Precio máximo:</label>
+          <input 
+            id="precioRange"
+            type="range" 
+            min="0" 
+            max="50000"
+            value={filtros.precioMax}
+            onChange={(e) => setFiltros({ ...filtros, precioMax: Number(e.target.value) })}
+            className="range-slider"
+          />
+          <span className="price-display">€{filtros.precioMax}</span>
+        </div>
+
+        <label className="checkbox-container">
+          <input 
+            type="checkbox"
+            checked={filtros.soloOrganicos}
+            onChange={(e) => setFiltros({ ...filtros, soloOrganicos: e.target.checked })}
+          />
+          Solo productos orgánicos
+        </label>
+
+        <button onClick={handleBuscar}>Buscar</button>
       </div>
 
       {/* Modal animado */}
-      {/* Modal de producto */}
+      {/* Modal de producto profesional */}
       {productoModal && (
         <div className="modal-backdrop fade-in" onClick={() => setProductoModal(null)}>
-          <div className="modal-contenido" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={productoModal.imagen?.trim() ? productoModal.imagen : imagenPorDefecto}
-              alt={productoModal.nombre || "Producto"}
-              className="modal-imagen"
-            />
-            <h2>{productoModal.nombre}</h2>
-            <p><strong>Descripción:</strong> {productoModal.descripcion || "Sin descripción"}</p>
-            <p><strong>Precio:</strong> €{productoModal.precio} / {productoModal.unidadVenta}</p>
-            <p><strong>Certificación:</strong> {productoModal.certificacion}</p>
-            <p><strong>Productor:</strong> {productoModal.productor}</p>
-            <p><strong>Origen:</strong> {productoModal.origen}</p>
-            <p><strong>Temporada:</strong> {productoModal.temporada}</p>
-            <p><strong>Cantidad por unidad:</strong> {productoModal.cantidadPorUnidad}</p>
-            <p><strong>Stock disponible:</strong> {productoModal.stock}</p>
-            <p><strong>Creado:</strong> {new Date(productoModal.createdAt).toLocaleDateString()}</p>
-            <button className="btn-cerrar" onClick={() => setProductoModal(null)}>
-              Cerrar
+          <div className="modal-profesional" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close-btn" onClick={() => setProductoModal(null)}>
+              ✕
             </button>
+            
+            <div className="modal-header">
+              <img
+                src={productoModal.imagen?.trim() ? productoModal.imagen : imagenPorDefecto}
+                alt={productoModal.nombre || "Producto"}
+                className="modal-imagen-pro"
+              />
+              <div className="modal-info-header">
+                <h2 className="modal-titulo">{productoModal.nombre}</h2>
+                <div className="modal-precio-rating">
+                  <span className="modal-precio">€{productoModal.precio}</span>
+                  <span className="modal-unidad">por {productoModal.unidadVenta}</span>
+                  <span className="modal-rating">⭐ {(Math.random() * 2 + 3).toFixed(1)}</span>
+                </div>
+                <div className="modal-tags">
+                  <span className={`modal-tag ${productoModal.certificacion?.toLowerCase().replace(/\s+/g, '-')}`}>
+                    {productoModal.certificacion}
+                  </span>
+                  <span className="modal-stock">Stock: {productoModal.stock}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-body">
+              <div className="modal-section">
+                <h3>📝 Descripción</h3>
+                <p>{productoModal.descripcion || "Sin descripción disponible"}</p>
+              </div>
+
+              <div className="modal-grid">
+                <div className="modal-section">
+                  <h3>👨‍🌾 Productor</h3>
+                  <p>{productoModal.productor}</p>
+                </div>
+                
+                <div className="modal-section">
+                  <h3>📍 Origen</h3>
+                  <p>{productoModal.origen}</p>
+                </div>
+
+                <div className="modal-section">
+                  <h3>🗓️ Temporada</h3>
+                  <p>{productoModal.temporada}</p>
+                </div>
+
+                <div className="modal-section">
+                  <h3>📦 Cantidad por unidad</h3>
+                  <p>{productoModal.cantidadPorUnidad}</p>
+                </div>
+              </div>
+
+              <div className="modal-section">
+                <h3>📅 Información adicional</h3>
+                <p><strong>Fecha de creación:</strong> {new Date(productoModal.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button 
+                className="modal-btn-agregar" 
+                onClick={() => {
+                  handleAgregarCarrito(productoModal);
+                  setProductoModal(null);
+                }}
+              >
+                🛒 Agregar al carrito
+              </button>
+            </div>
           </div>
         </div>
       )}

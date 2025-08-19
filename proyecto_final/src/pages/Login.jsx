@@ -43,7 +43,7 @@ export default function Login() {
   return (
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
-        <h2>Iniciar Sesión</h2>
+        <h2>🌿 Iniciar Sesión</h2>
         
         <label>
           Correo Electrónico

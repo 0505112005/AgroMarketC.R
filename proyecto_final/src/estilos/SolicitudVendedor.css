@@ -1,0 +1,522 @@
+/* SolicitudVendedor CSS - Estilo profesional AgroMarket 2025 */
+
+/* Variables importadas de variables.css */
+@import url('./variables.css');
+
+/* Estilos personalizados para SweetAlert2 */
+.swal-popup-agro {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+}
+
+.swal-title-agro {
+  color: var(--azul-oscuro) !important;
+  font-weight: 700 !important;
+  font-size: 1.8rem !important;
+}
+
+.swal-html-agro {
+  margin: 1.5rem 0 !important;
+}
+
+.swal-button-agro {
+  background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro)) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal-button-agro:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(46, 125, 50, 0.3) !important;
+}
+
+/* Contenedor principal */
+.solicitud-vendedor {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 2rem 0;
+}
+
+.solicitud-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header */
+.solicitud-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+  border-radius: var(--radio-grande);
+  color: white;
+  box-shadow: var(--sombra-media);
+}
+
+.solicitud-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.solicitud-header p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* Grid principal - Layout con elementos flotantes */
+.solicitud-grid {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+/* Sección de beneficios - Flotante a la derecha */
+.beneficios-section {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-media);
+  border-top: 4px solid var(--verde-claro);
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: var(--transicion-media);
+}
+
+/* Ajustes para elementos flotantes - Títulos más pequeños */
+.beneficios-section h2,
+.requisitos-section h2 {
+  color: var(--azul-oscuro);
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.beneficios-section h2::before {
+  content: '🌟';
+  font-size: 1.2rem;
+}
+
+.requisitos-section h2::before {
+  content: '📋';
+  font-size: 1.2rem;
+}
+
+/* Beneficios y requisitos más compactos */
+.beneficio-item,
+.requisito-item {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+}
+
+.beneficio-content h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.beneficio-content p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.requisito-text {
+  font-size: 0.85rem;
+}
+
+.beneficios-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.beneficio-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: var(--gris-claro);
+  border-radius: var(--radio-medio);
+  transition: var(--transicion-media);
+  border-left: 4px solid var(--verde-claro);
+}
+
+.beneficio-item:hover {
+  transform: translateX(5px);
+  box-shadow: var(--sombra-suave);
+}
+
+.beneficio-icon {
+  font-size: 1.5rem;
+  color: var(--verde-principal);
+  min-width: 2rem;
+}
+
+.beneficio-content h3 {
+  color: var(--azul-oscuro);
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.beneficio-content p {
+  color: var(--gris-texto);
+  margin: 0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Sección de requisitos - Flotante a la izquierda */
+.requisitos-section {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-media);
+  border-top: 4px solid var(--verde-principal);
+  position: fixed;
+  left: 380px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: var(--transicion-media);
+}
+
+
+
+.requisitos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.requisito-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(46, 125, 50, 0.05);
+  border-radius: var(--radio-medio);
+  border: 1px solid rgba(46, 125, 50, 0.1);
+}
+
+.requisito-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--verde-principal);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.requisito-text {
+  color: var(--azul-oscuro);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Formulario - Centrado con más espacio */
+.formulario-section {
+  background: white;
+  padding: 3rem;
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra-media);
+  border-top: 4px solid var(--verde-muy-claro);
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+.formulario-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.formulario-header h2 {
+  color: var(--azul-oscuro);
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.formulario-header p {
+  color: var(--gris-texto);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.solicitud-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  color: var(--azul-oscuro);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  padding: 1rem;
+  border: 2px solid var(--gris-medio);
+  border-radius: var(--radio-medio);
+  font-size: 1rem;
+  font-family: inherit;
+  background: white;
+  transition: var(--transicion-rapida);
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--verde-claro);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Checkbox personalizado */
+.checkbox-label {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  color: var(--gris-texto);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 1rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gris-medio);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transicion-rapida);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+  background: var(--verde-principal);
+  border-color: var(--verde-principal);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+  content: '✓';
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* Botón de envío */
+.submit-button {
+  background: linear-gradient(135deg, var(--verde-principal), var(--verde-claro));
+  color: white;
+  border: none;
+  padding: 1.25rem 2.5rem;
+  border-radius: var(--radio-medio);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transicion-media);
+  box-shadow: var(--sombra-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 1rem;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-media);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+/* Información adicional */
+.info-adicional {
+  background: rgba(46, 125, 50, 0.05);
+  border: 1px solid rgba(46, 125, 50, 0.1);
+  border-radius: var(--radio-medio);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.info-adicional h3 {
+  color: var(--verde-principal);
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.info-adicional p {
+  color: var(--gris-texto);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Estadísticas */
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 2rem;
+  border-radius: var(--radio-grande);
+  text-align: center;
+  box-shadow: var(--sombra-suave);
+  border-top: 3px solid var(--verde-claro);
+  transition: var(--transicion-media);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--sombra-media);
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--verde-principal);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: var(--azul-oscuro);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Responsive - Ocultar elementos flotantes en pantallas pequeñas */
+@media (max-width: 1400px) {
+  .beneficios-section,
+  .requisitos-section {
+    position: static;
+    transform: none;
+    width: 100%;
+    max-height: none;
+    margin-bottom: 2rem;
+  }
+  
+  .solicitud-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .formulario-section {
+    margin-top: 2rem;
+  }
+}
+
+@media (max-width: 968px) {
+  .solicitud-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .stats-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .solicitud-header h1 {
+    font-size: 2rem;
+  }
+  
+  .formulario-section {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .solicitud-container {
+    padding: 0 1rem;
+  }
+  
+  .beneficios-section,
+  .requisitos-section,
+  .formulario-section {
+    padding: 1.5rem;
+  }
+  
+  .solicitud-header {
+    padding: 1.5rem;
+  }
+  
+  .solicitud-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 1rem;
+  }
+}

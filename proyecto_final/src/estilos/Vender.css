@@ -10,21 +10,21 @@
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-  padding: 2rem 2.5rem;
-  max-width: 420px;
+  padding: 2rem 2.0rem;
+  max-width: 620px;
   width: 100%;
 }
 
 .formulario .campo {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.0rem;
 }
 
 .formulario label {
   font-weight: bold;
   color: #2e7d32;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.0rem;
 }
 
 .formulario input,

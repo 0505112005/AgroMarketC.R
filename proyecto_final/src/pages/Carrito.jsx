@@ -26,7 +26,7 @@ const validarTarjeta = ({ numero, nombre, expiracion, cvv }) => {
 };
 
 const Carrito = () => {
-  const { carrito, quitarProducto, restarProducto, vaciarCarrito } = useCarrito();
+  const { carrito, agregarProducto, restarProducto, vaciarCarrito } = useCarrito();
   const [showModal, setShowModal] = useState(false);
   const [nombre, setNombre] = useState("");
   const [numeroTarjeta, setNumeroTarjeta] = useState("");
@@ -44,7 +44,11 @@ const Carrito = () => {
   const handleNumeroChange = (e) => setNumeroTarjeta(formatNumeroTarjeta(e.target.value));
   const handleExpiracionChange = (e) => setExpiracion(formatExpiracion(e.target.value));
 
-  const total = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
+  const shipping = 3500;
+  const freeShippingThreshold = 50000;
+  const qualifiesForFreeShipping = subtotal >= freeShippingThreshold;
+  const total = subtotal + (qualifiesForFreeShipping ? 0 : shipping);
 
   const handlePago = () => {
     const resultado = validarTarjeta({ numero: numeroTarjeta, nombre, expiracion, cvv });
@@ -71,7 +75,7 @@ const Carrito = () => {
 
   return (
     <div className="carrito-container">
-      <h2>Tu Carrito</h2>
+      <h2>🌿 Tu Carrito</h2>
       {carrito.length === 0 ? (
         <p>No tienes productos en el carrito.</p>
       ) : (
@@ -85,14 +89,36 @@ const Carrito = () => {
                   <p>CRC {prod.precio} x {prod.cantidad}</p>
                   <div className="botones-cantidad">
                     <button onClick={() => restarProducto(prod._id)}>-</button>
-                    <button onClick={() => quitarProducto(prod._id)}>X</button>
+                    <button onClick={() => agregarProducto(prod._id)}>X</button>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
-          <h3>Total: CRC {total}</h3>
-          <button className="btn-pagar" onClick={() => setShowModal(true)}>Realizar Pedido</button>
+          
+          <div className="order-summary">
+            <h2>Resumen del Pedido</h2>
+            <div className="summary-row">
+              <span>Subtotal ({carrito.reduce((acc, p) => acc + p.cantidad, 0)} producto{carrito.reduce((acc, p) => acc + p.cantidad, 0) !== 1 ? 's' : ''}):</span>
+              <span>₡{subtotal.toLocaleString()}</span>
+            </div>
+            <div className="summary-row">
+              <span>Envío:</span>
+              <span>{qualifiesForFreeShipping ? 'Gratis' : `₡${shipping.toLocaleString()}`}</span>
+            </div>
+            <p className="free-shipping-note">
+              Envío gratis en compras superiores a ₡{freeShippingThreshold.toLocaleString()}
+            </p>
+            <div className="summary-total">
+              <span>Total:</span>
+              <span>₡{qualifiesForFreeShipping ? subtotal.toLocaleString() : total.toLocaleString()}</span>
+            </div>
+            <div className="summary-buttons">
+              <button className="pay-btn" onClick={() => setShowModal(true)}>Proceder al Pago</button>
+              <button className="continue-btn" onClick={() => window.location.href = '/catalogo'}>Continuar Comprando</button>
+            </div>
+          </div>
+
         </>
       )}
 

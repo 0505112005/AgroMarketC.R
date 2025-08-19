@@ -144,7 +144,7 @@ const MisProductos = () => {
   return (
     <div className="mis-productos-container">
       <div className="mis-productos-header">
-        <h2 className="mis-productos-titulo">🧺 Mis Productos Publicados</h2>
+        <h2 className="mis-productos-titulo">🌿 Mis Productos Publicados</h2>
         <button className="btn-publicar" onClick={() => navigate("/vender")}>
           Nuevo Producto
         </button>

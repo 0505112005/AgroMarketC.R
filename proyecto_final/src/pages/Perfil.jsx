@@ -37,7 +37,7 @@ const Perfil = () => {
               />
             </div>
             <h2>{usuario.nombre}</h2>
-            <p className="perfil-rol">{usuario.rol}</p>
+            <p className="perfil-rol">🌿{usuario.rol}</p>
             <p><strong>Email:</strong> {usuario.email}</p>
           </>
         ) : (

@@ -168,3 +168,84 @@
 .tarjeta-realista.girar .tarjeta-atras {
   transform: rotateY(0deg);
 }
+
+/* Estilos para el order summary */
+.order-summary {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.order-summary h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 5px 0;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  border-top: 2px solid #4caf50;
+  padding-top: 10px;
+  margin-top: 15px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.free-shipping-note {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  margin: 10px 0;
+  text-align: center;
+  border: 1px solid #c8e6c9;
+}
+
+.summary-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.pay-btn, .continue-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.pay-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.pay-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+.continue-btn {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.continue-btn:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px);
+}

@@ -98,7 +98,7 @@ function Vender() {
     return (
         <div className="vender-container">
             <section className="formulario-agregar">
-                <h2>📦 Agregar Nuevo Producto</h2>
+                <h2>🌿 Agregar Nuevo Producto</h2>
                 <form className="formulario" onSubmit={handleSubmit}>
                     <div className="campo">
                         <label>Nombre del producto</label>

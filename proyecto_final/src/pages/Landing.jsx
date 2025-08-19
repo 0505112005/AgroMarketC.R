@@ -40,11 +40,10 @@ export default function Landing() {
       {/* NAVBAR */}
       <header className="navbar blur">
         <div className="brand">
-          <img src="/logo.svg" alt="AgroMarket" />
-          <div>
-            <strong>AgroMarket</strong>
+          
+            <strong> 🌿 AgroMarket</strong>
             <small>Fresh & Sustainable</small>
-          </div>
+          
         </div>
 
         <nav className="menu">
