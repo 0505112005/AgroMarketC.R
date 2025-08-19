@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CarritoContext = createContext();
-
 export const useCarrito = () => useContext(CarritoContext);
 
 export const CarritoProvider = ({ children }) => {
@@ -11,26 +10,55 @@ export const CarritoProvider = ({ children }) => {
     return stored ? JSON.parse(stored) : [];
   });
 
+  // Guardar carrito en localStorage cada vez que cambia
   useEffect(() => {
     localStorage.setItem("carrito", JSON.stringify(carrito));
   }, [carrito]);
 
-  // Agregar producto (si ya existe, suma cantidad)
-  const agregarProducto = (producto) => {
+  // Agregar producto al carrito y al backend
+  const agregarProducto = async (producto, usuarioId, token) => {
+    // Actualizar carrito local
     setCarrito((prev) => {
       const existe = prev.find((p) => p._id === producto._id);
       if (existe) {
         return prev.map((p) =>
           p._id === producto._id
-            ? { ...p, cantidad: p.cantidad + producto.cantidad }
+            ? { ...p, cantidad: p.cantidad + (producto.cantidad || 1) }
             : p
         );
       }
       return [...prev, { ...producto, cantidad: producto.cantidad || 1 }];
     });
+
+    // Enviar al backend
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/favoritos-carrito/agregar",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            usuarioId,
+            productoId: producto._id,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error agregando favorito:", errorData.error);
+      } else {
+        const favorito = await response.json();
+        console.log("Favorito agregado correctamente:", favorito);
+      }
+    } catch (error) {
+      console.error("Error al actualizar favoritos:", error);
+    }
   };
 
-  // Restar cantidad de un producto (o eliminar si queda 0)
   const restarProducto = (id) => {
     setCarrito((prev) =>
       prev
@@ -41,12 +69,9 @@ export const CarritoProvider = ({ children }) => {
     );
   };
 
-  // Quitar producto completamente
-  const quitarProducto = (id) => {
+  const quitarProducto = (id) =>
     setCarrito((prev) => prev.filter((p) => p._id !== id));
-  };
 
-  // Vaciar carrito
   const vaciarCarrito = () => setCarrito([]);
 
   return (

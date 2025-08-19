@@ -23,7 +23,7 @@ const Inicio = () => {
     }
   }, []);
 
-  // Traer pedidos y favoritos del usuario
+  // Traer pedidos, favoritos y actividad reciente del usuario
   useEffect(() => {
     if (!user?.id) return;
 
@@ -41,7 +41,7 @@ const Inicio = () => {
 
     const fetchFavoritos = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${user.id}`);
+        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${user.id}`);
         if (!res.ok) return setFavoritos([]);
         const data = await res.json();
 
@@ -55,7 +55,7 @@ const Inicio = () => {
             veces: item.cantidadAgregados
           }));
 
-        // Ordenar por veces agregadas y tomar los top 5
+        // Ordenar por veces agregadas y tomar top 5
         const topFavoritos = productosFavoritos.sort((a, b) => b.veces - a.veces).slice(0, 5);
         setFavoritos(topFavoritos);
       } catch (err) {
@@ -120,7 +120,7 @@ const Inicio = () => {
       <section className="main-secciones">
         {/* Productos Favoritos */}
         <div className="favoritos cuadro">
-          <h3 className="titulo-seccion">⭐ Tus Productos Favoritos</h3>
+          <h3 className="titulo-seccion">🌿 Tus productos más agregados</h3>
           <div className="productos-grid favoritos-grid">
             {favoritos.length === 0 ? (
               <p className="no-productos">Todavía no tienes productos favoritos.</p>

@@ -9,10 +9,10 @@ const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
   const [topFavoritos, setTopFavoritos] = useState([]);
-  const [filtros, setFiltros] = useState({ 
-    nombre: "", 
-    categoria: "", 
-    precioMin: "", 
+  const [filtros, setFiltros] = useState({
+    nombre: "",
+    categoria: "",
+    precioMin: "",
     precioMax: 50000,
     soloOrganicos: false
   });
@@ -47,7 +47,7 @@ const Catalogo = () => {
     if (!usuario?.id) return;
     const fetchTopFavoritos = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/${usuario.id}`);
+        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${usuario.id}`);
         const data = await res.json();
         setTopFavoritos(data || []);
       } catch (err) {
@@ -74,28 +74,47 @@ const Catalogo = () => {
       return;
     }
     if (!producto) return;
-    
+
     // Agregar al carrito
     agregarProducto(producto);
-    
+
+    // Datos que vamos a enviar al backend
+    const datosFavorito = {
+      usuarioId: usuario.id,
+      productoId: producto._id,
+    };
+    console.log("Enviando datos al backend:", datosFavorito);
+
     // Actualizar contador de favoritos en la API
     try {
-      await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
+      const response = await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          usuarioId: usuario.id,
-          productoId: producto._id,
-        }),
+        body: JSON.stringify(datosFavorito),
       });
+
+      const resultado = await response.json();
+
+      if (!response.ok) {
+        console.error("Error agregando favorito:", resultado);
+      } else {
+        console.log("Favorito agregado con éxito:", resultado);
+
+        // 👇 Recargar los favoritos del usuario para que se actualicen en la vista
+        const resTop = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${usuario.id}`);
+        const nuevosFavoritos = await resTop.json();
+        setTopFavoritos(nuevosFavoritos || []);
+      }
+
     } catch (err) {
       console.error("Error al actualizar favoritos:", err);
     }
-    
+
     mostrarMensajeExito("Producto agregado al carrito");
   };
+
 
   // Filtrar productos
   const productosFiltrados = productos.filter((p) => {
@@ -104,7 +123,7 @@ const Catalogo = () => {
     const categoriaMatch = filtros.categoria ? p.certificacion === filtros.categoria : true;
     const precioMatch = p.precio <= filtros.precioMax && p.precio >= (filtros.precioMin || 0);
     const organicoMatch = filtros.soloOrganicos ? p.certificacion === "Orgánico" : true;
-    
+
     return nombreMatch && categoriaMatch && precioMatch && organicoMatch;
   });
 
@@ -139,8 +158,8 @@ const Catalogo = () => {
         </div>
         <h3 className="card-title">{producto.nombre}</h3>
         <p className="card-description">
-          {producto.descripcion?.length > 60 
-            ? `${producto.descripcion.substring(0, 60)}...` 
+          {producto.descripcion?.length > 60
+            ? `${producto.descripcion.substring(0, 60)}...`
             : producto.descripcion || "Sin descripción"}
         </p>
         <div className="card-location">
@@ -156,17 +175,17 @@ const Catalogo = () => {
             <span className="delivery">🚚 Entrega 24h</span>
           </div>
           <div className="card-buttons">
-            <button 
-              className="btn-ver-mas" 
+            <button
+              className="btn-ver-mas"
               onClick={() => setProductoModal(producto)}
             >
-               Ver más
+              Ver más
             </button>
-            <button 
-              className="add-btn" 
+            <button
+              className="add-btn"
               onClick={() => handleAgregarCarrito(producto)}
             >
-               Agregar
+              Agregar
             </button>
           </div>
         </div>
@@ -192,7 +211,7 @@ const Catalogo = () => {
 
         {/* Catálogo completo */}
         <h2 className="titulo">🌿 Catálogo completo</h2>
-        
+
         <div className="productos-grid">
           {productosFiltrados.length === 0 ? (
             <p>No hay productos disponibles</p>
@@ -227,10 +246,10 @@ const Catalogo = () => {
 
         <div className="range-container">
           <label htmlFor="precioRange">Precio máximo:</label>
-          <input 
+          <input
             id="precioRange"
-            type="range" 
-            min="0" 
+            type="range"
+            min="0"
             max="50000"
             value={filtros.precioMax}
             onChange={(e) => setFiltros({ ...filtros, precioMax: Number(e.target.value) })}
@@ -240,7 +259,7 @@ const Catalogo = () => {
         </div>
 
         <label className="checkbox-container">
-          <input 
+          <input
             type="checkbox"
             checked={filtros.soloOrganicos}
             onChange={(e) => setFiltros({ ...filtros, soloOrganicos: e.target.checked })}
@@ -259,7 +278,7 @@ const Catalogo = () => {
             <button className="modal-close-btn" onClick={() => setProductoModal(null)}>
               ✕
             </button>
-            
+
             <div className="modal-header">
               <img
                 src={productoModal.imagen?.trim() ? productoModal.imagen : imagenPorDefecto}
@@ -293,7 +312,7 @@ const Catalogo = () => {
                   <h3>👨‍🌾 Productor</h3>
                   <p>{productoModal.productor}</p>
                 </div>
-                
+
                 <div className="modal-section">
                   <h3>📍 Origen</h3>
                   <p>{productoModal.origen}</p>
@@ -317,8 +336,8 @@ const Catalogo = () => {
             </div>
 
             <div className="modal-footer">
-              <button 
-                className="modal-btn-agregar" 
+              <button
+                className="modal-btn-agregar"
                 onClick={() => {
                   handleAgregarCarrito(productoModal);
                   setProductoModal(null);
