@@ -125,7 +125,7 @@ const Inicio = () => {
       {/* Header */}
       <header className="inicio-header">
         <div className="header-info">
-          <h1>🌿 Dashboard - AgroMarket</h1>
+          <h1>🌿 Dashboard </h1>
           <p className="header-subtitle">Panel de control personal</p>
         </div>
         <button

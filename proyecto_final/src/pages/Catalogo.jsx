@@ -13,7 +13,7 @@ const Catalogo = () => {
     nombre: "",
     categoria: "",
     precioMin: "",
-    precioMax: 50000,
+    precioMax: 20000,
     soloOrganicos: false
   });
   const [usuario, setUsuario] = useState(null);
@@ -240,7 +240,7 @@ const Catalogo = () => {
             id="precioRange"
             type="range"
             min="0"
-            max="50000"
+            max="20000"
             value={filtros.precioMax}
             onChange={(e) => setFiltros({ ...filtros, precioMax: Number(e.target.value) })}
             className="range-slider"

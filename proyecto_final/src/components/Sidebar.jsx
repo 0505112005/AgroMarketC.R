@@ -47,12 +47,15 @@ export default function Sidebar() {
       </div>
 
       <nav className="nav__menu">
+
         <NavLink end to="/inicio" className={linkClass}>
           📊 Dashboard
         </NavLink>
+
         <NavLink to="/catalogo" className={linkClass}>
           📦 Catálogo
         </NavLink>
+
         <NavLink to="/carrito" className={linkClass}>
           🛒 Carrito ({carrito.length})
         </NavLink>
@@ -60,20 +63,15 @@ export default function Sidebar() {
         <NavLink to="/mis-productos" className={linkClass}>
           🧺 Mis Productos
         </NavLink>
-        <NavLink to="/mensajeria" className={linkClass} style={{ position: "relative" }}>
-          💬 Mensajería
-          {unreadCount > 0 && (
-            <span className="nav__badge">{unreadCount}</span>
-          )}
-        </NavLink>
-        <NavLink to="/perfil" className={linkClass}>
-          👤 Mi Perfil
-        </NavLink>
+        
         {user?.rol === "comprador" && (
           <NavLink to="/solicitud-vendedor" className={linkClass}>
             📩 Quiero Vender
           </NavLink>
         )}
+         <NavLink to="/perfil" className={linkClass}>
+          👤 Mi Perfil
+        </NavLink>
       </nav>
 
       

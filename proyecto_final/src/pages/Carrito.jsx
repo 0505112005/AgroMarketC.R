@@ -87,6 +87,7 @@ const Carrito = () => {
   const qualifiesForFreeShipping = subtotal >= freeShippingThreshold;
   const total = subtotal + (qualifiesForFreeShipping ? 0 : shipping);
 
+
   const handlePago = () => {
     // Validación de la tarjeta
     const resultado = validarTarjeta({ numero: numeroTarjeta, nombre, expiracion, cvv });
@@ -105,22 +106,82 @@ const Carrito = () => {
       title: "¡Pago realizado!",
       text: `Se ha procesado tu pago de CRC ${total}`
     }).then(() => {
-      // Generar factura en PDF
+      // Generar factura en PDF con mejor estilo y detalle
       const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text("🌿 Factura de Compra", 105, 20, { align: "center" });
+      // Encabezado con logo y nombre
+      doc.setFillColor(46, 204, 113); // Verde
+      doc.rect(0, 0, 210, 30, 'F');
+      doc.setFontSize(18);
+      doc.setTextColor(255,255,255);
+      doc.text("AgroMarket C.R", 15, 20);
+      // Logo (opcional, si tienes una url base64)
+      // doc.addImage(logoBase64, 'PNG', 170, 5, 25, 20);
 
-      let y = 40;
+
+  // Título factura y nombre del comprador
+  doc.setFontSize(16);
+  doc.setTextColor(44, 62, 80);
+  doc.text("Factura de Compra", 105, 40, { align: "center" });
+  doc.setFontSize(12);
+  doc.setTextColor(44, 62, 80);
+  doc.text(`A nombre de: ${nombre || "(Sin nombre)"}`, 105, 48, { align: "center" });
+
+      // Tabla de productos
+      let startY = 50;
+      doc.setFontSize(12);
+      doc.setFillColor(39, 174, 96); // Verde más oscuro
+      doc.setTextColor(255,255,255);
+      doc.rect(15, startY, 180, 10, 'F');
+      doc.text("Producto", 20, startY + 7);
+      doc.text("Cantidad", 80, startY + 7);
+      doc.text("Precio Unitario", 110, startY + 7);
+      doc.text("Total", 170, startY + 7);
+
+      doc.setTextColor(44, 62, 80);
+      let y = startY + 15;
       carrito.forEach((prod, i) => {
-        doc.setFontSize(12);
-        doc.text(`${i + 1}. ${prod.nombre} (${prod.cantidad} x ₡${prod.precio.toLocaleString()})`, 20, y);
-        y += 10;
+        doc.setFontSize(11);
+        doc.text(`${prod.nombre}`, 20, y);
+        doc.text(`${prod.cantidad}`, 85, y, { align: "right" });
+        doc.text(`${prod.precio?.toLocaleString()}`, 130, y, { align: "right" });
+        doc.text(`${(prod.precio * prod.cantidad)?.toLocaleString()}`, 190, y, { align: "right" });
+        y += 8;
       });
 
-      doc.setFontSize(14);
-      doc.text(`Subtotal: ₡${subtotal.toLocaleString()}`, 20, y + 10);
-      doc.text(`Envío: ${qualifiesForFreeShipping ? 'Gratis' : `₡${shipping.toLocaleString()}`}`, 20, y + 20);
-      doc.text(`Total: ₡${total.toLocaleString()}`, 20, y + 30);
+      // Línea separadora
+      doc.setDrawColor(39, 174, 96);
+      doc.line(15, y, 195, y);
+      y += 5;
+
+      // Resumen de totales
+      doc.setFontSize(12);
+      doc.text(`Subtotal:`, 130, y);
+      doc.text(`${subtotal.toLocaleString()}`, 190, y, { align: "right" });
+      y += 7;
+      doc.text(`Envío:`, 130, y);
+      doc.text(`${qualifiesForFreeShipping ? 'Gratis' : `${shipping.toLocaleString()}`}`, 190, y, { align: "right" });
+      y += 7;
+      doc.setFontSize(13);
+      doc.setTextColor(39, 174, 96);
+      doc.text(`Total:`, 130, y);
+      doc.text(`${total.toLocaleString()}`, 190, y, { align: "right" });
+      doc.setTextColor(44, 62, 80);
+      y += 15;
+
+      // Nota de envío gratis
+      if (qualifiesForFreeShipping) {
+        doc.setFontSize(11);
+        doc.setTextColor(39, 174, 96);
+        doc.text(`¡Envío gratis por compras superiores a ₡${freeShippingThreshold.toLocaleString()}!`, 20, y);
+        doc.setTextColor(44, 62, 80);
+        y += 7;
+      }
+
+      // Pie de página
+      doc.setFontSize(10);
+      doc.setTextColor(127, 140, 141);
+      doc.text("Gracias por tu compra en AgroMarket C.R. ¡Esperamos verte pronto!", 105, 285, { align: "center" });
+      doc.text("Contacto: info@agromarketcr.com", 105, 292, { align: "center" });
 
       // Abrir factura en nueva ventana para visualización
       doc.output("dataurlnewwindow");
