@@ -1,0 +1,67 @@
+/* Media Query para móviles pequeños - Productos Profesionales */
+@media (max-width: 480px) {
+  .products-showcase {
+    padding: 1.5rem 0;
+  }
+
+  .showcase-header {
+    margin-bottom: 2rem;
+  }
+
+  .showcase-title {
+    font-size: 1.5rem;
+  }
+
+  .showcase-subtitle {
+    font-size: 0.9rem;
+    padding: 0 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .product-card {
+    max-width: 350px;
+    margin: 0 auto;
+    border-radius: 14px;
+  }
+
+  .product-card:hover {
+    transform: translateY(-10px) scale(1.01);
+  }
+
+  .product-image {
+    height: 160px;
+  }
+
+  .product-badge {
+    top: 12px;
+    left: 12px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.75rem;
+  }
+
+  .quick-view-btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .product-info {
+    padding: 1.3rem;
+  }
+
+  .product-title {
+    font-size: 1rem;
+  }
+
+  .product-price {
+    font-size: 1.2rem;
+  }
+
+  .price-unit {
+    font-size: 0.8rem;
+  }
+}

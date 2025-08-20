@@ -167,12 +167,12 @@ const Catalogo = () => {
         </div>
         <div className="card-footer">
           <div className="price-rating">
-            <span className="price">€{producto.precio} <small>por {producto.unidadVenta || 'kg'}</small></span>
+            <span className="price">₡{producto.precio} <small>por {producto.unidadVenta || 'kg'}</small></span>
             <span className="rating">⭐ {rating}</span>
           </div>
           <div className="seller">
             <span>{producto.productor || "Productor"}</span>
-            <span className="delivery">🚚 Entrega 24h</span>
+            <span className="delivery"> Entrega 24h</span>
           </div>
           <div className="card-buttons">
             <button
@@ -245,7 +245,7 @@ const Catalogo = () => {
             onChange={(e) => setFiltros({ ...filtros, precioMax: Number(e.target.value) })}
             className="range-slider"
           />
-          <span className="price-display">€{filtros.precioMax}</span>
+          <span className="price-display">₡{filtros.precioMax}</span>
         </div>
 
         <label className="checkbox-container">
@@ -278,7 +278,7 @@ const Catalogo = () => {
               <div className="modal-info-header">
                 <h2 className="modal-titulo">{productoModal.nombre}</h2>
                 <div className="modal-precio-rating">
-                  <span className="modal-precio">€{productoModal.precio}</span>
+                  <span className="modal-precio">₡{productoModal.precio}</span>
                   <span className="modal-unidad">por {productoModal.unidadVenta}</span>
                   <span className="modal-rating">⭐ {(Math.random() * 2 + 3).toFixed(1)}</span>
                 </div>

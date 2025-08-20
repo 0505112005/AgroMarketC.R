@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import "../estilos/Inicio.css";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../components/CarritoContext";
+import Swal from "sweetalert2";
 
 const Inicio = () => {
   const [user, setUser] = useState(null);
@@ -10,7 +11,7 @@ const Inicio = () => {
   const [favoritos, setFavoritos] = useState([]);
   const [actividadReciente, setActividadReciente] = useState([]);
   const navigate = useNavigate();
-  const { carrito } = useCarrito();
+  const { carrito, agregarProducto } = useCarrito();
 
   // Cargar usuario del localStorage
   useEffect(() => {
@@ -81,93 +82,175 @@ const Inicio = () => {
   const nombreUsuario = user?.nombre || "Invitado";
   const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
+  // Función para agregar al carrito con notificación
+  const handleAgregarAlCarrito = async (producto) => {
+    try {
+      const token = localStorage.getItem("token");
+      await agregarProducto(producto, user?.id, token);
+      
+      Swal.fire({
+        title: '¡Agregado al carrito! 🛒',
+        text: `${producto.nombre} se ha añadido a tu carrito`,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    } catch (error) {
+      console.error("Error al agregar producto:", error);
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo agregar el producto al carrito',
+        icon: 'error',
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    }
+  };
+
   return (
     <div className="inicio-content">
+      {/* Header mejorado */}
       <header className="inicio-header">
-        <h1>🌿 Dashboard - AgroMarket</h1>
+        <div className="header-info">
+          <h1>🌿 Dashboard - AgroMarket</h1>
+          <p className="header-subtitle">Panel de control personal</p>
+        </div>
         <button
           className="btn-catalogo"
           onClick={() => navigate("/catalogo")}
           type="button"
         >
-          Ver Catálogo Completo
+          📱 Ver Catálogo
         </button>
       </header>
 
-      <section className="saludo">
-        <h2>¡Bienvenido, {nombreUsuario}!</h2>
-        <p>Descubre los mejores productos agrícolas frescos y de calidad</p>
-      </section>
-
-      <section className="estadisticas">
-        <div className="estadistica-card">
-          <div className="estadistica-valor">{pedidos.length}</div>
-          <div className="estadistica-label">Pedidos Realizados</div>
-          <div className="estadistica-icon" aria-label="Pedidos">📦</div>
-        </div>
-        <div className="estadistica-card">
-          <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
-          <div className="estadistica-label">Total Gastado</div>
-          <div className="estadistica-icon" aria-label="Total Gastado">💰</div>
-        </div>
-        <div className="estadistica-card">
-          <div className="estadistica-valor">{carrito.length}</div>
-          <div className="estadistica-label">En Carrito</div>
-          <div className="estadistica-icon" aria-label="Carrito">🛒</div>
+      {/* Saludo personalizado */}
+      <section className="saludo-section">
+        <div className="saludo-content">
+          <h2>¡Bienvenido de vuelta, {nombreUsuario}! 👋</h2>
+          <p>Descubre los mejores productos agrícolas frescos y de calidad premium</p>
         </div>
       </section>
 
-      <section className="main-secciones">
-        {/* Productos Favoritos */}
-        <div className="favoritos cuadro">
-          <h3 className="titulo-seccion">🌿 Tus productos más agregados</h3>
-          <div className="productos-grid favoritos-grid">
-            {favoritos.length === 0 ? (
-              <p className="no-productos">Todavía no tienes productos favoritos.</p>
-            ) : (
-              favoritos.map((prod) => (
-                <div key={prod._id} className="card pequeña">
-                  <img
-                    src={prod.imagen || "https://via.placeholder.com/100?text=Sin+Imagen"}
-                    alt={prod.nombre}
-                    className="card-imagen"
-                  />
-                  <h4>{prod.nombre}</h4>
-                  <p className="precio">₡{prod.precio?.toLocaleString() || "0"}</p>
-                  <p className="veces">Añadido {prod.veces} veces</p>
-                  <button
-                    className="ver"
-                    onClick={() => navigate(`/producto/${prod._id}`)}
-                    type="button"
-                  >
-                    Ver Producto
-                  </button>
-                </div>
-              ))
-            )}
+      {/* Estadísticas mejoradas */}
+      <section className="estadisticas-section">
+        
+        <div className="estadisticas-grid">
+          <div className="estadistica-card pedidos">
+            <div className="card-icon">📦</div>
+            <div className="card-content">
+              <div className="estadistica-valor">{pedidos.length}</div>
+              <div className="estadistica-label">Pedidos Realizados</div>
+            </div>
+          </div>
+          <div className="estadistica-card gastos">
+            <div className="card-icon">💸</div>
+            <div className="card-content">
+              <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
+              <div className="estadistica-label">Total Gastado</div>
+            </div>
+          </div>
+          <div className="estadistica-card carrito">
+            <div className="card-icon">🛒</div>
+            <div className="card-content">
+              <div className="estadistica-valor">{carrito.length}</div>
+              <div className="estadistica-label">En Carrito</div>
+            </div>
           </div>
         </div>
+      </section>
+
+      {/* Secciones principales reorganizadas */}
+      <div className="main-dashboard">
+        {/* Productos Favoritos */}
+        <section className="favoritos-section">
+          <div className="section-header">
+            <h3 className="section-title"> Tus Productos Favoritos</h3>
+            <p className="section-subtitle">Los productos que más has agregado al carrito</p>
+            
+          </div>
+          <div className="favoritos-container">
+            {favoritos.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">🛍️</div>
+                <h4>Aún no tienes productos favoritos</h4>
+                <p>Explora nuestro catálogo y comienza a agregar productos a tu carrito</p>
+                <button 
+                  className="btn-explorar"
+                  onClick={() => navigate("/catalogo")}
+                  type="button"
+                >
+                  Explorar Productos
+                </button>
+              </div>
+            ) : (
+              <div className="productos-grid">
+                {favoritos.map((prod) => (
+                  <div key={prod._id} className="producto-card">
+                    <div className="producto-imagen-container">
+                      <img
+                        src={prod.imagen || "https://via.placeholder.com/200x150?text=Sin+Imagen"}
+                        alt={prod.nombre}
+                        className="producto-imagen"
+                      />
+                      <div className="producto-badge">{prod.veces}x</div>
+                    </div>
+                    <div className="producto-info">
+                      <h4 className="producto-titulo">{prod.nombre}</h4>
+                      <p className="producto-precio">₡{prod.precio?.toLocaleString() || "0"}</p>
+                      
+                      <button
+                        className="btn-agregar-carrito"
+                        onClick={() => handleAgregarAlCarrito({
+                          _id: prod._id,
+                          nombre: prod.nombre,
+                          precio: prod.precio,
+                          imagen: prod.imagen
+                        })}
+                        type="button"
+                      >
+                        🛒 Añadir al Carrito
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* Actividad Reciente */}
-        <div className="actividad-reciente cuadro">
-          <h3 className="titulo-seccion">📋 Actividad Reciente</h3>
-          <ul>
+        <section className="actividad-section">
+          <div className="section-header">
+            <h3 className="section-title"> Actividad Reciente</h3>
+            <p className="section-subtitle">Últimos movimientos en tu cuenta</p>
+          </div>
+          <div className="actividad-container">
             {actividadReciente.length === 0 ? (
-              <li>No hay actividad reciente.</li>
+              <div className="empty-activity">
+                <p>No hay actividad reciente</p>
+              </div>
             ) : (
-              actividadReciente.map((act) => (
-                <li key={act.id}>
-                  <strong>{act.texto}</strong>
-                  <br />
-                  <small className="tiempo">{act.tiempo}</small>
-                </li>
-              ))
+              <div className="actividad-lista">
+                {actividadReciente.map((act) => (
+                  <div key={act.id} className="actividad-item">
+                    <div className="actividad-icon">📝</div>
+                    <div className="actividad-content">
+                      <p className="actividad-texto">{act.texto}</p>
+                      <span className="actividad-tiempo">{act.tiempo}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
-          </ul>
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
-
 export default Inicio;

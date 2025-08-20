@@ -28,7 +28,7 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route path="inicio" element={<Inicio />} />
         <Route path="catalogo" element={<Catalogo />} />
-        
+
         {/* Ruta protegida para vendedores */}
         <Route 
           path="vender" 

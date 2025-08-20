@@ -33,6 +33,39 @@ const Carrito = () => {
   const [expiracion, setExpiracion] = useState("");
   const [cvv, setCvv] = useState("");
 
+  // Función para incrementar cantidad de un producto en el carrito
+  const incrementarCantidad = (producto) => {
+    agregarProducto(producto);
+  };
+
+  // Función para eliminar un producto completamente del carrito
+  const eliminarProducto = (producto) => {
+    Swal.fire({
+      title: '¿Eliminar producto?',
+      text: `¿Estás seguro de que quieres eliminar "${producto.nombre}" del carrito?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e74c3c',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Aquí usamos restarProducto múltiples veces para eliminar completamente
+        for (let i = 0; i < producto.cantidad; i++) {
+          restarProducto(producto._id);
+        }
+        Swal.fire({
+          title: '¡Eliminado!',
+          text: 'El producto ha sido eliminado del carrito',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }
+    });
+  };
+
   const formatNumeroTarjeta = (num) => num.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
   const formatExpiracion = (exp) => {
     let val = exp.replace(/\D/g, "");
@@ -80,21 +113,79 @@ const Carrito = () => {
         <p>No tienes productos en el carrito.</p>
       ) : (
         <>
-          <ul className="lista-carrito">
+          <div className="lista-carrito">
             {carrito.map((prod) => (
-              <li key={prod._id} className="producto-carrito">
-                <img src={prod.imagen || "https://via.placeholder.com/100"} alt={prod.nombre} />
-                <div>
-                  <h4>{prod.nombre}</h4>
-                  <p>CRC {prod.precio} x {prod.cantidad}</p>
-                  <div className="botones-cantidad">
-                    <button onClick={() => restarProducto(prod._id)}>-</button>
-                    <button onClick={() => agregarProducto(prod._id)}>X</button>
+              <div key={prod._id} className="producto-carrito">
+                <div className="producto-imagen-container">
+                  <img 
+                    src={prod.imagen || "https://via.placeholder.com/120x120?text=Producto"} 
+                    alt={prod.nombre} 
+                    className="producto-imagen-carrito"
+                  />
+                  <button 
+                    className="btn-eliminar-producto"
+                    onClick={() => eliminarProducto(prod)}
+                    title="Eliminar producto del carrito"
+                  >
+                    🗑️
+                  </button>
+                </div>
+                
+                <div className="producto-info">
+                  <h4 className="producto-nombre-carrito">{prod.nombre}</h4>
+                  <p className="producto-descripcion-carrito">
+                    {prod.descripcion ? 
+                      (prod.descripcion.length > 80 ? 
+                        `${prod.descripcion.substring(0, 80)}...` : 
+                        prod.descripcion
+                      ) : 
+                      "Producto fresco y de calidad"
+                    }
+                  </p>
+                  <div className="producto-detalles">
+                    {prod.origen && <span className="producto-origen">📍 {prod.origen}</span>}
+                    {prod.certificacion && (
+                      <span className={`producto-certificacion ${prod.certificacion?.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {prod.certificacion}
+                      </span>
+                    )}
                   </div>
                 </div>
-              </li>
+                
+                <div className="producto-controles">
+                  <div className="precio-container">
+                    <span className="precio-unitario">₡{prod.precio?.toLocaleString()}</span>
+                    <span className="unidad-venta">por {prod.unidadVenta || 'kg'}</span>
+                  </div>
+                  
+                  <div className="cantidad-controles">
+                    <span className="cantidad-label">Cantidad:</span>
+                    <div className="botones-cantidad">
+                      <button 
+                        className="btn-cantidad btn-restar" 
+                        onClick={() => restarProducto(prod._id)}
+                        disabled={prod.cantidad <= 1}
+                      >
+                        −
+                      </button>
+                      <span className="cantidad-display">{prod.cantidad}</span>
+                      <button 
+                        className="btn-cantidad btn-sumar" 
+                        onClick={() => incrementarCantidad(prod)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="precio-total">
+                    <span className="precio-total-label">Total:</span>
+                    <span className="precio-total-valor">₡{(prod.precio * prod.cantidad)?.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
           
           <div className="order-summary">
             <h2>Resumen del Pedido</h2>
