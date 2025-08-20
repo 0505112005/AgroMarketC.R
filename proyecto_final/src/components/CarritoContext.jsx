@@ -15,7 +15,6 @@ export const CarritoProvider = ({ children }) => {
     localStorage.setItem("carrito", JSON.stringify(carrito));
   }, [carrito]);
 
-  // Agregar producto al carrito y al backend
   const agregarProducto = async (producto, usuarioId, token) => {
     // Actualizar carrito local
     setCarrito((prev) => {
@@ -23,11 +22,11 @@ export const CarritoProvider = ({ children }) => {
       if (existe) {
         return prev.map((p) =>
           p._id === producto._id
-            ? { ...p, cantidad: p.cantidad + (producto.cantidad || 1) }
+            ? { ...p, cantidad: p.cantidad + 1 } 
             : p
         );
       }
-      return [...prev, { ...producto, cantidad: producto.cantidad || 1 }];
+      return [...prev, { ...producto, cantidad: 1 }]; 
     });
 
     // Enviar al backend

@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { useCarrito } from "../components/CarritoContext";
 import "../estilos/Carrito.css";
 import Swal from "sweetalert2";
+import { jsPDF } from "jspdf";
+
+
+
 
 // Función de validación
 const validarTarjeta = ({ numero, nombre, expiracion, cvv }) => {
@@ -10,7 +14,7 @@ const validarTarjeta = ({ numero, nombre, expiracion, cvv }) => {
 
   if (!nombre.trim()) return "Nombre no puede estar vacío";
 
-  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiracion)) 
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiracion))
     return "Fecha de expiración inválida";
 
   const [mes, anio] = expiracion.split("/").map(Number);
@@ -69,8 +73,8 @@ const Carrito = () => {
   const formatNumeroTarjeta = (num) => num.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
   const formatExpiracion = (exp) => {
     let val = exp.replace(/\D/g, "");
-    if (val.length >= 3) val = val.slice(0,4);
-    if (val.length > 2) val = val.slice(0,2) + "/" + val.slice(2);
+    if (val.length >= 3) val = val.slice(0, 4);
+    if (val.length > 2) val = val.slice(0, 2) + "/" + val.slice(2);
     return val;
   };
 
@@ -84,6 +88,7 @@ const Carrito = () => {
   const total = subtotal + (qualifiesForFreeShipping ? 0 : shipping);
 
   const handlePago = () => {
+    // Validación de la tarjeta
     const resultado = validarTarjeta({ numero: numeroTarjeta, nombre, expiracion, cvv });
     if (resultado !== true) {
       Swal.fire({
@@ -99,12 +104,34 @@ const Carrito = () => {
       icon: "success",
       title: "¡Pago realizado!",
       text: `Se ha procesado tu pago de CRC ${total}`
-    });
+    }).then(() => {
+      // Generar factura en PDF
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text("🌿 Factura de Compra", 105, 20, { align: "center" });
 
-    vaciarCarrito();
-    setShowModal(false);
-    setNombre(""); setNumeroTarjeta(""); setExpiracion(""); setCvv("");
+      let y = 40;
+      carrito.forEach((prod, i) => {
+        doc.setFontSize(12);
+        doc.text(`${i + 1}. ${prod.nombre} (${prod.cantidad} x ₡${prod.precio.toLocaleString()})`, 20, y);
+        y += 10;
+      });
+
+      doc.setFontSize(14);
+      doc.text(`Subtotal: ₡${subtotal.toLocaleString()}`, 20, y + 10);
+      doc.text(`Envío: ${qualifiesForFreeShipping ? 'Gratis' : `₡${shipping.toLocaleString()}`}`, 20, y + 20);
+      doc.text(`Total: ₡${total.toLocaleString()}`, 20, y + 30);
+
+      // Abrir factura en nueva ventana para visualización
+      doc.output("dataurlnewwindow");
+
+      // Limpiar carrito y modal
+      vaciarCarrito();
+      setShowModal(false);
+      setNombre(""); setNumeroTarjeta(""); setExpiracion(""); setCvv("");
+    });
   };
+
 
   return (
     <div className="carrito-container">
@@ -117,12 +144,12 @@ const Carrito = () => {
             {carrito.map((prod) => (
               <div key={prod._id} className="producto-carrito">
                 <div className="producto-imagen-container">
-                  <img 
-                    src={prod.imagen || "https://via.placeholder.com/120x120?text=Producto"} 
-                    alt={prod.nombre} 
+                  <img
+                    src={prod.imagen || "https://via.placeholder.com/120x120?text=Producto"}
+                    alt={prod.nombre}
                     className="producto-imagen-carrito"
                   />
-                  <button 
+                  <button
                     className="btn-eliminar-producto"
                     onClick={() => eliminarProducto(prod)}
                     title="Eliminar producto del carrito"
@@ -130,15 +157,15 @@ const Carrito = () => {
                     🗑️
                   </button>
                 </div>
-                
+
                 <div className="producto-info">
                   <h4 className="producto-nombre-carrito">{prod.nombre}</h4>
                   <p className="producto-descripcion-carrito">
-                    {prod.descripcion ? 
-                      (prod.descripcion.length > 80 ? 
-                        `${prod.descripcion.substring(0, 80)}...` : 
+                    {prod.descripcion ?
+                      (prod.descripcion.length > 80 ?
+                        `${prod.descripcion.substring(0, 80)}...` :
                         prod.descripcion
-                      ) : 
+                      ) :
                       "Producto fresco y de calidad"
                     }
                   </p>
@@ -151,33 +178,33 @@ const Carrito = () => {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="producto-controles">
                   <div className="precio-container">
                     <span className="precio-unitario">₡{prod.precio?.toLocaleString()}</span>
                     <span className="unidad-venta">por {prod.unidadVenta || 'kg'}</span>
                   </div>
-                  
+
                   <div className="cantidad-controles">
                     <span className="cantidad-label">Cantidad:</span>
                     <div className="botones-cantidad">
-                      <button 
-                        className="btn-cantidad btn-restar" 
+                      <button
+                        className="btn-cantidad btn-restar"
                         onClick={() => restarProducto(prod._id)}
                         disabled={prod.cantidad <= 1}
                       >
                         −
                       </button>
                       <span className="cantidad-display">{prod.cantidad}</span>
-                      <button 
-                        className="btn-cantidad btn-sumar" 
+                      <button
+                        className="btn-cantidad btn-sumar"
                         onClick={() => incrementarCantidad(prod)}
                       >
                         +
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="precio-total">
                     <span className="precio-total-label">Total:</span>
                     <span className="precio-total-valor">₡{(prod.precio * prod.cantidad)?.toLocaleString()}</span>
@@ -186,7 +213,7 @@ const Carrito = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="order-summary">
             <h2>Resumen del Pedido</h2>
             <div className="summary-row">

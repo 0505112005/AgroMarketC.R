@@ -13,6 +13,12 @@ const Inicio = () => {
   const navigate = useNavigate();
   const { carrito, agregarProducto } = useCarrito();
 
+  // 📌 Cálculo del total del carrito
+  const totalCarrito = carrito.reduce(
+    (acc, p) => acc + p.precio * p.cantidad,
+    0
+  );
+
   // Cargar usuario del localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
@@ -30,7 +36,9 @@ const Inicio = () => {
 
     const fetchPedidos = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/pedidos/comprador/${user.id}`);
+        const res = await fetch(
+          `http://localhost:5000/api/pedidos/comprador/${user.id}`
+        );
         if (!res.ok) return setPedidos([]);
         const data = await res.json();
         setPedidos(Array.isArray(data) ? data : []);
@@ -42,22 +50,25 @@ const Inicio = () => {
 
     const fetchFavoritos = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${user.id}`);
+        const res = await fetch(
+          `http://localhost:5000/api/favoritos-carrito/top/${user.id}`
+        );
         if (!res.ok) return setFavoritos([]);
         const data = await res.json();
-
         const productosFavoritos = data
-          .filter(item => item?.productoId)
-          .map(item => ({
+          .filter((item) => item?.productoId)
+          .map((item) => ({
             _id: item.productoId._id,
             nombre: item.productoId.nombre,
             precio: item.productoId.precio,
             imagen: item.productoId.imagen,
-            veces: item.cantidadAgregados
+            veces: item.cantidadAgregados,
           }));
 
         // Ordenar por veces agregadas y tomar top 5
-        const topFavoritos = productosFavoritos.sort((a, b) => b.veces - a.veces).slice(0, 5);
+        const topFavoritos = productosFavoritos
+          .sort((a, b) => b.veces - a.veces)
+          .slice(0, 5);
         setFavoritos(topFavoritos);
       } catch (err) {
         console.error("Error fetching favoritos:", err);
@@ -80,40 +91,38 @@ const Inicio = () => {
   }, [user?.id]);
 
   const nombreUsuario = user?.nombre || "Invitado";
-  const totalGastado = pedidos.reduce((acc, pedido) => acc + (pedido.total || 0), 0);
 
   // Función para agregar al carrito con notificación
   const handleAgregarAlCarrito = async (producto) => {
     try {
       const token = localStorage.getItem("token");
       await agregarProducto(producto, user?.id, token);
-      
       Swal.fire({
-        title: '¡Agregado al carrito! 🛒',
+        title: "¡Agregado al carrito! 🛒",
         text: `${producto.nombre} se ha añadido a tu carrito`,
-        icon: 'success',
+        icon: "success",
         timer: 2000,
         showConfirmButton: false,
         toast: true,
-        position: 'top-end'
+        position: "top-end",
       });
     } catch (error) {
       console.error("Error al agregar producto:", error);
       Swal.fire({
-        title: 'Error',
-        text: 'No se pudo agregar el producto al carrito',
-        icon: 'error',
+        title: "Error",
+        text: "No se pudo agregar el producto al carrito",
+        icon: "error",
         timer: 2000,
         showConfirmButton: false,
         toast: true,
-        position: 'top-end'
+        position: "top-end",
       });
     }
   };
 
   return (
     <div className="inicio-content">
-      {/* Header mejorado */}
+      {/* Header */}
       <header className="inicio-header">
         <div className="header-info">
           <h1>🌿 Dashboard - AgroMarket</h1>
@@ -128,17 +137,18 @@ const Inicio = () => {
         </button>
       </header>
 
-      {/* Saludo personalizado */}
+      {/* Saludo */}
       <section className="saludo-section">
         <div className="saludo-content">
           <h2>¡Bienvenido de vuelta, {nombreUsuario}! 👋</h2>
-          <p>Descubre los mejores productos agrícolas frescos y de calidad premium</p>
+          <p>
+            Descubre los mejores productos agrícolas frescos y de calidad premium
+          </p>
         </div>
       </section>
 
-      {/* Estadísticas mejoradas */}
+      {/* Estadísticas */}
       <section className="estadisticas-section">
-        
         <div className="estadisticas-grid">
           <div className="estadistica-card pedidos">
             <div className="card-icon">📦</div>
@@ -147,39 +157,48 @@ const Inicio = () => {
               <div className="estadistica-label">Pedidos Realizados</div>
             </div>
           </div>
+
+          {/* 💸 ahora muestra total del carrito */}
           <div className="estadistica-card gastos">
             <div className="card-icon">💸</div>
             <div className="card-content">
-              <div className="estadistica-valor">₡{totalGastado.toLocaleString()}</div>
-              <div className="estadistica-label">Total Gastado</div>
+              <div className="estadistica-valor">
+                ₡{totalCarrito.toLocaleString()}
+              </div>
+              <div className="estadistica-label">Total en Carrito</div>
             </div>
           </div>
+
           <div className="estadistica-card carrito">
             <div className="card-icon">🛒</div>
             <div className="card-content">
               <div className="estadistica-valor">{carrito.length}</div>
-              <div className="estadistica-label">En Carrito</div>
+              <div className="estadistica-label">Productos en Carrito</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Secciones principales reorganizadas */}
+      {/* Secciones principales */}
       <div className="main-dashboard">
         {/* Productos Favoritos */}
         <section className="favoritos-section">
           <div className="section-header">
             <h3 className="section-title"> Tus Productos Favoritos</h3>
-            <p className="section-subtitle">Los productos que más has agregado al carrito</p>
-            
+            <p className="section-subtitle">
+              Los productos que más has agregado al carrito
+            </p>
           </div>
           <div className="favoritos-container">
             {favoritos.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">🛍️</div>
                 <h4>Aún no tienes productos favoritos</h4>
-                <p>Explora nuestro catálogo y comienza a agregar productos a tu carrito</p>
-                <button 
+                <p>
+                  Explora nuestro catálogo y comienza a agregar productos a tu
+                  carrito
+                </p>
+                <button
                   className="btn-explorar"
                   onClick={() => navigate("/catalogo")}
                   type="button"
@@ -193,7 +212,10 @@ const Inicio = () => {
                   <div key={prod._id} className="producto-card">
                     <div className="producto-imagen-container">
                       <img
-                        src={prod.imagen || "https://via.placeholder.com/200x150?text=Sin+Imagen"}
+                        src={
+                          prod.imagen ||
+                          "https://via.placeholder.com/200x150?text=Sin+Imagen"
+                        }
                         alt={prod.nombre}
                         className="producto-imagen"
                       />
@@ -201,16 +223,19 @@ const Inicio = () => {
                     </div>
                     <div className="producto-info">
                       <h4 className="producto-titulo">{prod.nombre}</h4>
-                      <p className="producto-precio">₡{prod.precio?.toLocaleString() || "0"}</p>
-                      
+                      <p className="producto-precio">
+                        ₡{prod.precio?.toLocaleString() || "0"}
+                      </p>
                       <button
                         className="btn-agregar-carrito"
-                        onClick={() => handleAgregarAlCarrito({
-                          _id: prod._id,
-                          nombre: prod.nombre,
-                          precio: prod.precio,
-                          imagen: prod.imagen
-                        })}
+                        onClick={() =>
+                          handleAgregarAlCarrito({
+                            _id: prod._id,
+                            nombre: prod.nombre,
+                            precio: prod.precio,
+                            imagen: prod.imagen,
+                          })
+                        }
                         type="button"
                       >
                         🛒 Añadir al Carrito
@@ -227,7 +252,9 @@ const Inicio = () => {
         <section className="actividad-section">
           <div className="section-header">
             <h3 className="section-title"> Actividad Reciente</h3>
-            <p className="section-subtitle">Últimos movimientos en tu cuenta</p>
+            <p className="section-subtitle">
+              Últimos movimientos en tu cuenta
+            </p>
           </div>
           <div className="actividad-container">
             {actividadReciente.length === 0 ? (
@@ -253,4 +280,5 @@ const Inicio = () => {
     </div>
   );
 };
+
 export default Inicio;
