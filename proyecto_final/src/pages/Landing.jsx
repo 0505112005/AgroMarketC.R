@@ -135,7 +135,7 @@ export default function Landing() {
       {/* HERO */}
       <section className="hero">
         <div className="hero-left reveal" ref={setRef}>
-          <div className="badge shimmer">#1 Marketplace Agrícola en Costa Rica</div>
+          <div className="badge">#1 Marketplace Agrícola en Costa Rica</div>
           <h1 className="title">
             Del Campo a tu Mesa
           </h1>

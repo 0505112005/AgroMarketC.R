@@ -38,12 +38,20 @@ const Catalogo = () => {
   }, []);
 
   // Obtener productos
-  useEffect(() => {
+ useEffect(() => {
     const fetchProductos = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/productos");
         const data = await res.json();
-        setProductos(data || []);
+
+        // Agregamos un rating aleatorio a cada producto
+        const productosConRating = (data || []).map((p) => ({
+          ...p,
+          rating: (Math.random() * 2 + 3).toFixed(1), // Rating entre 3.0 y 5.0
+        }));
+
+        // Actualizamos el estado de productos
+        setProductos(productosConRating);
       } catch (err) {
         console.error("Error al obtener productos:", err);
       }
@@ -167,7 +175,7 @@ const Catalogo = () => {
           <div className="price-rating">
             <span className="price">₡{producto.precio} <small>por {producto.unidadVenta}</small></span>
 
-            <span className="rating">⭐ {rating} {producto.variedad} </span>
+            <span className="rating">⭐ {producto.rating} {producto.variedad} </span>
           </div>
           <div className="seller">
             <span>👨‍🌾 {producto.productor || "Productor"}</span>
@@ -290,7 +298,7 @@ const Catalogo = () => {
                 <div className="modal-precio-rating">
                   <span className="modal-precio">₡{productoModal.precio}</span>
                   <span className="modal-unidad">por {productoModal.unidadVenta}</span>
-                  <span className="modal-rating">⭐ {(Math.random() * 2 + 3).toFixed(1)}</span>
+                  <span className="modal-rating">⭐ {productoModal.rating}</span>
                 </div>
                 <div className="modal-tags">
                   <span className={`modal-tag ${productoModal.certificacion?.toLowerCase().replace(/\s+/g, '-')}`}>
