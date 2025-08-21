@@ -7,11 +7,37 @@
 }
 
 .carrito-container h2 {
-  font-size: 28px;
+  font-size: 50px;
   color: #2c3e50;
   margin-bottom: 30px;
   text-align: center;
   font-weight: 700;
+}
+
+/* Estilos para carrito vacío */
+.carrito-vacio {
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+}
+
+
+.canasta-fondo {
+  font-size: 120px;
+  opacity: 0.3;
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.carrito-vacio p {
+  font-size: 18px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
 .lista-carrito {
@@ -556,4 +582,100 @@
 
 .btn-volver:hover {
   background-color: #4caf50; /* verde más oscuro al pasar el mouse */
+}
+
+/* Estilos para envío gratis */
+.free-shipping-container {
+  margin: 15px 0;
+  padding: 20px;
+  background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+  border-radius: 15px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.free-shipping-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.free-shipping-text {
+  color: #2ecc71 !important;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.progress-container {
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(145deg, #e9ecef, #f8f9fa);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dee2e6;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  border-radius: 10px;
+  transition: all 0.6s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shipping-message {
+  text-align: center;
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.shipping-message.success {
+  color: #2ecc71;
+  font-weight: bold;
+  font-size: 16px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.02);
+  }
 }

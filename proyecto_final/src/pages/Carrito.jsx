@@ -61,7 +61,7 @@ const Carrito = () => {
 
   const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
   const shipping = 3500;
-  const freeShippingThreshold = 50000;
+  const freeShippingThreshold = 25000;
   const qualifiesForFreeShipping = subtotal >= freeShippingThreshold;
   const total = subtotal + (qualifiesForFreeShipping ? 0 : shipping);
 
@@ -88,8 +88,17 @@ const Carrito = () => {
       }
     }
 
-    // Pago exitoso
-    Swal.fire({ icon: "success", title: "¡Pago realizado!", text: `Se ha procesado tu pago de CRC ${total}` })
+    // Mensaje de pago exitoso con información del envío gratis
+    const mensajePago = qualifiesForFreeShipping 
+      ? `¡Pago realizado! Total: ₡${total.toLocaleString()} - ¡Envío gratis incluido!`
+      : `¡Pago realizado! Total: ₡${total.toLocaleString()}`;
+
+    Swal.fire({ 
+      icon: "success", 
+      title: "¡Pago exitoso!", 
+      text: mensajePago,
+      confirmButtonColor: '#2ecc71'
+    })
       .then(() => {
         // Generar factura PDF
         const doc = new jsPDF();
@@ -184,7 +193,10 @@ const Carrito = () => {
     <div className="carrito-container">
       <h2>🌿 Tu Carrito</h2>
       {carrito.length === 0 ? (
-        <p>No tienes productos en el carrito.</p>
+        <div className="carrito-vacio">
+          <div className="canasta-fondo">🛒</div>
+          <p>No tienes productos en el carrito.</p>
+        </div>
       ) : (
         <>
           {/* Lista de productos */}
@@ -234,16 +246,42 @@ const Carrito = () => {
               <span>Subtotal ({carrito.reduce((acc, p) => acc + p.cantidad, 0)} producto{carrito.reduce((acc, p) => acc + p.cantidad, 0) !== 1 ? 's' : ''}):</span>
               <span>₡{subtotal.toLocaleString()}</span>
             </div>
-            <div className="summary-row">
-              <span>Envío:</span>
-              <span>{qualifiesForFreeShipping ? 'Gratis' : `₡${shipping.toLocaleString()}`}</span>
+            
+            {/* Barra de progreso para envío gratis */}
+            <div className="free-shipping-container">
+              <div className="free-shipping-info">
+                <span>Envío:</span>
+                <span className={qualifiesForFreeShipping ? "free-shipping-text" : ""}>
+                  {qualifiesForFreeShipping ? '¡Gratis!' : `₡${shipping.toLocaleString()}`}
+                </span>
+              </div>
+              
+              <div className="progress-container">
+                <div className="progress-bar">
+                  <div 
+                    className="progress-fill" 
+                    style={{ 
+                      width: `${Math.min((subtotal / freeShippingThreshold) * 100, 100)}%`,
+                      backgroundColor: qualifiesForFreeShipping ? '#2ecc71' : '#3498db'
+                    }}
+                  ></div>
+                </div>
+                
+                {qualifiesForFreeShipping ? (
+                  <p className="shipping-message success">
+                    🎉 ¡Felicidades! Tienes envío gratis
+                  </p>
+                ) : (
+                  <p className="shipping-message">
+                    Te faltan ₡{(freeShippingThreshold - subtotal).toLocaleString()} para envío gratis
+                  </p>
+                )}
+              </div>
             </div>
-            <p className="free-shipping-note">
-              Envío gratis en compras superiores a ₡{freeShippingThreshold.toLocaleString()}
-            </p>
+            
             <div className="summary-total">
               <span>Total:</span>
-              <span>₡{qualifiesForFreeShipping ? subtotal.toLocaleString() : total.toLocaleString()}</span>
+              <span>₡{total.toLocaleString()}</span>
             </div>
             <div className="summary-buttons">
               <button className="pay-btn" onClick={() => { setMetodoPago(null); setShowModal(true); }}>Proceder al Pago</button>

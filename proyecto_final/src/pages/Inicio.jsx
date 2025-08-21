@@ -238,7 +238,7 @@ const Inicio = () => {
                         }
                         type="button"
                       >
-                        🛒 Añadir al Carrito
+                        Agregar 🛒 
                       </button>
                     </div>
                   </div>

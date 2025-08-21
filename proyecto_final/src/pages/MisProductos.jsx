@@ -221,13 +221,13 @@ const MisProductos = () => {
                     className="btn-editar"
                     onClick={() => handleEditar(producto)}
                   >
-                    ✏️ Editar
+                     Editar
                   </button>
                   <button
                     className="btn-eliminar"
                     onClick={() => handleEliminar(producto._id)}
                   >
-                    🗑️ Eliminar
+                     Eliminar
                   </button>
                 </div>
               </div>
@@ -290,6 +290,7 @@ const MisProductos = () => {
                     <option value="No orgánico">No orgánico</option>
                     <option value="En transición">En transición</option>
                   </select>
+                  
                   <div className="stock-input-container">
                     <span>Stock:</span>
                     <input
@@ -302,55 +303,6 @@ const MisProductos = () => {
                     <span>unidades</span>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="modal-body">
-              <div className="modal-section">
-                <h3>📝 Descripción</h3>
-                <textarea
-                  value={datosEdicion.descripcion}
-                  onChange={(e) => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
-                  className="modal-descripcion-textarea"
-                  placeholder="Descripción del producto"
-                  rows="4"
-                />
-              </div>
-
-              <div className="modal-grid">
-                <div className="modal-section">
-                  <h3>🖼️ Imagen URL</h3>
-                  <input
-                    type="url"
-                    value={datosEdicion.imagen}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, imagen: e.target.value})}
-                    className="modal-input"
-                    placeholder="URL de la imagen"
-                  />
-                </div>
-
-                <div className="modal-section">
-                  <h3>📍 Origen</h3>
-                  <input
-                    type="text"
-                    value={datosEdicion.origen}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, origen: e.target.value})}
-                    className="modal-input"
-                    placeholder="Lugar de origen"
-                  />
-                </div>
-
-                <div className="modal-section">
-                  <h3>🗓️ Temporada</h3>
-                  <input
-                    type="text"
-                    value={datosEdicion.temporada}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, temporada: e.target.value})}
-                    className="modal-input"
-                    placeholder="Temporada del producto"
-                  />
-                </div>
-
                 <div className="modal-section">
                   <select
                     value={datosEdicion.variedad}
@@ -369,6 +321,56 @@ const MisProductos = () => {
               </div>
             </div>
 
+            <div className="modal-body">
+              <div className="modal-section">
+                <h3> Descripción</h3>
+                <textarea
+                  value={datosEdicion.descripcion}
+                  onChange={(e) => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
+                  className="modal-descripcion-textarea"
+                  placeholder="Descripción del producto"
+                  rows="4"
+                />
+              </div>
+
+              <div className="modal-grid">
+                <div className="modal-section">
+                  <h3> Imagen URL</h3>
+                  <input
+                    type="url"
+                    value={datosEdicion.imagen}
+                    onChange={(e) => setDatosEdicion({...datosEdicion, imagen: e.target.value})}
+                    className="modal-input"
+                    placeholder="URL de la imagen"
+                  />
+                </div>
+
+                <div className="modal-section">
+                  <h3> Origen</h3>
+                  <input
+                    type="text"
+                    value={datosEdicion.origen}
+                    onChange={(e) => setDatosEdicion({...datosEdicion, origen: e.target.value})}
+                    className="modal-input"
+                    placeholder="Lugar de origen"
+                  />
+                </div>
+
+                <div className="modal-section">
+                  <h3> Temporada</h3>
+                  <input
+                    type="text"
+                    value={datosEdicion.temporada}
+                    onChange={(e) => setDatosEdicion({...datosEdicion, temporada: e.target.value})}
+                    className="modal-input"
+                    placeholder="Temporada del producto"
+                  />
+                </div>
+
+                
+              </div>
+            </div>
+
             <div className="modal-footer">
               <div className="modal-footer-buttons">
                 <button
@@ -381,7 +383,7 @@ const MisProductos = () => {
                   className="modal-btn-guardar"
                   onClick={handleGuardarEdicion}
                 >
-                  💾 Guardar cambios
+                   Guardar cambios
                 </button>
               </div>
             </div>
