@@ -14,7 +14,8 @@ const Catalogo = () => {
     categoria: "",
     precioMin: "",
     precioMax: 20000,
-    soloOrganicos: false
+    soloOrganicos: false,
+    
   });
   const [usuario, setUsuario] = useState(null);
   const [productoModal, setProductoModal] = useState(null);
@@ -189,6 +190,13 @@ const Catalogo = () => {
 
         {/* Catálogo completo */}
         <h2 className="titulo">🌿 Catálogo completo</h2>
+         <input
+          type="text"
+          placeholder="🔍 Buscar productos por nombre..."
+          value={filtros.nombre}
+          onChange={(e) => setFiltros({ ...filtros, nombre: e.target.value })}
+          className="search-input"
+        />
 
         <div className="productos-grid">
           {productosFiltrados.length === 0 ? (
@@ -204,13 +212,7 @@ const Catalogo = () => {
         <h2>Busqueda de Productos</h2>
         <p>Descubre productos frescos y de calidad premium.</p>
 
-        <input
-          type="text"
-          placeholder="🔍 Buscar productos por nombre..."
-          value={filtros.nombre}
-          onChange={(e) => setFiltros({ ...filtros, nombre: e.target.value })}
-          className="search-input"
-        />
+       
 
         <select
           value={filtros.categoria}
