@@ -542,3 +542,18 @@
   background-color: #e0e0e0;
   transform: translateY(-2px);
   }
+
+  .btn-volver {
+  background-color: #4caf50; /* verde */
+  color: white;
+  border: none;
+  padding: 9px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-volver:hover {
+  background-color: #4caf50; /* verde más oscuro al pasar el mouse */
+}
