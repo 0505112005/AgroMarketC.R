@@ -14,6 +14,8 @@ function Vender() {
         origen: '',
         temporada: '',
         stock: 1,
+        variedad: '', // valor por defecto vacío para que el usuario seleccione
+        unidadVenta: 'kg', // valor por defecto válido
     });
 
     const navigate = useNavigate();
@@ -80,6 +82,8 @@ function Vender() {
                 origen: '',
                 temporada: '',
                 stock: 1,
+                variedad: '',
+                unidadVenta: 'kg',
             });
 
             navigate("/mis-productos");
@@ -123,9 +127,24 @@ function Vender() {
                             required
                         />
                     </div>
+                    <div className="campo">
+                        <label>Variedad</label>
+                        <select
+                            name="variedad"
+                            value={producto.variedad}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Selecciona una variedad</option>
+                            <option value="Fruta">Fruta</option>
+                            <option value="Verdura">Verdura</option>
+                            <option value="Grano">Grano</option>
+                            <option value="Hierba">Hierba</option>
+                        </select>
+                    </div>
 
                     <div className="campo">
-                        <label>Precio por unidad</label>
+                        <label>Precio</label>
                         <input
                             type="number"
                             name="precio"
@@ -134,6 +153,44 @@ function Vender() {
                             onChange={handleChange}
                             required
                         />
+                    </div>
+                    <div className="campo">
+                        <label>Unidad de venta</label>
+                        <div className="radio-btn-group">
+                            <label className={`radio-btn ${producto.unidadVenta === 'unidad' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="unidadVenta"
+                                    value="unidad"
+                                    checked={producto.unidadVenta === 'unidad'}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span>Por Unidad</span>
+                            </label>
+                            <label className={`radio-btn ${producto.unidadVenta === 'kg' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="unidadVenta"
+                                    value="kg"
+                                    checked={producto.unidadVenta === 'kg'}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span>Kg</span>
+                            </label>
+                            <label className={`radio-btn ${producto.unidadVenta === 'lb' ? 'selected' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="unidadVenta"
+                                    value="lb"
+                                    checked={producto.unidadVenta === 'lb'}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <span>Lb</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div className="campo">
@@ -169,8 +226,8 @@ function Vender() {
                             required
                         >
                             <option value="Orgánico">Orgánico</option>
+                            
                             <option value="No orgánico">No orgánico</option>
-                            <option value="En transición">En transición</option>
                         </select>
                     </div>
 

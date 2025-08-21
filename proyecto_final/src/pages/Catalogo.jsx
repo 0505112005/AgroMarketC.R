@@ -42,20 +42,7 @@ const Catalogo = () => {
     fetchProductos();
   }, []);
 
-  // Obtener top favoritos del usuario
-  useEffect(() => {
-    if (!usuario?.id) return;
-    const fetchTopFavoritos = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${usuario.id}`);
-        const data = await res.json();
-        setTopFavoritos(data || []);
-      } catch (err) {
-        console.error("Error al cargar top favoritos:", err);
-      }
-    };
-    fetchTopFavoritos();
-  }, [usuario]);
+  
 
   // SweetAlert2 para carrito
   const mostrarMensajeExito = (texto) => {
@@ -167,7 +154,7 @@ const Catalogo = () => {
         </div>
         <div className="card-footer">
           <div className="price-rating">
-            <span className="price">₡{producto.precio} <small>por {producto.unidadVenta || 'kg'}</small></span>
+            <span className="price">₡{producto.precio} <small>por {producto.unidadVenta}</small></span>
             <span className="rating">⭐ {rating}</span>
           </div>
           <div className="seller">
@@ -230,8 +217,8 @@ const Catalogo = () => {
         >
           <option value="">Todas las Categorías</option>
           <option value="Orgánico">Orgánico</option>
+          <option value="Híbrido">Híbrido</option>
           <option value="No orgánico">No orgánico</option>
-          <option value="En transición">En transición</option>
         </select>
 
         <div className="range-container">

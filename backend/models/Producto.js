@@ -9,7 +9,7 @@ const productoSchema = new mongoose.Schema(
     // 👇 Incluye "Híbrido" para que coincida con tu filtro del catálogo
     certificacion: {
       type: String,
-      enum: ["Orgánico", "Híbrido", "No orgánico", "En transición"],
+      enum: ["Orgánico", "No orgánico"],
       default: "No orgánico",
     },
 
@@ -31,18 +31,19 @@ const productoSchema = new mongoose.Schema(
     // 🔹 Campos adicionales para el detalle
     origen: { type: String, trim: true },         // provincia/ región
     temporada: { type: String, trim: true },      // p.ej. "Verano", "Agosto-Octubre"
-    unidadVenta: {
+    unidadVenta: { 
       type: String,
-      enum: ["kg", "unidad", "manojo", "litro", "docena"],
+      enum: ["unidad", "kg", "lb"],
       default: "kg",
     },
     cantidadPorUnidad: { type: Number, default: 1 }, // p.ej. 1 kg, 1 unidad
-    stock: { type: Number, default: 0, min: 0 },  // inventario disponible
-    fechaCosecha: { type: Date },
-    fechaVencimiento: { type: Date },             // opcional si aplica
-    variedad: { type: String, trim: true },       // p.ej. "Fuji", "Criolla"
-    condicionesAlmacenamiento: { type: String, trim: true }, // p.ej. "Refrigerar"
-    notas: { type: String, trim: true },          // info libre adicional
+    stock: { type: Number, default: 0, min: 0 },  // inventario disponible      
+    variedad: { 
+      type: String,
+      enum: ["Fruta", "Verdura", "Grano", "Hierba"],
+      default: "Fruta", // personaliza según tus productos
+    },       // p.ej. "Fuji", "Criolla"
+    
   },
   { timestamps: true }
 );

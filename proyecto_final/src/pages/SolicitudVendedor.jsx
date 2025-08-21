@@ -25,21 +25,7 @@ const SolicitudVendedor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formulario.terminos) {
-      Swal.fire({
-        icon: 'warning',
-        title: '¡Atención!',
-        text: 'Debes aceptar los términos y condiciones para continuar',
-        confirmButtonText: 'Entendido',
-        confirmButtonColor: '#2e7d32',
-        customClass: {
-          popup: 'swal-popup-agro',
-          title: 'swal-title-agro',
-          confirmButton: 'swal-button-agro'
-        }
-      });
-      return;
-    }
+    
     
     console.log("Solicitud enviada:", formulario);
     
@@ -240,7 +226,7 @@ const SolicitudVendedor = () => {
                   id="telefono"
                   name="telefono"
                   className="form-input"
-                  placeholder="+57 300 123 4567"
+                  placeholder="+506 "
                   value={formulario.telefono}
                   onChange={handleChange}
                   required

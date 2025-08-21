@@ -30,7 +30,10 @@ router.post("/", authMiddleware, async (req, res) => {
       imagen: req.body.imagen,
       usuarioId: req.user._id,
       productor: req.body.productor,
+      variedad: req.body.variedad,
+      unidadVenta: req.body.unidadVenta,
     });
+    
 
     const guardado = await nuevoProducto.save();
     res.status(201).json(guardado);
@@ -91,6 +94,8 @@ router.put("/:id", authMiddleware, async (req, res) => {
     producto.origen = datos.origen || producto.origen;
     producto.temporada = datos.temporada || producto.temporada;
     producto.productor = datos.productor || producto.productor;
+    producto.variedad = datos.variedad || producto.variedad;
+    producto.unidadVenta = datos.unidadVenta || producto.unidadVenta;
 
     const actualizado = await producto.save();
     res.json(actualizado);

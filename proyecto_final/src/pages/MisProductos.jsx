@@ -16,7 +16,7 @@ const MisProductos = () => {
     origen: '',
     temporada: '',
     cantidadPorUnidad: '',
-    unidadVenta: 'kg'
+    unidadVenta: ''
   });
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -106,7 +106,7 @@ const MisProductos = () => {
       origen: producto.origen || '',
       temporada: producto.temporada || '',
       cantidadPorUnidad: producto.cantidadPorUnidad || '',
-      unidadVenta: producto.unidadVenta || 'kg'
+      unidadVenta: producto.unidadVenta || ''
     });
   };
 
@@ -201,7 +201,8 @@ const MisProductos = () => {
               
               <div className="card-footer">
                 <div className="price-rating">
-                  <span className="price">₡{producto.precio} <small>por {producto.unidadVenta || 'kg'}</small></span>
+                  <span className="price">₡{producto.precio} <small> por {producto.unidadVenta}</small></span>
+                    
                   {producto.temporada && (
                     <span className="temporada">🗓️ {producto.temporada}</span>
                   )}
@@ -273,7 +274,7 @@ const MisProductos = () => {
                   >
                     <option value="kg">por kg</option>
                     <option value="unidad">por unidad</option>
-                    <option value="libra">por libra</option>
+                    <option value="lb">por libra</option>
                   </select>
                 </div>
                 <div className="modal-tags">
