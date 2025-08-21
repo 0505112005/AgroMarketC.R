@@ -5,6 +5,13 @@ import Swal from "sweetalert2";
 import "../estilos/catalogo.css";
 
 const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
+const tipos = [
+  { label: 'Todos', value: '' },
+  { label: 'Frutas', value: 'Fruta' },
+  { label: 'Verduras', value: 'Verdura' },
+  { label: 'Granos', value: 'Grano' },
+  { label: 'Hierbas', value: 'Hierba' },
+];
 
 const Catalogo = () => {
   const [productos, setProductos] = useState([]);
@@ -12,10 +19,11 @@ const Catalogo = () => {
   const [filtros, setFiltros] = useState({
     nombre: "",
     categoria: "",
+    tipo: "",
+    ubicacion: "",
     precioMin: "",
     precioMax: 20000,
     soloOrganicos: false,
-    
   });
   const [usuario, setUsuario] = useState(null);
   const [productoModal, setProductoModal] = useState(null);
@@ -43,7 +51,7 @@ const Catalogo = () => {
     fetchProductos();
   }, []);
 
-  
+
 
   // SweetAlert2 para carrito
   const mostrarMensajeExito = (texto) => {
@@ -109,10 +117,12 @@ const Catalogo = () => {
     if (!p) return false;
     const nombreMatch = p.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase());
     const categoriaMatch = filtros.categoria ? p.certificacion === filtros.categoria : true;
+    const tipoMatch = filtros.tipo ? p.variedad === filtros.tipo : true;
+    const ubicacionMatch = filtros.ubicacion ? p.origen?.toLowerCase().includes(filtros.ubicacion.toLowerCase()) : true;
     const precioMatch = p.precio <= filtros.precioMax && p.precio >= (filtros.precioMin || 0);
     const organicoMatch = filtros.soloOrganicos ? p.certificacion === "Orgánico" : true;
 
-    return nombreMatch && categoriaMatch && precioMatch && organicoMatch;
+    return nombreMatch && categoriaMatch && tipoMatch && ubicacionMatch && precioMatch && organicoMatch;
   });
 
   const handleBuscar = () => {
@@ -151,16 +161,16 @@ const Catalogo = () => {
             : producto.descripcion || "Sin descripción"}
         </p>
         <div className="card-location">
-          📍 {producto.origen || "Origen no especificado"} 
+          📍 {producto.origen || "Origen no especificado"}
         </div>
         <div className="card-footer">
           <div className="price-rating">
             <span className="price">₡{producto.precio} <small>por {producto.unidadVenta}</small></span>
-            
+
             <span className="rating">⭐ {rating} {producto.variedad} </span>
           </div>
           <div className="seller">
-            <span>{producto.productor || "Productor"}</span>
+            <span>👨‍🌾 {producto.productor || "Productor"}</span>
             <span className="delivery"> Entrega 24h</span>
           </div>
           <div className="card-buttons">
@@ -186,11 +196,11 @@ const Catalogo = () => {
     <section className="catalogo">
       <div className="catalogo-content">
         {/* Top favoritos */}
-       
+
 
         {/* Catálogo completo */}
         <h2 className="titulo">🌿 Catálogo completo</h2>
-         <input
+        <input
           type="text"
           placeholder="🔍 Buscar productos por nombre..."
           value={filtros.nombre}
@@ -211,9 +221,6 @@ const Catalogo = () => {
       <div className="catalogo-container">
         <h2>Busqueda de Productos</h2>
         <p>Descubre productos frescos y de calidad premium.</p>
-
-       
-
         <select
           value={filtros.categoria}
           onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
@@ -222,6 +229,20 @@ const Catalogo = () => {
           <option value="Orgánico">Orgánico</option>
           <option value="No orgánico">No orgánico</option>
         </select>
+        <div className="filtro-tipo">
+
+          <ul className="tipo-lista">
+            {tipos.map((tipo) => (
+              <li
+                key={tipo.value}
+                className={filtros.tipo === tipo.value ? 'activo' : ''}
+                onClick={() => setFiltros({ ...filtros, tipo: tipo.value })}
+              >
+                {tipo.label}
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className="range-container">
           <label htmlFor="precioRange">Precio máximo:</label>
@@ -239,14 +260,14 @@ const Catalogo = () => {
 
         <label className="checkbox-container">
           <input
-            type="checkbox"
-            checked={filtros.soloOrganicos}
-            onChange={(e) => setFiltros({ ...filtros, soloOrganicos: e.target.checked })}
+            type="text"
+            placeholder=" Filtrar por ubicación "
+            value={filtros.ubicacion}
+            onChange={(e) => setFiltros({ ...filtros, ubicacion: e.target.value })}
+            className="ubicacion-input"
           />
-          Solo productos orgánicos
         </label>
 
-        <button onClick={handleBuscar}>Buscar</button>
       </div>
 
       {/* Modal animado */}
@@ -282,34 +303,40 @@ const Catalogo = () => {
 
             <div className="modal-body">
               <div className="modal-section">
-                <h3>📝 Descripción</h3>
+                <h3> Descripción</h3>
                 <p>{productoModal.descripcion || "Sin descripción disponible"}</p>
               </div>
 
               <div className="modal-grid">
                 <div className="modal-section">
-                  <h3>👨‍🌾 Productor</h3>
-                  <p>{productoModal.productor}</p>
+                  <h3> Productor</h3>
+                  <p>{productoModal.productor || "No especificado"}</p>
                 </div>
 
                 <div className="modal-section">
-                  <h3>📍 Origen</h3>
-                  <p>{productoModal.origen}</p>
+                  <h3> Origen</h3>
+                  <p>{productoModal.origen || "No especificado"}</p>
                 </div>
 
                 <div className="modal-section">
-                  <h3>🗓️ Temporada</h3>
-                  <p>{productoModal.temporada}</p>
+                  <h3> Temporada</h3>
+                  <p>{productoModal.temporada || "No especificada"}</p>
                 </div>
 
                 <div className="modal-section">
-                  <h3>📦 Cantidad por unidad</h3>
-                  <p>{productoModal.cantidadPorUnidad}</p>
+                  <h3> Variedad</h3>
+                  <p>{productoModal.variedad || "No especificada"}</p>
                 </div>
+
+                <div className="modal-section">
+                  <h3> Unidad de Venta</h3>
+                  <p>{productoModal.unidadVenta || "No especificada"}</p>
+                </div>
+
               </div>
 
               <div className="modal-section">
-                <h3>📅 Información adicional</h3>
+                <h3> Información adicional</h3>
                 <p><strong>Fecha de creación:</strong> {new Date(productoModal.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
