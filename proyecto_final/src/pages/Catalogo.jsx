@@ -150,12 +150,13 @@ const Catalogo = () => {
             : producto.descripcion || "Sin descripción"}
         </p>
         <div className="card-location">
-          📍 {producto.origen || "Origen no especificado"}
+          📍 {producto.origen || "Origen no especificado"} 
         </div>
         <div className="card-footer">
           <div className="price-rating">
             <span className="price">₡{producto.precio} <small>por {producto.unidadVenta}</small></span>
-            <span className="rating">⭐ {rating}</span>
+            
+            <span className="rating">⭐ {rating} {producto.variedad} </span>
           </div>
           <div className="seller">
             <span>{producto.productor || "Productor"}</span>
@@ -217,7 +218,6 @@ const Catalogo = () => {
         >
           <option value="">Todas las Categorías</option>
           <option value="Orgánico">Orgánico</option>
-          <option value="Híbrido">Híbrido</option>
           <option value="No orgánico">No orgánico</option>
         </select>
 

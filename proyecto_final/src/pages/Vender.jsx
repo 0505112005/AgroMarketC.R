@@ -191,6 +191,7 @@ function Vender() {
                                 <span>Lb</span>
                             </label>
                         </div>
+                        
                     </div>
 
                     <div className="campo">

@@ -224,6 +224,13 @@
   border-radius: 12px;
   font-weight: 600;
 }
+.temporada2 {
+  font-size: 12px;
+  color: #0c973ac4;
+  background: #e0ffe2;
+  padding: 4px 8px;
+  font-weight: 600;
+}
 
 .cantidad-unidad {
   font-size: 13px;

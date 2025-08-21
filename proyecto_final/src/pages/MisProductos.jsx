@@ -15,8 +15,8 @@ const MisProductos = () => {
     certificacion: '',
     origen: '',
     temporada: '',
-    cantidadPorUnidad: '',
-    unidadVenta: ''
+    unidadVenta: '',
+    variedad: '',
   });
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -106,7 +106,8 @@ const MisProductos = () => {
       origen: producto.origen || '',
       temporada: producto.temporada || '',
       cantidadPorUnidad: producto.cantidadPorUnidad || '',
-      unidadVenta: producto.unidadVenta || ''
+      unidadVenta: producto.unidadVenta || '',
+      variedad: producto.variedad || '',
     });
   };
 
@@ -206,13 +207,14 @@ const MisProductos = () => {
                   {producto.temporada && (
                     <span className="temporada">🗓️ {producto.temporada}</span>
                   )}
-                </div>
-                
-                {producto.cantidadPorUnidad && (
-                  <div className="cantidad-unidad">
-                    📦 {producto.cantidadPorUnidad}
+                  {producto.variedad && (
+                  <div className="temporada2">
+                    Tipo: {producto.variedad}
                   </div>
                 )}
+                </div>
+                
+                
                 
                 <div className="producto-acciones">
                   <button
@@ -350,14 +352,19 @@ const MisProductos = () => {
                 </div>
 
                 <div className="modal-section">
-                  <h3>📦 Cantidad por unidad</h3>
-                  <input
-                    type="text"
-                    value={datosEdicion.cantidadPorUnidad}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, cantidadPorUnidad: e.target.value})}
-                    className="modal-input"
-                    placeholder="Ej: 500g, 1kg, 12 unidades"
-                  />
+                  <select
+                    value={datosEdicion.variedad}
+                    onChange={(e) => setDatosEdicion({...datosEdicion, variedad: e.target.value})}
+                    className="modal-certificacion-select"
+                  >
+                    
+                    <option value="Fruta">Fruta</option>
+                    <option value="Verdura">Verdura</option>
+                    <option value="Grano">Grano</option>
+                    <option value="Hierba">Hierba</option>
+                  </select>
+                  
+                 
                 </div>
               </div>
             </div>

@@ -36,13 +36,13 @@ const productoSchema = new mongoose.Schema(
       enum: ["unidad", "kg", "lb"],
       default: "kg",
     },
-    cantidadPorUnidad: { type: Number, default: 1 }, // p.ej. 1 kg, 1 unidad
+    
     stock: { type: Number, default: 0, min: 0 },  // inventario disponible      
-    variedad: { 
+    variedad: { // personaliza según tus productos
       type: String,
       enum: ["Fruta", "Verdura", "Grano", "Hierba"],
-      default: "Fruta", // personaliza según tus productos
-    },       // p.ej. "Fuji", "Criolla"
+      default: "Fruta", 
+    },       
     
   },
   { timestamps: true }
