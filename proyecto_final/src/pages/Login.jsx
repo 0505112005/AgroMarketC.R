@@ -1,6 +1,8 @@
 import React, { useState } from "react"; // Importamos React y el hook useState
 import { useNavigate } from "react-router-dom"; // Hook para navegar entre rutas
 import "../estilos/Login.css"; // Importamos los estilos del componente
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 
 export default function Login() {
   // Estado para el correo electrónico ingresado
@@ -20,11 +22,14 @@ export default function Login() {
 
     try {
       // Hacemos la petición POST al backend para login
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+
+
+      const res = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST", // Método POST para enviar datos
         headers: { "Content-Type": "application/json" }, // Indicamos que enviamos JSON
         body: JSON.stringify({ email, password }), // Convertimos el objeto a JSON
       });
+
 
       const data = await res.json(); // Obtenemos la respuesta como JSON
       console.log("Respuesta login:", data); // Imprimimos la respuesta para depuración

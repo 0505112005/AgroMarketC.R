@@ -4,6 +4,7 @@ import "../estilos/Inicio.css"; // Estilos específicos de la página
 import { useNavigate } from "react-router-dom"; // Hook para navegación entre rutas
 import { useCarrito } from "../components/CarritoContext"; // Contexto para manejar carrito
 import Swal from "sweetalert2"; // Librería para alertas bonitas
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 const Inicio = () => {
   // Estados locales
@@ -39,7 +40,7 @@ const Inicio = () => {
     const fetchPedidos = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/pedidos/comprador/${user.id}`
+          `${backendUrl}/api/pedidos/comprador/${user.id}`
         );
         if (!res.ok) return setPedidos([]); // Si falla, setea arreglo vacío
         const data = await res.json();
@@ -54,7 +55,7 @@ const Inicio = () => {
     const fetchFavoritos = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/favoritos-carrito/top/${user.id}`
+          `${backendUrl}/api/favoritos-carrito/top/${user.id}`
         );
         if (!res.ok) return setFavoritos([]);
         const data = await res.json();
@@ -247,7 +248,7 @@ const Inicio = () => {
                         }
                         type="button"
                       >
-                        Agregar 🛒 
+                        Agregar 🛒
                       </button>
                     </div>
                   </div>

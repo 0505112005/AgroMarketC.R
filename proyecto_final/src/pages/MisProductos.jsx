@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom"; // Importamos useNavigate para r
 import Swal from "sweetalert2"; // Importamos SweetAlert2 para mostrar alertas bonitas
 import "../estilos/MisProductos.css"; // Importamos los estilos CSS del componente
 
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+
 const MisProductos = () => {
   // Estado para almacenar los productos del usuario
   const [misProductos, setMisProductos] = useState([]);
@@ -45,7 +48,7 @@ const MisProductos = () => {
     // Función para obtener productos del servidor
     const fetchMisProductos = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/productos", {
+        const res = await fetch(`${backendUrl}/api/productos`, {
           headers: { Authorization: `Bearer ${token}` } // Agregamos token en header
         });
         const productos = await res.json(); // Parseamos la respuesta JSON
@@ -77,7 +80,7 @@ const MisProductos = () => {
 
     if (confirm.isConfirmed) {
       try {
-        const res = await fetch(`http://localhost:5000/api/productos/${id}`, {
+        const res = await fetch(`${backendUrl}/api/productos/${id}`, {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -92,11 +95,11 @@ const MisProductos = () => {
           });
         } else {
           const err = await res.json();
-          Swal.fire({ 
-            icon: "error", 
-            title: "Error", 
-            text: err.mensaje || "No se pudo eliminar el producto", 
-            confirmButtonColor: "#4CAF50" 
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: err.mensaje || "No se pudo eliminar el producto",
+            confirmButtonColor: "#4CAF50"
           });
         }
       } catch (error) {
@@ -132,7 +135,7 @@ const MisProductos = () => {
   // Función para guardar cambios de edición
   const handleGuardarEdicion = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/productos/${productoEditando._id}`, {
+      const res = await fetch(`${backendUrl}/api/productos/${productoEditando._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -156,11 +159,11 @@ const MisProductos = () => {
         });
       } else {
         const err = await res.json();
-        Swal.fire({ 
-          icon: "error", 
-          title: "Error", 
-          text: err.mensaje || "No se pudo actualizar el producto", 
-          confirmButtonColor: "#4CAF50" 
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.mensaje || "No se pudo actualizar el producto",
+          confirmButtonColor: "#4CAF50"
         });
       }
     } catch (error) {
@@ -180,7 +183,7 @@ const MisProductos = () => {
       <div className="mis-productos-header">
         <h2 className="mis-productos-titulo">🌿 Mis Productos Publicados</h2>
         <button className="btn-newproduct" onClick={() => navigate("/vender")}>
-           Nuevo Producto
+          Nuevo Producto
         </button>
       </div>
 
@@ -200,7 +203,7 @@ const MisProductos = () => {
                 alt={producto.nombre}
                 className="producto-imagen"
               />
-              
+
               {/* Tags y stock */}
               <div className="card-tags">
                 {producto.certificacion && (
@@ -210,7 +213,7 @@ const MisProductos = () => {
                 )}
                 <span className="stock">Stock: {producto.stock || 0}</span>
               </div>
-              
+
               {/* Nombre y descripción */}
               <h3 className="producto-nombre">{producto.nombre}</h3>
               <p className="producto-descripcion">
@@ -218,42 +221,42 @@ const MisProductos = () => {
                   ? `${producto.descripcion.substring(0, 60)}...`
                   : producto.descripcion || "Sin descripción"}
               </p>
-              
+
               {/* Origen del producto */}
               {producto.origen && (
                 <div className="card-location">
                   📍 {producto.origen}
                 </div>
               )}
-              
+
               {/* Pie de tarjeta con precio, temporada, variedad */}
               <div className="card-footer">
                 <div className="price-rating">
                   <span className="price">₡{producto.precio} <small> por {producto.unidadVenta}</small></span>
-                    
+
                   {producto.temporada && (
                     <span className="temporada">🗓️ {producto.temporada}</span>
                   )}
                   {producto.variedad && (
-                  <div className="temporada2">
-                    Tipo: {producto.variedad}
-                  </div>
-                )}
+                    <div className="temporada2">
+                      Tipo: {producto.variedad}
+                    </div>
+                  )}
                 </div>
-                
+
                 {/* Botones de acciones */}
                 <div className="producto-acciones">
                   <button
                     className="btn-editar"
                     onClick={() => handleEditar(producto)}
                   >
-                     Editar
+                    Editar
                   </button>
                   <button
                     className="btn-eliminar"
                     onClick={() => handleEliminar(producto._id)}
                   >
-                     Eliminar
+                    Eliminar
                   </button>
                 </div>
               </div>
@@ -281,7 +284,7 @@ const MisProductos = () => {
                 <input
                   type="text"
                   value={datosEdicion.nombre}
-                  onChange={(e) => setDatosEdicion({...datosEdicion, nombre: e.target.value})}
+                  onChange={(e) => setDatosEdicion({ ...datosEdicion, nombre: e.target.value })}
                   className="modal-titulo-input"
                   placeholder="Nombre del producto"
                 />
@@ -291,14 +294,14 @@ const MisProductos = () => {
                     <input
                       type="number"
                       value={datosEdicion.precio}
-                      onChange={(e) => setDatosEdicion({...datosEdicion, precio: Number(e.target.value)})}
+                      onChange={(e) => setDatosEdicion({ ...datosEdicion, precio: Number(e.target.value) })}
                       className="modal-precio-input"
                       placeholder="Precio"
                     />
                   </div>
                   <select
                     value={datosEdicion.unidadVenta}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, unidadVenta: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, unidadVenta: e.target.value })}
                     className="modal-unidad-select"
                   >
                     <option value="kg">por kg</option>
@@ -309,7 +312,7 @@ const MisProductos = () => {
                 <div className="modal-tags">
                   <select
                     value={datosEdicion.certificacion}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, certificacion: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, certificacion: e.target.value })}
                     className="modal-certificacion-select"
                   >
                     <option value="">Certificación</option>
@@ -317,13 +320,13 @@ const MisProductos = () => {
                     <option value="No orgánico">No orgánico</option>
                     <option value="En transición">En transición</option>
                   </select>
-                  
+
                   <div className="stock-input-container">
                     <span>Stock:</span>
                     <input
                       type="number"
                       value={datosEdicion.stock}
-                      onChange={(e) => setDatosEdicion({...datosEdicion, stock: Number(e.target.value)})}
+                      onChange={(e) => setDatosEdicion({ ...datosEdicion, stock: Number(e.target.value) })}
                       className="modal-stock-input"
                       placeholder="0"
                     />
@@ -333,7 +336,7 @@ const MisProductos = () => {
                 <div className="modal-section">
                   <select
                     value={datosEdicion.variedad}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, variedad: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, variedad: e.target.value })}
                     className="modal-certificacion-select"
                   >
                     <option value="Fruta">Fruta</option>
@@ -351,7 +354,7 @@ const MisProductos = () => {
                 <h3> Descripción</h3>
                 <textarea
                   value={datosEdicion.descripcion}
-                  onChange={(e) => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
+                  onChange={(e) => setDatosEdicion({ ...datosEdicion, descripcion: e.target.value })}
                   className="modal-descripcion-textarea"
                   placeholder="Descripción del producto"
                   rows="4"
@@ -364,7 +367,7 @@ const MisProductos = () => {
                   <input
                     type="url"
                     value={datosEdicion.imagen}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, imagen: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, imagen: e.target.value })}
                     className="modal-input"
                     placeholder="URL de la imagen"
                   />
@@ -375,7 +378,7 @@ const MisProductos = () => {
                   <input
                     type="text"
                     value={datosEdicion.origen}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, origen: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, origen: e.target.value })}
                     className="modal-input"
                     placeholder="Lugar de origen"
                   />
@@ -386,7 +389,7 @@ const MisProductos = () => {
                   <input
                     type="text"
                     value={datosEdicion.temporada}
-                    onChange={(e) => setDatosEdicion({...datosEdicion, temporada: e.target.value})}
+                    onChange={(e) => setDatosEdicion({ ...datosEdicion, temporada: e.target.value })}
                     className="modal-input"
                     placeholder="Temporada del producto"
                   />
@@ -407,7 +410,7 @@ const MisProductos = () => {
                   className="modal-btn-guardar"
                   onClick={handleGuardarEdicion}
                 >
-                   Guardar cambios
+                  Guardar cambios
                 </button>
               </div>
             </div>

@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom"; // Hook para navegación program
 import { useCarrito } from "../components/CarritoContext"; // Contexto del carrito de compras
 import Swal from "sweetalert2"; // Librería para mostrar alertas bonitas
 import "../estilos/catalogo.css"; // Estilos CSS para el catálogo
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+
 
 // URL de imagen por defecto si el producto no tiene imagen
 const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
@@ -45,7 +48,7 @@ const Catalogo = () => {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/productos");
+        const res = await fetch(`${backendUrl}/api/productos`);
         const data = await res.json();
 
         // Agregar rating aleatorio a cada producto
@@ -94,7 +97,7 @@ const Catalogo = () => {
 
     try {
       // Llamada a la API para agregar producto a favoritos
-      const response = await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
+      const response = await fetch(`${backendUrl}/api/favoritos-carrito/agregar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +113,7 @@ const Catalogo = () => {
         console.log("Favorito agregado con éxito:", resultado);
 
         // Refrescar lista de top favoritos del usuario
-        const resTop = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${usuario.id}`);
+        const resTop = await fetch(`${backendUrl}/api/favoritos-carrito/top/${usuario.id}`);
         const nuevosFavoritos = await resTop.json();
         setTopFavoritos(nuevosFavoritos || []);
       }
@@ -150,7 +153,7 @@ const Catalogo = () => {
     };
 
     // Rating simulado
-    const rating = (Math.random() * 2 + 3).toFixed(1); 
+    const rating = (Math.random() * 2 + 3).toFixed(1);
 
     return (
       <div className="card" key={producto._id}>
