@@ -1,36 +1,41 @@
-import React, { useState } from "react";
-import { useCarrito } from "../components/CarritoContext";
-import "../estilos/Carrito.css";
-import Swal from "sweetalert2";
-import { jsPDF } from "jspdf";
+import React, { useState } from "react"; // Importamos React y useState para manejar estados
+import { useCarrito } from "../components/CarritoContext"; // Hook personalizado para manejar carrito
+import "../estilos/Carrito.css"; // Estilos del carrito
+import Swal from "sweetalert2"; // Librería para alertas bonitas
+import { jsPDF } from "jspdf"; // Librería para generar PDFs
 
-// Función de validación
+// Función para validar datos de tarjeta de crédito
 const validarTarjeta = ({ numero, nombre, expiracion, cvv }) => {
-  const num = numero.replace(/\s+/g, '');
-  if (!/^\d{16}$/.test(num)) return "Número de tarjeta inválido";
-  if (!nombre.trim()) return "Nombre no puede estar vacío";
-  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiracion)) return "Fecha de expiración inválida";
+  const num = numero.replace(/\s+/g, ''); // Eliminamos espacios del número
+  if (!/^\d{16}$/.test(num)) return "Número de tarjeta inválido"; // Debe tener 16 dígitos
+  if (!nombre.trim()) return "Nombre no puede estar vacío"; // Nombre obligatorio
+  if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiracion)) return "Fecha de expiración inválida"; // Formato MM/AA
   const [mes, anio] = expiracion.split("/").map(Number);
   const fechaActual = new Date();
   const añoActual = Number(fechaActual.getFullYear().toString().slice(-2));
   const mesActual = fechaActual.getMonth() + 1;
-  if (anio < añoActual || (anio === añoActual && mes < mesActual)) return "Tarjeta expirada";
-  if (!/^\d{3}$/.test(cvv)) return "CVV inválido";
-  return true;
+  if (anio < añoActual || (anio === añoActual && mes < mesActual)) return "Tarjeta expirada"; // Validar que no esté vencida
+  if (!/^\d{3}$/.test(cvv)) return "CVV inválido"; // CVV de 3 dígitos
+  return true; // Todo válido
 };
 
 const Carrito = () => {
+  // Extraemos funciones y datos del carrito desde el contexto
   const { carrito, agregarProducto, restarProducto, vaciarCarrito } = useCarrito();
+
+  // Estados para modal, datos de tarjeta, método de pago y comprobante SINPE
   const [showModal, setShowModal] = useState(false);
   const [nombre, setNombre] = useState("");
   const [numeroTarjeta, setNumeroTarjeta] = useState("");
   const [expiracion, setExpiracion] = useState("");
   const [cvv, setCvv] = useState("");
   const [metodoPago, setMetodoPago] = useState(null); // "tarjeta" o "sinpe"
-  const [comprobante, setComprobante] = useState("");   // para SINPE
+  const [comprobante, setComprobante] = useState("");   // Para SINPE
 
+  // Funciones para modificar cantidad del producto
   const incrementarCantidad = (producto) => { agregarProducto(producto); };
   const eliminarProducto = (producto) => {
+    // Pregunta de confirmación al usuario antes de eliminar
     Swal.fire({
       title: '¿Eliminar producto?',
       text: `¿Estás seguro de que quieres eliminar "${producto.nombre}" del carrito?`,
@@ -42,12 +47,14 @@ const Carrito = () => {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
+        // Restamos la cantidad del producto
         for (let i = 0; i < producto.cantidad; i++) { restarProducto(producto._id); }
         Swal.fire({ title: '¡Eliminado!', text: 'El producto ha sido eliminado del carrito', icon: 'success', timer: 1500, showConfirmButton: false });
       }
     });
   };
 
+  // Formateo de número de tarjeta y expiración
   const formatNumeroTarjeta = (num) => num.replace(/\D/g, "").replace(/(.{4})/g, "$1 ").trim();
   const formatExpiracion = (exp) => {
     let val = exp.replace(/\D/g, "");
@@ -56,22 +63,27 @@ const Carrito = () => {
     return val;
   };
 
+  // Manejo de cambios en inputs de tarjeta
   const handleNumeroChange = (e) => setNumeroTarjeta(formatNumeroTarjeta(e.target.value));
   const handleExpiracionChange = (e) => setExpiracion(formatExpiracion(e.target.value));
 
+  // Cálculo de totales
   const subtotal = carrito.reduce((acc, p) => acc + p.precio * p.cantidad, 0);
   const shipping = 3500;
   const freeShippingThreshold = 25000;
   const qualifiesForFreeShipping = subtotal >= freeShippingThreshold;
   const total = subtotal + (qualifiesForFreeShipping ? 0 : shipping);
 
+  // Función para abrir modal con método de pago
   const abrirModal = (metodo) => {
     setMetodoPago(metodo);
-    setComprobante(""); // Limpiar SINPE
+    setComprobante(""); // Limpiar comprobante
     setShowModal(true);
   };
 
+  // Manejo del pago
   const handlePago = () => {
+    // Validación de tarjeta
     if (metodoPago === "tarjeta") {
       const resultado = validarTarjeta({ numero: numeroTarjeta, nombre, expiracion, cvv });
       if (resultado !== true) {
@@ -80,30 +92,31 @@ const Carrito = () => {
       }
     }
 
+    // Validación de SINPE
     if (metodoPago === "sinpe") {
       if (comprobante.length !== 25) {
         Swal.fire({ icon: 'error', title: 'Número inválido', text: 'El número de comprobante debe tener exactamente 25 dígitos.' });
-
         return;
       }
     }
 
-    // Mensaje de pago exitoso con información del envío gratis
-    const mensajePago = qualifiesForFreeShipping 
+    // Mensaje de pago exitoso
+    const mensajePago = qualifiesForFreeShipping
       ? `¡Pago realizado! Total: ₡${total.toLocaleString()} - ¡Envío gratis incluido!`
       : `¡Pago realizado! Total: ₡${total.toLocaleString()}`;
 
-    Swal.fire({ 
-      icon: "success", 
-      title: "¡Pago exitoso!", 
+    Swal.fire({
+      icon: "success",
+      title: "¡Pago exitoso!",
       text: mensajePago,
       confirmButtonColor: '#2ecc71'
     })
       .then(() => {
-        // Generar factura PDF
+        // Generar factura en PDF
         const doc = new jsPDF();
+
         // Encabezado con logo y nombre
-        doc.setFillColor(46, 204, 113); // Verde
+        doc.setFillColor(46, 204, 113);
         doc.rect(0, 0, 210, 30, 'F');
         doc.setFontSize(18);
         doc.setTextColor(255, 255, 255);
@@ -114,10 +127,9 @@ const Carrito = () => {
         doc.setTextColor(44, 62, 80);
         doc.text("Factura de Compra", 105, 40, { align: "center" });
         doc.setFontSize(12);
-        doc.setTextColor(44, 62, 80);
         doc.text(`A nombre de: ${nombre || "(Sin nombre)"}`, 105, 48, { align: "center" });
 
-        // **Número de comprobante SINPE si corresponde**
+        // Número de comprobante SINPE si aplica
         if (metodoPago === "sinpe") {
           doc.text(`Comprobante SINPE: ${comprobante}`, 105, 56, { align: "center" });
         }
@@ -125,7 +137,7 @@ const Carrito = () => {
         // Tabla de productos
         let startY = metodoPago === "sinpe" ? 60 : 50;
         doc.setFontSize(12);
-        doc.setFillColor(39, 174, 96); // Verde más oscuro
+        doc.setFillColor(39, 174, 96);
         doc.setTextColor(255, 255, 255);
         doc.rect(15, startY, 180, 10, 'F');
         doc.text("Producto", 20, startY + 7);
@@ -144,12 +156,10 @@ const Carrito = () => {
           y += 8;
         });
 
-        // Línea separadora
+        // Línea separadora y resumen
         doc.setDrawColor(39, 174, 96);
         doc.line(15, y, 195, y);
         y += 5;
-
-        // Resumen de totales
         doc.setFontSize(12);
         doc.text(`Subtotal:`, 130, y);
         doc.text(`${subtotal.toLocaleString()}`, 190, y, { align: "right" });
@@ -164,7 +174,7 @@ const Carrito = () => {
         doc.setTextColor(44, 62, 80);
         y += 15;
 
-        // Nota de envío gratis
+        // Nota de envío gratis si aplica
         if (qualifiesForFreeShipping) {
           doc.setFontSize(11);
           doc.setTextColor(39, 174, 96);
@@ -179,7 +189,7 @@ const Carrito = () => {
         doc.text("Gracias por tu compra en AgroMarket C.R. ¡Esperamos verte pronto!", 105, 285, { align: "center" });
         doc.text("Contacto: info@agromarketcr.com", 105, 292, { align: "center" });
 
-        // Abrir factura en nueva ventana para visualización
+        // Mostrar PDF en nueva ventana
         doc.output("dataurlnewwindow");
 
         // Limpiar carrito y modal
@@ -199,14 +209,17 @@ const Carrito = () => {
         </div>
       ) : (
         <>
-          {/* Lista de productos */}
+          {/* Lista de productos en carrito */}
           <div className="lista-carrito">
             {carrito.map((prod) => (
               <div key={prod._id} className="producto-carrito">
+                {/* Imagen y botón eliminar */}
                 <div className="producto-imagen-container">
                   <img src={prod.imagen || "https://via.placeholder.com/120x120?text=Producto"} alt={prod.nombre} className="producto-imagen-carrito" />
                   <button className="btn-eliminar-producto" onClick={() => eliminarProducto(prod)} title="Eliminar producto del carrito">🗑️</button>
                 </div>
+
+                {/* Información del producto */}
                 <div className="producto-info">
                   <h4 className="producto-nombre-carrito">{prod.nombre}</h4>
                   <p className="producto-descripcion-carrito">
@@ -217,6 +230,8 @@ const Carrito = () => {
                     {prod.certificacion && <span className={`producto-certificacion ${prod.certificacion?.toLowerCase().replace(/\s+/g, '-')}`}>{prod.certificacion}</span>}
                   </div>
                 </div>
+
+                {/* Controles de cantidad y precio */}
                 <div className="producto-controles">
                   <div className="precio-container">
                     <span className="precio-unitario">₡{prod.precio?.toLocaleString()}</span>
@@ -239,15 +254,15 @@ const Carrito = () => {
             ))}
           </div>
 
-          {/* Resumen y botones */}
+          {/* Resumen del pedido y botones */}
           <div className="order-summary">
             <h2>Resumen del Pedido</h2>
             <div className="summary-row">
               <span>Subtotal ({carrito.reduce((acc, p) => acc + p.cantidad, 0)} producto{carrito.reduce((acc, p) => acc + p.cantidad, 0) !== 1 ? 's' : ''}):</span>
               <span>₡{subtotal.toLocaleString()}</span>
             </div>
-            
-            {/* Barra de progreso para envío gratis */}
+
+            {/* Barra de progreso envío gratis */}
             <div className="free-shipping-container">
               <div className="free-shipping-info">
                 <span>Envío:</span>
@@ -255,18 +270,18 @@ const Carrito = () => {
                   {qualifiesForFreeShipping ? '¡Gratis!' : `₡${shipping.toLocaleString()}`}
                 </span>
               </div>
-              
+
               <div className="progress-container">
                 <div className="progress-bar">
-                  <div 
-                    className="progress-fill" 
-                    style={{ 
+                  <div
+                    className="progress-fill"
+                    style={{
                       width: `${Math.min((subtotal / freeShippingThreshold) * 100, 100)}%`,
                       backgroundColor: qualifiesForFreeShipping ? '#2ecc71' : '#3498db'
                     }}
                   ></div>
                 </div>
-                
+
                 {qualifiesForFreeShipping ? (
                   <p className="shipping-message success">
                     🎉 ¡Felicidades! Tienes envío gratis
@@ -278,7 +293,7 @@ const Carrito = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="summary-total">
               <span>Total:</span>
               <span>₡{total.toLocaleString()}</span>
@@ -291,31 +306,25 @@ const Carrito = () => {
         </>
       )}
 
-      {/* Modal de pago */}
+      {/* Modal de selección y proceso de pago */}
       {showModal && (
         <div className="modal-backdrop" onClick={() => setShowModal(false)}>
           <div className="modal-contenido grande" onClick={(e) => e.stopPropagation()}>
             <h2>Selecciona método de pago</h2>
 
+            {/* Opciones iniciales de pago */}
             {!metodoPago && (
               <div className="opciones-pago" style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                <button
-                  type="button"
-                  className="btn btn-volver"
-                  onClick={() => { setMetodoPago("tarjeta"); setComprobante(""); }}
-                >
+                <button type="button" className="btn btn-volver" onClick={() => { setMetodoPago("tarjeta"); setComprobante(""); }}>
                   💳 Pagar con Tarjeta
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-volver"
-                  onClick={() => { setMetodoPago("sinpe"); setComprobante(""); }}
-                >
+                <button type="button" className="btn btn-volver" onClick={() => { setMetodoPago("sinpe"); setComprobante(""); }}>
                   📱 Pagar con SINPE
                 </button>
               </div>
             )}
 
+            {/* Formulario de tarjeta */}
             {metodoPago === "tarjeta" && (
               <>
                 <div className={`tarjeta-realista ${cvv ? "girar" : ""}`}>

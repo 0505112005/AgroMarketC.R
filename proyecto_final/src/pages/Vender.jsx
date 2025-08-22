@@ -1,36 +1,40 @@
 // src/pages/Vender.jsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import "../estilos/Vender.css";
+import React, { useState } from 'react'; // Importa React y useState para manejar estados
+import { useNavigate } from 'react-router-dom'; // Hook para navegar entre rutas
+import Swal from 'sweetalert2'; // Librería para mostrar alertas bonitas
+import "../estilos/Vender.css"; // Importa estilos de la página
 
 function Vender() {
+    // Estado para almacenar los datos del producto que se va a crear
     const [producto, setProducto] = useState({
         nombre: '',
         descripcion: '',
         precio: '',
         imagen: '',
-        certificacion: 'No orgánico', // valor por defecto válido
+        certificacion: 'No orgánico', // Valor por defecto de certificación
         origen: '',
         temporada: '',
-        stock: 1,
-        variedad: '', // valor por defecto vacío para que el usuario seleccione
-        unidadVenta: 'kg', // valor por defecto válido
+        stock: 1, // Valor por defecto de stock
+        variedad: '', // Variedad vacía por defecto, se selecciona luego
+        unidadVenta: 'kg', // Unidad de venta por defecto
     });
 
-    const navigate = useNavigate();
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const navigate = useNavigate(); // Hook para redirigir a otras rutas
+    const usuario = JSON.parse(localStorage.getItem("usuario")); // Obtiene datos del usuario logueado desde localStorage
 
+    // Función para actualizar el estado 'producto' cuando el usuario escribe o selecciona algo
     const handleChange = (e) => {
         const { name, value } = e.target;
         setProducto({ ...producto, [name]: value });
     };
 
+    // Función que se ejecuta al enviar el formulario
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Evita que se recargue la página
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token"); // Obtiene token de autenticación
         if (!token) {
+            // Muestra alerta si no hay token
             Swal.fire({
                 icon: "error",
                 title: "Error de autenticación",
@@ -40,23 +44,26 @@ function Vender() {
             return;
         }
 
+        // Prepara el objeto con los datos del nuevo producto
         const nuevoProducto = {
             ...producto,
+            // Si no hay imagen, asigna una por defecto
             imagen: producto.imagen.trim() || "https://cdn-icons-png.flaticon.com/512/847/847969.png",
-            usuarioId: usuario.id,
-            productor: usuario.nombre,
-            precio: Number(producto.precio),
-            stock: Number(producto.stock),
+            usuarioId: usuario.id, // ID del usuario que publica
+            productor: usuario.nombre, // Nombre del productor
+            precio: Number(producto.precio), // Convierte precio a número
+            stock: Number(producto.stock), // Convierte stock a número
         };
 
         try {
+            // Envío de los datos al backend usando fetch
             const res = await fetch("http://localhost:5000/api/productos", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}` // Token en header para autenticar
                 },
-                body: JSON.stringify(nuevoProducto),
+                body: JSON.stringify(nuevoProducto), // Convierte objeto a JSON
             });
 
             if (!res.ok) {
@@ -64,6 +71,7 @@ function Vender() {
                 throw new Error(errorData.mensaje || "Error al guardar el producto");
             }
 
+            // Muestra alerta de éxito si se guardó correctamente
             Swal.fire({
                 icon: "success",
                 title: "¡Producto publicado!",
@@ -73,6 +81,7 @@ function Vender() {
                 timerProgressBar: true
             });
 
+            // Reinicia el formulario
             setProducto({
                 nombre: '',
                 descripcion: '',
@@ -86,9 +95,10 @@ function Vender() {
                 unidadVenta: 'kg',
             });
 
-            navigate("/mis-productos");
+            navigate("/mis-productos"); // Redirige a la página de mis productos
 
         } catch (err) {
+            // Maneja errores de envío mostrando alerta
             console.error("❌ Error al enviar producto:", err);
             Swal.fire({
                 icon: "error",
@@ -104,6 +114,7 @@ function Vender() {
             <section className="formulario-agregar">
                 <h2>🌿 Agregar Nuevo Producto</h2>
                 <form className="formulario" onSubmit={handleSubmit}>
+                    {/* Campo para el nombre del producto */}
                     <div className="campo">
                         <label>Nombre del producto</label>
                         <input
@@ -116,6 +127,7 @@ function Vender() {
                         />
                     </div>
 
+                    {/* Campo para descripción del producto */}
                     <div className="campo">
                         <label>Descripción</label>
                         <textarea
@@ -127,6 +139,8 @@ function Vender() {
                             required
                         />
                     </div>
+
+                    {/* Campo para seleccionar la variedad */}
                     <div className="campo">
                         <label>Variedad</label>
                         <select
@@ -143,6 +157,7 @@ function Vender() {
                         </select>
                     </div>
 
+                    {/* Campo para precio */}
                     <div className="campo">
                         <label>Precio</label>
                         <input
@@ -154,6 +169,8 @@ function Vender() {
                             required
                         />
                     </div>
+
+                    {/* Selección de unidad de venta (radio buttons) */}
                     <div className="campo">
                         <label>Unidad de venta</label>
                         <div className="radio-btn-group">
@@ -191,9 +208,9 @@ function Vender() {
                                 <span>Lb</span>
                             </label>
                         </div>
-                        
                     </div>
 
+                    {/* Campo para stock disponible */}
                     <div className="campo">
                         <label>Stock disponible</label>
                         <input
@@ -207,6 +224,7 @@ function Vender() {
                         />
                     </div>
 
+                    {/* Campo para imagen opcional */}
                     <div className="campo">
                         <label>Imagen (URL opcional)</label>
                         <input
@@ -218,6 +236,7 @@ function Vender() {
                         />
                     </div>
 
+                    {/* Selección de certificación */}
                     <div className="campo">
                         <label>Certificación</label>
                         <select
@@ -227,11 +246,11 @@ function Vender() {
                             required
                         >
                             <option value="Orgánico">Orgánico</option>
-                            
                             <option value="No orgánico">No orgánico</option>
                         </select>
                     </div>
 
+                    {/* Campo para origen */}
                     <div className="campo">
                         <label>Origen</label>
                         <input
@@ -243,6 +262,7 @@ function Vender() {
                         />
                     </div>
 
+                    {/* Campo para temporada */}
                     <div className="campo">
                         <label>Temporada</label>
                         <input
@@ -254,6 +274,7 @@ function Vender() {
                         />
                     </div>
 
+                    {/* Botones para publicar o volver */}
                     <div className="botones-formulario">
                         <button type="submit" className="publicar">Publicar producto</button>
                         <button
@@ -270,4 +291,4 @@ function Vender() {
     );
 }
 
-export default Vender;
+export default Vender; // Exporta el componente para usarlo en otras partes de la app

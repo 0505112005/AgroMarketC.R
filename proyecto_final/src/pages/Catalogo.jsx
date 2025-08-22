@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCarrito } from "../components/CarritoContext";
-import Swal from "sweetalert2";
-import "../estilos/catalogo.css";
+import React, { useEffect, useState } from "react"; // Importa React y hooks para manejar estado y efectos
+import { useNavigate } from "react-router-dom"; // Hook para navegación programática
+import { useCarrito } from "../components/CarritoContext"; // Contexto del carrito de compras
+import Swal from "sweetalert2"; // Librería para mostrar alertas bonitas
+import "../estilos/catalogo.css"; // Estilos CSS para el catálogo
 
+// URL de imagen por defecto si el producto no tiene imagen
 const imagenPorDefecto = "https://via.placeholder.com/300x200?text=Sin+imagen";
+
+// Tipos de productos para filtrado
 const tipos = [
   { label: 'Todos', value: '' },
   { label: 'Frutas', value: 'Fruta' },
@@ -14,43 +17,44 @@ const tipos = [
 ];
 
 const Catalogo = () => {
-  const [productos, setProductos] = useState([]);
-  const [topFavoritos, setTopFavoritos] = useState([]);
+  // Estados principales del componente
+  const [productos, setProductos] = useState([]); // Lista completa de productos
+  const [topFavoritos, setTopFavoritos] = useState([]); // Lista de productos más agregados
   const [filtros, setFiltros] = useState({
-    nombre: "",
-    categoria: "",
-    tipo: "",
-    ubicacion: "",
-    precioMin: "",
-    precioMax: 20000,
-    soloOrganicos: false,
+    nombre: "",        // Filtro por nombre
+    categoria: "",     // Filtro por certificación/categoría
+    tipo: "",          // Filtro por tipo de producto
+    ubicacion: "",     // Filtro por ubicación
+    precioMin: "",     // Precio mínimo
+    precioMax: 20000,  // Precio máximo
+    soloOrganicos: false, // Filtro solo productos orgánicos
   });
-  const [usuario, setUsuario] = useState(null);
-  const [productoModal, setProductoModal] = useState(null);
+  const [usuario, setUsuario] = useState(null); // Usuario logueado
+  const [productoModal, setProductoModal] = useState(null); // Producto que se muestra en modal
 
-  const navigate = useNavigate();
-  const { agregarProducto } = useCarrito();
+  const navigate = useNavigate(); // Hook para redireccionar páginas
+  const { agregarProducto } = useCarrito(); // Función para agregar producto al carrito desde el contexto
 
-  // Cargar usuario desde localStorage
+  // Cargar usuario desde localStorage al montar el componente
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("usuario"));
     if (storedUser?.id) setUsuario(storedUser);
   }, []);
 
-  // Obtener productos
- useEffect(() => {
+  // Obtener productos desde la API
+  useEffect(() => {
     const fetchProductos = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/productos");
         const data = await res.json();
 
-        // Agregamos un rating aleatorio a cada producto
+        // Agregar rating aleatorio a cada producto
         const productosConRating = (data || []).map((p) => ({
           ...p,
           rating: (Math.random() * 2 + 3).toFixed(1), // Rating entre 3.0 y 5.0
         }));
 
-        // Actualizamos el estado de productos
+        // Guardar productos en el estado
         setProductos(productosConRating);
       } catch (err) {
         console.error("Error al obtener productos:", err);
@@ -59,9 +63,7 @@ const Catalogo = () => {
     fetchProductos();
   }, []);
 
-
-
-  // SweetAlert2 para carrito
+  // Función para mostrar mensaje de éxito al agregar al carrito
   const mostrarMensajeExito = (texto) => {
     Swal.fire({
       icon: 'success',
@@ -72,25 +74,26 @@ const Catalogo = () => {
     });
   };
 
+  // Función que maneja agregar producto al carrito y actualizar favoritos
   const handleAgregarCarrito = async (producto) => {
-    if (!usuario?.id) {
+    if (!usuario?.id) { // Si no hay usuario, redirige a login
       navigate("/login");
       return;
     }
     if (!producto) return;
 
-    // Agregar al carrito
+    // Agregar producto al carrito usando el contexto
     agregarProducto(producto);
 
-    // Datos que vamos a enviar al backend
+    // Preparar datos para enviar al backend y actualizar favoritos
     const datosFavorito = {
       usuarioId: usuario.id,
       productoId: producto._id,
     };
     console.log("Enviando datos al backend:", datosFavorito);
 
-    // Actualizar contador de favoritos en la API
     try {
+      // Llamada a la API para agregar producto a favoritos
       const response = await fetch("http://localhost:5000/api/favoritos-carrito/agregar", {
         method: "POST",
         headers: {
@@ -106,7 +109,7 @@ const Catalogo = () => {
       } else {
         console.log("Favorito agregado con éxito:", resultado);
 
-        // 👇 Recargar los favoritos del usuario para que se actualicen en la vista
+        // Refrescar lista de top favoritos del usuario
         const resTop = await fetch(`http://localhost:5000/api/favoritos-carrito/top/${usuario.id}`);
         const nuevosFavoritos = await resTop.json();
         setTopFavoritos(nuevosFavoritos || []);
@@ -116,11 +119,11 @@ const Catalogo = () => {
       console.error("Error al actualizar favoritos:", err);
     }
 
+    // Mostrar alerta de éxito
     mostrarMensajeExito("Producto agregado al carrito");
   };
 
-
-  // Filtrar productos
+  // Filtrar productos según los filtros seleccionados
   const productosFiltrados = productos.filter((p) => {
     if (!p) return false;
     const nombreMatch = p.nombre?.toLowerCase().includes(filtros.nombre.toLowerCase());
@@ -133,12 +136,12 @@ const Catalogo = () => {
     return nombreMatch && categoriaMatch && tipoMatch && ubicacionMatch && precioMatch && organicoMatch;
   });
 
+  // Función de búsqueda (solo imprime filtros aplicados)
   const handleBuscar = () => {
-    // La búsqueda se actualiza automáticamente por el filtrado reactivo
     console.log("Filtros aplicados:", filtros);
   };
 
-  // Renderizado
+  // Renderiza cada tarjeta de producto
   const renderCard = (producto) => {
     // Función para convertir certificación a clase CSS
     const getCertificacionClass = (cert) => {
@@ -146,35 +149,43 @@ const Catalogo = () => {
       return cert.toLowerCase().replace(/\s+/g, '-');
     };
 
-    // Simular rating (puedes agregar esto a tu modelo de producto más adelante)
-    const rating = (Math.random() * 2 + 3).toFixed(1); // Rating entre 3.0 y 5.0
+    // Rating simulado
+    const rating = (Math.random() * 2 + 3).toFixed(1); 
 
     return (
       <div className="card" key={producto._id}>
+        {/* Imagen del producto */}
         <img
           src={producto.imagen?.trim() ? producto.imagen : imagenPorDefecto}
           alt={producto.nombre || "Producto"}
           className="card-img"
         />
+
+        {/* Tags de certificación y stock */}
         <div className="card-tags">
           <span className={`tag ${getCertificacionClass(producto.certificacion)}`}>
             {producto.certificacion}
           </span>
           <span className="stock">Stock: {producto.stock}</span>
         </div>
+
+        {/* Nombre y descripción */}
         <h3 className="card-title">{producto.nombre}</h3>
         <p className="card-description">
           {producto.descripcion?.length > 60
             ? `${producto.descripcion.substring(0, 60)}...`
             : producto.descripcion || "Sin descripción"}
         </p>
+
+        {/* Ubicación del producto */}
         <div className="card-location">
           📍 {producto.origen || "Origen no especificado"}
         </div>
+
+        {/* Pie de la tarjeta: precio, rating, productor y botones */}
         <div className="card-footer">
           <div className="price-rating">
             <span className="price">₡{producto.precio} <small>por {producto.unidadVenta}</small></span>
-
             <span className="rating">⭐ {producto.rating} {producto.variedad} </span>
           </div>
           <div className="seller">
@@ -182,12 +193,14 @@ const Catalogo = () => {
             <span className="delivery"> Entrega 24h</span>
           </div>
           <div className="card-buttons">
+            {/* Abrir modal con información completa */}
             <button
               className="btn-ver-mas"
               onClick={() => setProductoModal(producto)}
             >
               Ver más
             </button>
+            {/* Agregar al carrito */}
             <button
               className="add-btn"
               onClick={() => handleAgregarCarrito(producto)}
@@ -203,11 +216,9 @@ const Catalogo = () => {
   return (
     <section className="catalogo">
       <div className="catalogo-content">
-        {/* Top favoritos */}
-
-
-        {/* Catálogo completo */}
+        {/* Título del catálogo */}
         <h2 className="titulo">🌿 Catálogo completo</h2>
+        {/* Buscador por nombre */}
         <input
           type="text"
           placeholder="🔍 Buscar productos por nombre..."
@@ -216,6 +227,7 @@ const Catalogo = () => {
           className="search-input"
         />
 
+        {/* Mostrar productos filtrados */}
         <div className="productos-grid">
           {productosFiltrados.length === 0 ? (
             <p>No hay productos disponibles</p>
@@ -225,10 +237,12 @@ const Catalogo = () => {
         </div>
       </div>
 
-      {/* Buscador flotante */}
+      {/* Filtros flotantes */}
       <div className="catalogo-container">
         <h2>Busqueda de Productos</h2>
         <p>Descubre productos frescos y de calidad premium.</p>
+
+        {/* Filtro por certificación */}
         <select
           value={filtros.categoria}
           onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
@@ -237,8 +251,9 @@ const Catalogo = () => {
           <option value="Orgánico">Orgánico</option>
           <option value="No orgánico">No orgánico</option>
         </select>
-        <div className="filtro-tipo">
 
+        {/* Filtro por tipo */}
+        <div className="filtro-tipo">
           <ul className="tipo-lista">
             {tipos.map((tipo) => (
               <li
@@ -252,6 +267,7 @@ const Catalogo = () => {
           </ul>
         </div>
 
+        {/* Filtro por rango de precio */}
         <div className="range-container">
           <label htmlFor="precioRange">Precio máximo:</label>
           <input
@@ -266,6 +282,7 @@ const Catalogo = () => {
           <span className="price-display">₡{filtros.precioMax}</span>
         </div>
 
+        {/* Filtro por ubicación */}
         <label className="checkbox-container">
           <input
             type="text"
@@ -275,11 +292,9 @@ const Catalogo = () => {
             className="ubicacion-input"
           />
         </label>
-
       </div>
 
-      {/* Modal animado */}
-      {/* Modal de producto profesional */}
+      {/* Modal de producto */}
       {productoModal && (
         <div className="modal-backdrop fade-in" onClick={() => setProductoModal(null)}>
           <div className="modal-profesional" onClick={(e) => e.stopPropagation()}>
@@ -287,6 +302,7 @@ const Catalogo = () => {
               ✕
             </button>
 
+            {/* Header del modal */}
             <div className="modal-header">
               <img
                 src={productoModal.imagen?.trim() ? productoModal.imagen : imagenPorDefecto}
@@ -309,6 +325,7 @@ const Catalogo = () => {
               </div>
             </div>
 
+            {/* Body del modal */}
             <div className="modal-body">
               <div className="modal-section">
                 <h3> Descripción</h3>
@@ -340,7 +357,6 @@ const Catalogo = () => {
                   <h3> Unidad de Venta</h3>
                   <p>{productoModal.unidadVenta || "No especificada"}</p>
                 </div>
-
               </div>
 
               <div className="modal-section">
@@ -349,6 +365,7 @@ const Catalogo = () => {
               </div>
             </div>
 
+            {/* Footer del modal con botón de agregar al carrito */}
             <div className="modal-footer">
               <button
                 className="modal-btn-agregar"
@@ -368,4 +385,4 @@ const Catalogo = () => {
   );
 };
 
-export default Catalogo;
+export default Catalogo; // Exporta el componente

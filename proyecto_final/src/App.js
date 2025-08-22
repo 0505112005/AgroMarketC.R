@@ -13,7 +13,6 @@ import Vender from "./pages/Vender";
 import Perfil from "./pages/Perfil";
 import Carrito from "./pages/Carrito";
 import MisProductos from "./pages/MisProductos";
-import Mensajeria from "./pages/Mensajeria";
 import SolicitudVendedor from "./pages/SolicitudVendedor";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -28,6 +27,10 @@ export default function App() {
       <Route element={<AppLayout />}>
         <Route path="inicio" element={<Inicio />} />
         <Route path="catalogo" element={<Catalogo />} />
+        <Route path="perfil" element={<Perfil />} />
+        <Route path="carrito" element={<Carrito />} />
+        <Route path="mis-productos" element={<MisProductos />} />
+        <Route path="solicitud-vendedor" element={<SolicitudVendedor />} />
 
         {/* Ruta protegida para vendedores */}
         <Route 
@@ -38,12 +41,6 @@ export default function App() {
             </RutaVendedor>
           } 
         />
-
-        <Route path="perfil" element={<Perfil />} />
-        <Route path="carrito" element={<Carrito />} />
-        <Route path="mis-productos" element={<MisProductos />} />
-        <Route path="mensajeria" element={<Mensajeria />} />
-        <Route path="solicitud-vendedor" element={<SolicitudVendedor />} />
       </Route>
 
       {/* Rutas SIN sidebar (públicas) */}

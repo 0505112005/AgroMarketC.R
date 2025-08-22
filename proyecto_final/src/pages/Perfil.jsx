@@ -56,7 +56,7 @@ const Perfil = () => {
             {/* Avatar del usuario */}
             <div className="perfil-avatar">
               <img
-                src={usuario.avatar || "/avatar-default.png"} // Si no hay avatar, usamos uno por defecto
+                src={usuario.avatar || `https://ui-avatars.com/api/?name=${usuario?.nombre || "Usuario"}&background=2e7d32&color=fff&size=128`}
                 alt="Avatar"
               />
             </div>

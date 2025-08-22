@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import "../estilos/MisProductos.css";
+import React, { useEffect, useState } from "react"; // Importamos React y hooks useEffect/useState
+import { useNavigate } from "react-router-dom"; // Importamos useNavigate para redirección de rutas
+import Swal from "sweetalert2"; // Importamos SweetAlert2 para mostrar alertas bonitas
+import "../estilos/MisProductos.css"; // Importamos los estilos CSS del componente
 
 const MisProductos = () => {
+  // Estado para almacenar los productos del usuario
   const [misProductos, setMisProductos] = useState([]);
+
+  // Estado para almacenar el producto que se está editando
   const [productoEditando, setProductoEditando] = useState(null);
+
+  // Estado para almacenar los datos del formulario de edición
   const [datosEdicion, setDatosEdicion] = useState({
     nombre: '',
     descripcion: '',
@@ -18,11 +23,14 @@ const MisProductos = () => {
     unidadVenta: '',
     variedad: '',
   });
-  const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-  const token = localStorage.getItem("token");
 
+  const navigate = useNavigate(); // Hook para redirigir a otras páginas
+  const usuario = JSON.parse(localStorage.getItem("usuario")); // Obtenemos info del usuario desde localStorage
+  const token = localStorage.getItem("token"); // Obtenemos token de autorización
+
+  // useEffect para cargar productos al montar el componente
   useEffect(() => {
+    // Verificamos que el usuario sea vendedor
     if (!usuario || usuario.rol !== "vendedor") {
       Swal.fire({
         icon: "error",
@@ -30,28 +38,31 @@ const MisProductos = () => {
         text: "Solo los vendedores pueden ver esta página.",
         confirmButtonColor: "#4CAF50"
       });
-      navigate("/inicio");
+      navigate("/inicio"); // Redirigimos a inicio si no es vendedor
       return;
     }
 
+    // Función para obtener productos del servidor
     const fetchMisProductos = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/productos", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` } // Agregamos token en header
         });
-        const productos = await res.json();
+        const productos = await res.json(); // Parseamos la respuesta JSON
+        // Filtramos solo los productos del usuario actual
         const filtrados = productos.filter(
           (prod) => prod.usuarioId === usuario.id
         );
-        setMisProductos(filtrados);
+        setMisProductos(filtrados); // Guardamos los productos filtrados
       } catch (error) {
-        console.error("Error al obtener productos:", error);
+        console.error("Error al obtener productos:", error); // Error al obtener productos
       }
     };
 
-    fetchMisProductos();
-  }, [usuario, navigate, token]);
+    fetchMisProductos(); // Llamamos a la función para traer productos
+  }, [usuario, navigate, token]); // Dependencias para recargar si cambian
 
+  // Función para eliminar un producto
   const handleEliminar = async (id) => {
     const confirm = await Swal.fire({
       title: "¿Eliminar producto?",
@@ -71,6 +82,7 @@ const MisProductos = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
+          // Eliminamos el producto del estado local
           setMisProductos(misProductos.filter((p) => p._id !== id));
           Swal.fire({
             icon: "success",
@@ -80,7 +92,12 @@ const MisProductos = () => {
           });
         } else {
           const err = await res.json();
-          Swal.fire({ icon: "error", title: "Error", text: err.mensaje || "No se pudo eliminar el producto", confirmButtonColor: "#4CAF50" });
+          Swal.fire({ 
+            icon: "error", 
+            title: "Error", 
+            text: err.mensaje || "No se pudo eliminar el producto", 
+            confirmButtonColor: "#4CAF50" 
+          });
         }
       } catch (error) {
         console.error("Error al eliminar:", error);
@@ -94,8 +111,9 @@ const MisProductos = () => {
     }
   };
 
+  // Función para preparar edición de un producto
   const handleEditar = (producto) => {
-    setProductoEditando(producto);
+    setProductoEditando(producto); // Marcamos el producto como editando
     setDatosEdicion({
       nombre: producto.nombre || '',
       descripcion: producto.descripcion || '',
@@ -108,9 +126,10 @@ const MisProductos = () => {
       cantidadPorUnidad: producto.cantidadPorUnidad || '',
       unidadVenta: producto.unidadVenta || '',
       variedad: producto.variedad || '',
-    });
+    }); // Llenamos el formulario de edición con los datos actuales
   };
 
+  // Función para guardar cambios de edición
   const handleGuardarEdicion = async () => {
     try {
       const res = await fetch(`http://localhost:5000/api/productos/${productoEditando._id}`, {
@@ -119,15 +138,16 @@ const MisProductos = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(datosEdicion)
+        body: JSON.stringify(datosEdicion) // Enviamos datos editados
       });
 
       if (res.ok) {
         const actualizado = await res.json();
+        // Actualizamos el estado de productos con la versión editada
         setMisProductos(prev =>
           prev.map(p => (p._id === productoEditando._id ? actualizado : p))
         );
-        setProductoEditando(null);
+        setProductoEditando(null); // Cerramos el modal
         Swal.fire({
           icon: "success",
           title: "Producto actualizado",
@@ -156,6 +176,7 @@ const MisProductos = () => {
 
   return (
     <div className="mis-productos-container">
+      {/* Header con título y botón para nuevo producto */}
       <div className="mis-productos-header">
         <h2 className="mis-productos-titulo">🌿 Mis Productos Publicados</h2>
         <button className="btn-newproduct" onClick={() => navigate("/vender")}>
@@ -163,21 +184,24 @@ const MisProductos = () => {
         </button>
       </div>
 
+      {/* Mostrar mensaje si no hay productos */}
       {misProductos.length === 0 ? (
         <div className="mis-productos-vacio">
           No has publicado productos aún.
         </div>
       ) : (
-        
+        // Lista de productos
         <div className="productos-lista">
           {misProductos.map((producto) => (
             <div key={producto._id} className="producto-item">
+              {/* Imagen del producto */}
               <img
                 src={producto.imagen || "placeholder-image.jpg"}
                 alt={producto.nombre}
                 className="producto-imagen"
               />
               
+              {/* Tags y stock */}
               <div className="card-tags">
                 {producto.certificacion && (
                   <span className={`tag ${producto.certificacion?.toLowerCase().replace(/\s+/g, '-')}`}>
@@ -187,6 +211,7 @@ const MisProductos = () => {
                 <span className="stock">Stock: {producto.stock || 0}</span>
               </div>
               
+              {/* Nombre y descripción */}
               <h3 className="producto-nombre">{producto.nombre}</h3>
               <p className="producto-descripcion">
                 {producto.descripcion?.length > 60
@@ -194,12 +219,14 @@ const MisProductos = () => {
                   : producto.descripcion || "Sin descripción"}
               </p>
               
+              {/* Origen del producto */}
               {producto.origen && (
                 <div className="card-location">
                   📍 {producto.origen}
                 </div>
               )}
               
+              {/* Pie de tarjeta con precio, temporada, variedad */}
               <div className="card-footer">
                 <div className="price-rating">
                   <span className="price">₡{producto.precio} <small> por {producto.unidadVenta}</small></span>
@@ -214,8 +241,7 @@ const MisProductos = () => {
                 )}
                 </div>
                 
-                
-                
+                {/* Botones de acciones */}
                 <div className="producto-acciones">
                   <button
                     className="btn-editar"
@@ -236,7 +262,7 @@ const MisProductos = () => {
         </div>
       )}
 
-      {/* Modal de edición profesional */}
+      {/* Modal de edición */}
       {productoEditando && (
         <div className="modal-backdrop fade-in" onClick={() => setProductoEditando(null)}>
           <div className="modal-profesional" onClick={(e) => e.stopPropagation()}>
@@ -244,6 +270,7 @@ const MisProductos = () => {
               ✕
             </button>
 
+            {/* Header del modal con imagen, nombre, precio, unidad y certificación */}
             <div className="modal-header">
               <img
                 src={datosEdicion.imagen || "https://via.placeholder.com/200x200?text=Producto"}
@@ -309,18 +336,16 @@ const MisProductos = () => {
                     onChange={(e) => setDatosEdicion({...datosEdicion, variedad: e.target.value})}
                     className="modal-certificacion-select"
                   >
-                    
                     <option value="Fruta">Fruta</option>
                     <option value="Verdura">Verdura</option>
                     <option value="Grano">Grano</option>
                     <option value="Hierba">Hierba</option>
                   </select>
-                  
-                 
                 </div>
               </div>
             </div>
 
+            {/* Body del modal con descripción, URL de imagen, origen y temporada */}
             <div className="modal-body">
               <div className="modal-section">
                 <h3> Descripción</h3>
@@ -366,11 +391,10 @@ const MisProductos = () => {
                     placeholder="Temporada del producto"
                   />
                 </div>
-
-                
               </div>
             </div>
 
+            {/* Footer del modal con botones Cancelar y Guardar */}
             <div className="modal-footer">
               <div className="modal-footer-buttons">
                 <button
@@ -394,4 +418,4 @@ const MisProductos = () => {
   );
 };
 
-export default MisProductos;
+export default MisProductos; // Exportamos el componente para usarlo en otras partes

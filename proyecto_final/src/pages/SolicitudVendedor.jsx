@@ -1,9 +1,10 @@
 // src/pages/SolicitudVendedor.jsx
-import React, { useState } from "react";
-import Swal from 'sweetalert2';
-import "../estilos/SolicitudVendedor.css";
+import React, { useState } from "react"; // Importa React y useState para manejar el estado del formulario
+import Swal from 'sweetalert2'; // Importa SweetAlert2 para mostrar alertas bonitas
+import "../estilos/SolicitudVendedor.css"; // Importa los estilos CSS de la página
 
 const SolicitudVendedor = () => {
+  // Estado para manejar los datos del formulario
   const [formulario, setFormulario] = useState({
     nombre: "",
     apellidos: "",
@@ -15,21 +16,22 @@ const SolicitudVendedor = () => {
     terminos: false,
   });
 
+  // Función que actualiza el estado del formulario cuando el usuario escribe o marca el checkbox
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormulario({
-      ...formulario,
-      [name]: type === "checkbox" ? checked : value,
+      ...formulario, // Mantiene los valores anteriores
+      [name]: type === "checkbox" ? checked : value, // Si es checkbox guarda checked, sino value
     });
   };
 
+  // Función que se ejecuta al enviar el formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    
-    console.log("Solicitud enviada:", formulario);
-    
-    // Mostrar SweetAlert de éxito
+    e.preventDefault(); // Previene el comportamiento por defecto de recargar la página
+
+    console.log("Solicitud enviada:", formulario); // Muestra los datos del formulario en consola
+
+    // Mostrar SweetAlert de éxito al enviar el formulario
     Swal.fire({
       icon: 'success',
       title: '¡Solicitud Enviada!',
@@ -41,19 +43,19 @@ const SolicitudVendedor = () => {
           <p>📱 Te contactaremos a tu teléfono: <strong>${formulario.telefono}</strong></p>
           <p>✅ Si cumples con todos los requisitos, recibirás acceso inmediato a tu panel de vendedor</p>
         </div>
-      `,
+      `, // Contenido personalizado con los datos del formulario
       confirmButtonText: '¡Perfecto!',
       confirmButtonColor: '#2e7d32',
       width: 600,
       customClass: {
-        popup: 'swal-popup-agro',
-        title: 'swal-title-agro',
-        htmlContainer: 'swal-html-agro',
-        confirmButton: 'swal-button-agro'
+        popup: 'swal-popup-agro', // Clase personalizada para popup
+        title: 'swal-title-agro', // Clase personalizada para el título
+        htmlContainer: 'swal-html-agro', // Clase personalizada para el contenido HTML
+        confirmButton: 'swal-button-agro' // Clase personalizada para el botón de confirmar
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        // Resetear el formulario
+        // Resetear el formulario después de confirmar el SweetAlert
         setFormulario({
           nombre: "",
           apellidos: "",
@@ -68,6 +70,7 @@ const SolicitudVendedor = () => {
     });
   };
 
+  // Array de beneficios para mostrar en la interfaz
   const beneficios = [
     {
       icon: "💰",
@@ -101,6 +104,7 @@ const SolicitudVendedor = () => {
     }
   ];
 
+  // Array de requisitos que deben cumplir los vendedores
   const requisitos = [
     "Ser mayor de 18 años y tener documentación vigente",
     "Experiencia mínima de 6 meses en agricultura o comercio",
@@ -114,13 +118,13 @@ const SolicitudVendedor = () => {
   return (
     <div className="solicitud-vendedor">
       <div className="solicitud-container">
-        {/* Header */}
+        {/* Header de la página */}
         <div className="solicitud-header">
           <h1>Únete a AgroMarket</h1>
           <p>Conecta con miles de compradores y haz crecer tu negocio agrícola en 2025</p>
         </div>
 
-        {/* Estadísticas */}
+        {/* Estadísticas resumidas de la plataforma */}
         <div className="stats-section">
           <div className="stat-card">
             <div className="stat-number">15,000+</div>
@@ -136,9 +140,9 @@ const SolicitudVendedor = () => {
           </div>
         </div>
 
-        {/* Grid principal */}
+        {/* Grid principal con beneficios y requisitos */}
         <div className="solicitud-grid">
-          {/* Beneficios */}
+          {/* Beneficios de ser vendedor */}
           <div className="beneficios-section">
             <h2>Beneficios Exclusivos 2025</h2>
             <ul className="beneficios-lista">
@@ -154,7 +158,7 @@ const SolicitudVendedor = () => {
             </ul>
           </div>
 
-          {/* Requisitos */}
+          {/* Requisitos que debe cumplir el vendedor */}
           <div className="requisitos-section">
             <h2>Requisitos 2025</h2>
             <ul className="requisitos-lista">
@@ -168,15 +172,17 @@ const SolicitudVendedor = () => {
           </div>
         </div>
 
-        {/* Formulario */}
+        {/* Sección del formulario */}
         <div className="formulario-section">
           <div className="formulario-header">
             <h2>Solicita tu Acceso</h2>
             <p>Completa el formulario y nuestro equipo te contactará en máximo 48 horas</p>
           </div>
 
+          {/* Formulario de solicitud */}
           <form onSubmit={handleSubmit} className="solicitud-form">
             <div className="form-row">
+              {/* Campo nombre */}
               <div className="form-group">
                 <label htmlFor="nombre">Nombres *</label>
                 <input
@@ -190,6 +196,8 @@ const SolicitudVendedor = () => {
                   required
                 />
               </div>
+
+              {/* Campo apellidos */}
               <div className="form-group">
                 <label htmlFor="apellidos">Apellidos *</label>
                 <input
@@ -206,6 +214,7 @@ const SolicitudVendedor = () => {
             </div>
 
             <div className="form-row">
+              {/* Campo correo electrónico */}
               <div className="form-group">
                 <label htmlFor="correo">Correo Electrónico *</label>
                 <input
@@ -219,6 +228,8 @@ const SolicitudVendedor = () => {
                   required
                 />
               </div>
+
+              {/* Campo teléfono */}
               <div className="form-group">
                 <label htmlFor="telefono">Teléfono/WhatsApp *</label>
                 <input
@@ -235,6 +246,7 @@ const SolicitudVendedor = () => {
             </div>
 
             <div className="form-row">
+              {/* Selección tipo de producto */}
               <div className="form-group">
                 <label htmlFor="tipoProducto">Tipo de Productos *</label>
                 <select
@@ -255,6 +267,8 @@ const SolicitudVendedor = () => {
                   <option value="otros">Otros Productos</option>
                 </select>
               </div>
+
+              {/* Selección años de experiencia */}
               <div className="form-group">
                 <label htmlFor="experiencia">Años de Experiencia *</label>
                 <select
@@ -275,6 +289,7 @@ const SolicitudVendedor = () => {
               </div>
             </div>
 
+            {/* Campo descripción del negocio */}
             <div className="form-group">
               <label htmlFor="descripcion">Describe tu negocio y productos *</label>
               <textarea
@@ -288,12 +303,13 @@ const SolicitudVendedor = () => {
               />
             </div>
 
-
+            {/* Botón para enviar la solicitud */}
             <button type="submit" className="submit-button">
               Enviar Solicitud
             </button>
           </form>
 
+          {/* Información adicional sobre el proceso de aprobación */}
           <div className="info-adicional">
             <h3>🚀 Proceso de Aprobación Rápido</h3>
             <p>
@@ -308,4 +324,4 @@ const SolicitudVendedor = () => {
   );
 };
 
-export default SolicitudVendedor;
+export default SolicitudVendedor; // Exporta el componente para usarlo en otras partes de la aplicación

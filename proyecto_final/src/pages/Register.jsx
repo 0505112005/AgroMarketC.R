@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "../clases/login";
+import Swal from "sweetalert2"; // 🔹 Importamos SweetAlert2
 import "../estilos/Register.css";
 
 const Register = () => {
@@ -11,8 +12,11 @@ const Register = () => {
     direccion: "",
     telefono: "",
   });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,9 +29,7 @@ const Register = () => {
     setError("");
 
     try {
-      console.log("Datos antes de enviar a registrarUsuario:", form);
       const result = await Login.registrarUsuario(form);
-      console.log("Respuesta del servidor:", result);
 
       if (!result.success) {
         setError(result.error || "Error al registrar usuario");
@@ -44,7 +46,16 @@ const Register = () => {
         telefono: "",
       });
 
-      alert(result.message || "Registro exitoso");
+      // 🔹 Usamos SweetAlert para mostrar mensaje de éxito
+      Swal.fire({
+        icon: "success",
+        title: "¡Registro exitoso!",
+        text: result.message || "Tu cuenta ha sido creada correctamente",
+        confirmButtonText: "Ir a Iniciar sesión"
+      }).then(() => {
+        navigate("/login"); // 🔹 Redirigimos a login después de cerrar la alerta
+      });
+
     } catch (error) {
       console.error("Error en registro:", error);
       setError(error.message || "Error de conexión al servidor");
@@ -53,23 +64,15 @@ const Register = () => {
     }
   };
 
-  const navigate = useNavigate();
-
   return (
     <div className="register-container">
-      
-
       <form className="register-form" onSubmit={handleSubmit}>
         <div className="form-header">
           <h2 className="register-title">🌱 Crear Cuenta</h2>
           <p className="register-subtitle">Únete a la comunidad de AgromarketC.R</p>
         </div>
 
-        {error && (
-          <div className="error-message">
-            ⚠️ {error}
-          </div>
-        )}
+        {error && <div className="error-message">⚠️ {error}</div>}
 
         <div className="form-grid">
           <div className="input-group">
@@ -138,11 +141,7 @@ const Register = () => {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="register-button"
-        >
+        <button type="submit" disabled={loading} className="register-button">
           {loading ? "Creando cuenta..." : "Crear cuenta"}
         </button>
 

@@ -1,40 +1,49 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../estilos/Login.css";
+import React, { useState } from "react"; // Importamos React y el hook useState
+import { useNavigate } from "react-router-dom"; // Hook para navegar entre rutas
+import "../estilos/Login.css"; // Importamos los estilos del componente
 
 export default function Login() {
+  // Estado para el correo electrónico ingresado
   const [email, setEmail] = useState("");
+  // Estado para la contraseña ingresada
   const [password, setPassword] = useState("");
+  // Estado para manejar mensajes de error
   const [error, setError] = useState("");
+
+  // Hook para redireccionar a otras rutas
   const navigate = useNavigate();
 
+  // Función que maneja el envío del formulario
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault(); // Evitamos que el formulario recargue la página
+    setError(""); // Limpiamos errores previos
 
     try {
+      // Hacemos la petición POST al backend para login
       const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        method: "POST", // Método POST para enviar datos
+        headers: { "Content-Type": "application/json" }, // Indicamos que enviamos JSON
+        body: JSON.stringify({ email, password }), // Convertimos el objeto a JSON
       });
 
-      const data = await res.json();
-      console.log("Respuesta login:", data); // <-- para verificar token
+      const data = await res.json(); // Obtenemos la respuesta como JSON
+      console.log("Respuesta login:", data); // Imprimimos la respuesta para depuración
 
+      // Si la respuesta no es correcta, mostramos el error
       if (!res.ok) {
         setError(data.message || "Error al iniciar sesión");
         return;
       }
 
-      // Guardar usuario y token en localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      // Si login fue exitoso, guardamos token y datos del usuario en localStorage
+      localStorage.setItem("token", data.token); // Token para autenticación
+      localStorage.setItem("usuario", JSON.stringify(data.usuario)); // Datos del usuario
 
-      // Redirigir a Inicio
+      // Redirigimos al usuario a la página de inicio
       navigate("/inicio", { replace: true });
 
     } catch (err) {
+      // Capturamos errores de conexión con el servidor
       console.error("Error de conexión:", err);
       setError("Error de conexión al servidor");
     }
@@ -44,35 +53,40 @@ export default function Login() {
     <div className="login-container">
       <form onSubmit={handleSubmit} className="login-form">
         <h2>🌿 Iniciar Sesión</h2>
-        
+
+        {/* Input de correo electrónico */}
         <label>
           Correo Electrónico
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={email} // Valor controlado por estado
+            onChange={(e) => setEmail(e.target.value)} // Actualiza estado
             placeholder="tu@email.com"
             required
           />
         </label>
 
+        {/* Input de contraseña */}
         <label>
           Contraseña
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={password} // Valor controlado por estado
+            onChange={(e) => setPassword(e.target.value)} // Actualiza estado
             placeholder="Ingresa tu contraseña"
             required
           />
         </label>
 
+        {/* Mostrar mensaje de error si existe */}
         {error && <div className="error">{error}</div>}
 
+        {/* Botón de envío */}
         <button type="submit" className="btn-login">
           Ingresar
         </button>
 
+        {/* Enlace para registro */}
         <div className="register-link">
           ¿No tienes cuenta?
           <a href="/register">Regístrate aquí</a>
