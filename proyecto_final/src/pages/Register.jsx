@@ -4,6 +4,7 @@ import Login from "../clases/login";
 import Swal from "sweetalert2"; // 🔹 Importamos SweetAlert2
 import "../estilos/Register.css";
 
+
 const Register = () => {
   const [form, setForm] = useState({
     nombre: "",
@@ -46,7 +47,7 @@ const Register = () => {
         telefono: "",
       });
 
-      // 🔹 Usamos SweetAlert para mostrar mensaje de éxito
+      //  Usamos SweetAlert para mostrar mensaje de éxito
       Swal.fire({
         icon: "success",
         title: "¡Registro exitoso!",
